@@ -4,7 +4,8 @@ import Image from "next/image";
 import type { LangKey } from "../lib/portfolio-data";
 
 /** Compact glyphs — muted tones so they read as flags without loud primaries. */
-const box = "block h-[11px] w-[17px] shrink-0 sm:h-3 sm:w-[21px]";
+const box =
+  "block h-[11px] w-[17px] shrink-0 rounded-[2px] sm:h-3 sm:w-[21px]";
 
 /** US — simplified stripes & canton in desaturated, warm-grayscale palette. */
 export function FlagEn({ className = "" }: { className?: string }) {
@@ -69,21 +70,28 @@ export function FlagTr({ className = "" }: { className?: string }) {
   );
 }
 
+const FLAG_FA_TOOLTIP = "Raise My Flag , Thats Lion & Sun";
+
 /**
  * Historical Iran — Lion & Sun (local asset, tuned to match muted nav treatment).
  * Source image stored at /public/flags/iran-lion-sun.jpg
  */
 export function FlagFa({ className = "" }: { className?: string }) {
   return (
-    <Image
-      src="/flags/iran-lion-sun.jpg"
-      alt=""
-      width={894}
-      height={511}
-      sizes="24px"
-      className={`${box} object-cover object-[center_42%] contrast-[0.94] saturate-[0.82] brightness-[0.99] ${className}`.trim()}
-      aria-hidden
-    />
+    <span
+      className={`inline-flex ${className}`.trim()}
+      title={FLAG_FA_TOOLTIP}
+    >
+      <Image
+        src="/flags/iran-lion-sun.jpg"
+        alt=""
+        width={894}
+        height={511}
+        sizes="24px"
+        className={`${box} object-cover object-[center_42%] contrast-[0.94] saturate-[0.82] brightness-[0.99]`.trim()}
+        aria-hidden
+      />
+    </span>
   );
 }
 

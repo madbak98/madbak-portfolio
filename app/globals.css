@@ -44,6 +44,14 @@ body {
   cursor: none;
 }
 
+/* Next/Image + some browsers use zoom-in on <img>; force no system cursor where the custom dot is used */
+@media (min-width: 768px) {
+  [data-cursor-no-difference],
+  [data-cursor-no-difference] * {
+    cursor: none !important;
+  }
+}
+
 @media (max-width: 1023px) {
   body {
     cursor: auto;
@@ -121,24 +129,90 @@ body {
   animation: orbit-dial 20s linear infinite;
 }
 
-/* Mini-game: restrained feedback — premium creative-tech, not spectacle */
+/* Mini-game: cinematic-but-controlled — glitch, flicker, burst, rare surprises */
 @keyframes mini-game-glitch {
   0%,
   100% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) skewX(0deg);
+    filter: contrast(1);
+  }
+  25% {
+    transform: translate3d(-0.8px, 0.4px, 0) skewX(-0.35deg);
+    filter: contrast(1.04);
   }
   50% {
-    transform: translate3d(-0.35px, 0.25px, 0);
+    transform: translate3d(0.6px, -0.5px, 0) skewX(0.28deg);
+    filter: contrast(0.99);
+  }
+  75% {
+    transform: translate3d(-0.4px, 0, 0) skewX(-0.12deg);
+    filter: contrast(1.02);
   }
 }
 
 .mini-game-glitching {
-  animation: mini-game-glitch 0.1s ease-out 1;
+  animation: mini-game-glitch 0.15s steps(2, end) 1;
+}
+
+@keyframes mini-game-screen-flicker {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.06;
+  }
+  35% {
+    opacity: 0;
+  }
+  55% {
+    opacity: 0.04;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.mini-game-screen-flicker {
+  animation: mini-game-screen-flicker 0.22s ease-out 1;
+}
+
+@keyframes mini-game-rare-invert {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.07;
+  }
+}
+
+.mini-game-rare-invert {
+  animation: mini-game-rare-invert 0.16s ease-out 1;
+}
+
+@keyframes mini-game-fa-blur {
+  0%,
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+  40% {
+    filter: blur(0.5px);
+    opacity: 0.88;
+  }
+  70% {
+    filter: blur(0.25px);
+    opacity: 0.94;
+  }
+}
+
+.mini-game-fa-scramble {
+  animation: mini-game-fa-blur 0.2s ease-out 1;
 }
 
 @keyframes mini-game-burst {
   0% {
-    opacity: 0.72;
+    opacity: 0.78;
     transform: translate3d(-50%, -50%, 0) scaleX(1);
   }
   100% {
@@ -148,12 +222,12 @@ body {
         calc(-50% + var(--ty, 0px)),
         0
       )
-      scaleX(0.35);
+      scaleX(0.32);
   }
 }
 
 .mini-game-particle {
-  animation: mini-game-burst 0.48s cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+  animation: mini-game-burst 0.46s cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
 }
 
 @keyframes mini-game-tap {
@@ -161,7 +235,7 @@ body {
     transform: scale(1);
   }
   55% {
-    transform: scale(1.028);
+    transform: scale(1.032);
   }
   100% {
     transform: scale(1);
@@ -172,8 +246,37 @@ body {
   animation: mini-game-tap 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
+@keyframes mini-game-surprise-toast {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mini-game-surprise-toast {
+  animation: mini-game-surprise-toast 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mini-game-glitching {
+    animation: none;
+  }
+
+  .mini-game-screen-flicker {
+    animation: none;
+    opacity: 0;
+  }
+
+  .mini-game-rare-invert {
+    animation: none;
+    opacity: 0;
+  }
+
+  .mini-game-fa-scramble {
     animation: none;
   }
 
@@ -184,6 +287,12 @@ body {
 
   .mini-game-tap-flash {
     animation: none;
+  }
+
+  .mini-game-surprise-toast {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 

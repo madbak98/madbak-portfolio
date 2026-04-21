@@ -556,32 +556,38 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
+    const baseInner =
+      "h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ease-out";
+
     const moveCursor = (e: MouseEvent) => {
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const overFlag = under?.closest("[data-cursor-no-difference]");
+      const isHoverable = under?.closest("a, button, .cursor-pointer");
+
       if (cursorOuterRef.current) {
         cursorOuterRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+        cursorOuterRef.current.style.opacity = "1";
+        cursorOuterRef.current.style.mixBlendMode = overFlag
+          ? "normal"
+          : "difference";
       }
-    };
 
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      const isHoverable = target?.closest("a, button, .cursor-pointer");
       if (cursorInnerRef.current) {
-        if (isHoverable) {
-          cursorInnerRef.current.classList.add("scale-[3]", "bg-white");
-          cursorInnerRef.current.classList.remove("bg-[#ff2a2a]");
+        const el = cursorInnerRef.current;
+        if (overFlag) {
+          el.className = `${baseInner} bg-[#ff2a2a]`;
+        } else if (isHoverable) {
+          el.className = `${baseInner} scale-[3] bg-white`;
         } else {
-          cursorInnerRef.current.classList.remove("scale-[3]", "bg-white");
-          cursorInnerRef.current.classList.add("bg-[#ff2a2a]");
+          el.className = `${baseInner} bg-[#ff2a2a]`;
         }
       }
     };
 
     window.addEventListener("mousemove", moveCursor);
-    window.addEventListener("mouseover", handleMouseOver);
 
     return () => {
       window.removeEventListener("mousemove", moveCursor);
-      window.removeEventListener("mouseover", handleMouseOver);
     };
   }, []);
 

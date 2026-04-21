@@ -112,20 +112,24 @@ export function SiteNav({
                   title={LANGUAGE_DISPLAY[code]}
                   aria-label={LANGUAGE_DISPLAY[code]}
                   aria-pressed={active}
-                  className={`relative flex min-h-[32px] min-w-[32px] touch-manipulation items-center justify-center rounded-full p-[5px] transition-all duration-300 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
+                  className={`group relative flex min-h-[32px] min-w-[32px] touch-manipulation items-center justify-center rounded-full p-[5px] transition-all duration-300 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
                     active
                       ? "bg-[#ff2a2a]/[0.12] shadow-[inset_0_0_0_1px_rgba(255,42,42,0.28),0_0_24px_rgba(255,42,42,0.1)]"
                       : "opacity-[0.58] hover:bg-white/[0.05] hover:opacity-100"
                   }`}
                 >
                   <span
-                    className={`overflow-hidden rounded-[2px] ring-1 transition-[box-shadow,filter] duration-300 ${
+                    data-cursor-no-difference
+                    className={`relative z-0 inline-flex overflow-visible rounded-[2px] ring-1 transition-[box-shadow,filter,transform] duration-300 group-hover:z-[5] ${
                       active
                         ? "ring-[#ff2a2a]/40 shadow-[0_1px_8px_rgba(0,0,0,0.35)]"
                         : "ring-white/[0.07]"
                     }`}
                   >
-                    <LanguageFlag code={code} />
+                    <LanguageFlag
+                      code={code}
+                      className="origin-center rounded-[2px] transition-transform duration-200 ease-out will-change-transform group-hover:scale-[1.24] motion-reduce:group-hover:scale-100"
+                    />
                   </span>
                 </button>
               );
@@ -315,20 +319,24 @@ export function MobileNavOverlay({
               title={LANGUAGE_DISPLAY[code]}
               aria-label={LANGUAGE_DISPLAY[code]}
               aria-pressed={lang === code}
-              className={`flex min-h-[52px] flex-row items-center gap-3 rounded-xl px-4 py-2.5 text-start font-mono transition-[transform,colors,background-color] duration-200 active:scale-[0.985] touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/50 ${trackMeta(lang)} ${
+              className={`group flex min-h-[52px] flex-row items-center gap-3 rounded-xl px-4 py-2.5 text-start font-mono transition-[transform,colors,background-color] duration-200 active:scale-[0.985] touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/50 ${trackMeta(lang)} ${
                 lang === code
                   ? "bg-[#ff2a2a]/12 text-[#EBE8E1] shadow-[inset_0_0_0_1px_rgba(255,42,42,0.22)]"
                   : "text-[#EBE8E1]/90 hover:bg-white/[0.06]"
               }`}
             >
               <span
-                className={`shrink-0 overflow-hidden rounded-[2px] ring-1 transition-shadow duration-300 ${
+                data-cursor-no-difference
+                className={`relative z-0 inline-flex shrink-0 overflow-visible rounded-[2px] ring-1 transition-shadow duration-300 group-hover:z-[5] ${
                   lang === code
                     ? "ring-[#ff2a2a]/45 shadow-[0_1px_6px_rgba(0,0,0,0.25)]"
-                    : "ring-white/[0.08] opacity-75"
+                    : "ring-white/[0.08] opacity-75 group-hover:opacity-100"
                 }`}
               >
-                <LanguageFlag code={code} />
+                <LanguageFlag
+                  code={code}
+                  className="origin-center rounded-[2px] transition-transform duration-200 ease-out will-change-transform group-hover:scale-[1.24] motion-reduce:group-hover:scale-100"
+                />
               </span>
               <span
                 className={`text-[15px] font-semibold leading-tight ${localeCase(lang)}`}
