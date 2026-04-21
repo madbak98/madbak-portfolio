@@ -19,8 +19,8 @@ export const TRANSLATIONS = {
     about_op: "Operator",
     about_h1_1: "DESIGNED",
     about_h1_2: "PRESENCE",
-    about_intro:
-      "I’m Babak, creating under the name MADBAK.",
+    about_intro_before: "I’m Babak, creating under the name ",
+    about_intro_after: ".",
     about_p2:
       "My work sits at the intersection of graphic design, video editing, and modern web development. I don’t just focus on visuals — I build digital experiences where design, motion, and code work together.",
     about_p3:
@@ -106,7 +106,8 @@ export const TRANSLATIONS = {
     about_op: "اپراتور",
     about_h1_1: "حضور",
     about_h1_2: "طراحی‌شده",
-    about_intro: "من بابک هستم و با نام MADBAK خلق می‌کنم.",
+    about_intro_before: "من بابک هستم و با نام ",
+    about_intro_after: " خلق می‌کنم.",
     about_p2:
       "کار من در تقاطع طراحی گرافیک، تدوین ویدیو و توسعهٔ وب مدرن قرار دارد. فقط به ظاهر کار نمی‌پردازم — تجربه‌های دیجیتالی می‌سازم که طراحی، موشن و کد با هم کار می‌کنند.",
     about_p3:
@@ -192,7 +193,8 @@ export const TRANSLATIONS = {
     about_op: "Operatör",
     about_h1_1: "TASARLANMIŞ",
     about_h1_2: "VARLIK",
-    about_intro: "Ben Babak; MADBAK adıyla üretiyorum.",
+    about_intro_before: "Ben Babak; ",
+    about_intro_after: " adıyla üretiyorum.",
     about_p2:
       "Çalışmam grafik tasarım, video kurgusu ve modern web geliştirmenin kesişiminde. Sadece görsellere odaklanmıyorum — tasarım, hareket ve kodun birlikte çalıştığı dijital deneyimler inşa ediyorum.",
     about_p3:

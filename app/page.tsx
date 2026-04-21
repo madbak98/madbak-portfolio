@@ -836,7 +836,13 @@ export default function Page() {
               <p
                 className={`mb-7 max-w-4xl text-xl font-black sm:mb-9 sm:text-3xl md:mb-10 md:text-5xl ${localeCase(lang)} ${leadProse(lang)} ${trackHeading(lang)}`}
               >
-                {t("about_intro")}
+                {t("about_intro_before")}
+                <span
+                  className={`text-[#ff2a2a] drop-shadow-[0_0_24px_rgba(255,42,42,0.22)] ${brandUppercase()}`}
+                >
+                  MADBAK
+                </span>
+                {t("about_intro_after")}
               </p>
               <div
                 className={`mb-12 max-w-3xl space-y-6 text-base font-light opacity-70 sm:mb-16 sm:space-y-7 sm:text-lg md:space-y-8 md:text-2xl ${bodyProse(lang)}`}
