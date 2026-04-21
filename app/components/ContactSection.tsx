@@ -10,6 +10,16 @@ import {
   TRANSLATIONS,
   type LangKey,
 } from "../lib/portfolio-data";
+import {
+  bodyProse,
+  contactAvailableTrack,
+  contactFooterLabel,
+  contactFooterMono,
+  contactMonoLabel,
+  contactSansEm,
+  contactSocialLabel,
+  localeCase,
+} from "../lib/locale-ui";
 
 function ContactXIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -80,7 +90,7 @@ export function ContactSection({
     <section
       id="contact"
       ref={ref}
-      className="relative flex min-h-[68vh] items-center justify-center overflow-hidden bg-[#ff2a2a] px-4 py-12 text-[#0A0A0A] sm:min-h-[75vh] sm:px-6 sm:py-16 md:px-8 md:py-20 lg:min-h-[82vh] lg:px-14"
+      className="relative flex min-h-[68vh] items-center justify-center overflow-hidden bg-[#ff2a2a] px-4 py-12 pb-[max(3rem,env(safe-area-inset-bottom))] pt-[max(3rem,env(safe-area-inset-top))] text-[#0A0A0A] sm:min-h-[75vh] sm:px-6 sm:py-16 md:px-8 md:py-20 lg:min-h-[82vh] lg:px-14"
     >
       <div className="absolute inset-0 bg-noise opacity-30 mix-blend-multiply" />
 
@@ -89,16 +99,18 @@ export function ContactSection({
         className="relative z-10 mx-auto w-full max-w-4xl"
       >
         <div className="mb-6">
-          <span className="font-mono text-xs tracking-[0.3em] text-[#0A0A0A] uppercase">
+          <span
+            className={`font-mono text-xs text-[#0A0A0A] ${localeCase(lang)} ${contactMonoLabel(lang)}`}
+          >
             {t("contact_label")}
           </span>
         </div>
 
         <h2
-          className="mb-8 font-black tracking-[-0.02em] uppercase sm:mb-12"
+          className={`mb-8 font-black sm:mb-12 ${localeCase(lang)} ${lang === "fa" ? "tracking-tight" : "tracking-[-0.02em]"}`}
           style={{
             fontSize: "clamp(2rem, 7vw, 5rem)",
-            lineHeight: 0.95,
+            lineHeight: lang === "fa" ? 1.08 : 0.95,
           }}
         >
           {t("contact_title_1")}
@@ -123,7 +135,7 @@ export function ContactSection({
             className="font-sans transition-colors duration-300 group-hover:text-black/80"
             style={{
               fontSize: "clamp(1.25rem, 3vw, 2rem)",
-              letterSpacing: "0.05em",
+              letterSpacing: lang === "fa" ? "0.02em" : "0.05em",
             }}
           >
             {CONTACT_EMAIL}
@@ -141,7 +153,7 @@ export function ContactSection({
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
               viewport={{ once: true }}
-              className={`group min-h-[52px] border-l-2 border-black/20 py-4 pl-6 transition-all duration-300 hover:border-[#0A0A0A] ${lang === "fa" ? "border-l-0 border-r-2 pr-6 pl-0" : ""}`}
+              className="group min-h-[52px] border-s-2 border-black/20 py-4 ps-6 transition-all duration-300 hover:border-[#0A0A0A]"
             >
               <div
                 className={`mb-2 flex items-center gap-3 ${lang === "fa" ? "flex-row-reverse" : ""}`}
@@ -152,12 +164,14 @@ export function ContactSection({
                   className="block shrink-0 text-[#0A0A0A]"
                   aria-hidden
                 />
-                <span className="font-mono text-sm tracking-[0.2em] text-black/60 uppercase">
+                <span
+                  className={`font-mono text-sm text-black/60 ${localeCase(lang)} ${contactSocialLabel(lang)}`}
+                >
                   {t(social.labelKey)}
                 </span>
               </div>
               <span
-                className="font-sans text-lg tracking-[0.1em] text-[#0A0A0A]"
+                className={`font-sans text-lg text-[#0A0A0A] ${contactSansEm(lang)}`}
               >
                 {social.handle}
               </span>
@@ -170,7 +184,7 @@ export function ContactSection({
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
           viewport={{ once: true }}
-          className={`mb-12 h-[2px] w-full origin-left bg-black/25 ${lang === "fa" ? "origin-right" : ""}`}
+          className="mb-12 h-[2px] w-full origin-start bg-black/25"
         />
 
         <motion.div
@@ -180,11 +194,15 @@ export function ContactSection({
           viewport={{ once: true }}
           className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center"
         >
-          <div className={lang === "fa" ? "text-right" : "text-left"}>
-            <p className="mb-2 font-sans text-xs tracking-[0.2em] text-black/70 uppercase">
+          <div className="max-w-xl text-start">
+            <p
+              className={`mb-2 font-sans text-xs text-black/70 ${localeCase(lang)} ${contactFooterLabel(lang)} ${bodyProse(lang)}`}
+            >
               {t("contact_commissions")}
             </p>
-            <p className="font-mono text-xs tracking-[0.15em] text-black/50">
+            <p
+              className={`font-mono text-xs text-black/50 ${contactFooterMono(lang)}`}
+            >
               {t("contact_rights")}
             </p>
           </div>
@@ -198,10 +216,12 @@ export function ContactSection({
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className={`flex items-center gap-2 ${lang === "fa" ? "flex-row-reverse" : ""}`}
+            className={`flex shrink-0 items-center gap-2 ${lang === "fa" ? "flex-row-reverse" : ""}`}
           >
             <div className="h-2 w-2 shrink-0 rounded-full bg-[#0A0A0A]" />
-            <span className="font-mono text-xs tracking-[0.2em] text-[#0A0A0A] uppercase">
+            <span
+              className={`font-mono text-xs text-[#0A0A0A] ${localeCase(lang)} ${contactAvailableTrack(lang)}`}
+            >
               {t("contact_available")}
             </span>
           </motion.div>

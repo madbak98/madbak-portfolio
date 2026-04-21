@@ -1,8 +1,11 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- External portfolio URLs (Twitter, GitHub raw, IPFS); Next/Image domains not configured */
-import React, { useState, useEffect, useRef } from "react";
+import React, { memo, useState, useEffect, useRef } from "react";
 import * as THREE from "three";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+
+import { PortfolioImage } from "./components/PortfolioImage";
+import { ModalImageGallery } from "./components/ModalImageGallery";
 
 import {
   NFT_ITEMS,
@@ -10,6 +13,27 @@ import {
   TRANSLATIONS,
   type LangKey,
 } from "./lib/portfolio-data";
+import {
+  LANGUAGE_DISPLAY,
+  bodyProse,
+  brandUppercase,
+  htmlLangAttr,
+  leadProse,
+  localeCase,
+  modalBody,
+  rootLocaleClasses,
+  trackHeading,
+  trackKickerEm,
+  trackMeta,
+  heroSubTracking,
+  nftSub1Track,
+  nftSub2Track,
+  nftTitleTracking,
+  nftSpanTracking,
+  nftCardTitleTrack,
+  nftDtTrack,
+  nftLinkTrack,
+} from "./lib/locale-ui";
 import { ContactSection } from "./components/ContactSection";
 
 /* ==========================================
@@ -33,8 +57,9 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
     scene.background = new THREE.Color("#030303");
     scene.fog = new THREE.FogExp2("#030303", 0.05);
 
-    const isMobile = window.innerWidth < 1024;
-    const geoDetail = isMobile ? 16 : 32;
+    const w = window.innerWidth;
+    const isMobile = w < 1024;
+    const geoDetail = w < 768 ? 12 : isMobile ? 16 : 32;
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -226,8 +251,10 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
 
 const LoadingScreen = ({
   onComplete,
+  lang,
 }: {
   onComplete: () => void;
+  lang: LangKey;
 }) => {
   const [progress, setProgress] = useState(0);
   const [flicker, setFlicker] = useState(false);
@@ -255,17 +282,23 @@ const LoadingScreen = ({
     >
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-20" />
       <div className="w-full max-w-sm px-6">
-        <div className="mb-2 flex items-end justify-between text-[10px] uppercase tracking-widest text-black">
+        <div
+          className={`mb-2 flex items-end justify-between text-[10px] ${brandUppercase()} ${trackMeta(lang)} text-black`}
+        >
           <span>Sys_Boot</span>
-          <span>{progress.toString().padStart(3, "0")}%</span>
+          <span className="tabular-nums">
+            {progress.toString().padStart(3, "0")}%
+          </span>
         </div>
         <div className="relative h-[1px] w-full overflow-hidden bg-black/10">
           <div
-            className="absolute top-0 left-0 h-full bg-[#ff2a2a] transition-all duration-100 ease-out"
+            className="absolute top-0 start-0 h-full bg-[#ff2a2a] transition-all duration-100 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="mt-8 text-center text-4xl font-black uppercase tracking-tighter text-black/5">
+        <div
+          className={`mt-8 text-center text-4xl font-black ${brandUppercase()} ${trackHeading(lang)} text-black/5`}
+        >
           MADBAK
         </div>
       </div>
@@ -275,7 +308,7 @@ const LoadingScreen = ({
 
 type Project = (typeof PROJECTS)[number];
 
-function ProjectTitleDisplay({
+const ProjectTitleDisplay = memo(function ProjectTitleDisplay({
   project,
   lang,
   className = "",
@@ -293,6 +326,7 @@ function ProjectTitleDisplay({
   if (lines?.length) {
     return (
       <span
+        dir="auto"
         className={`flex flex-col gap-0 leading-[0.9] ${className}`.trim()}
       >
         {lines.map((line, i) => (
@@ -303,8 +337,12 @@ function ProjectTitleDisplay({
       </span>
     );
   }
-  return <span className={className}>{title}</span>;
-}
+  return (
+    <span dir="auto" className={className}>
+      {title}
+    </span>
+  );
+});
 
 const Modal = ({
   project,
@@ -312,24 +350,59 @@ const Modal = ({
   t,
   lang,
 }: {
-  project: Project | null;
+  project: Project;
   onClose: () => void;
   t: (key: keyof (typeof TRANSLATIONS)["en"]) => string;
   lang: LangKey;
 }) => {
-  if (!project) return null;
-
+  const reduce = useReducedMotion();
   const title = project.langs[lang]?.title;
   const category = project.langs[lang]?.cat;
   const description = project.langs[lang]?.desc;
+  const role = project.langs[lang]?.role ?? "";
+  const context = project.langs[lang]?.context ?? "";
 
   return (
-    <div className="animate-portfolio-fade-in fixed inset-0 z-[90] flex items-end justify-center bg-black/80 p-0 backdrop-blur-xl md:p-6">
-      <div className="animate-portfolio-slide-up relative flex h-full w-full flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] text-[#EBE8E1] md:h-[85vh] md:flex-row">
+    <motion.div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[90] flex items-end justify-center bg-black/80 p-0 backdrop-blur-xl md:p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        duration: reduce ? 0.12 : 0.26,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      style={{ willChange: "opacity" }}
+      onPointerDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <motion.div
+        className="relative flex h-full max-h-[100dvh] w-full flex-col overflow-hidden border border-white/10 bg-[#0A0A0A] text-[#EBE8E1] md:h-[min(100dvh,85vh)] md:max-h-[85vh] md:flex-row"
+        initial={{
+          opacity: 0,
+          y: reduce ? 0 : 32,
+          scale: reduce ? 1 : 0.985,
+        }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{
+          opacity: 0,
+          y: reduce ? 0 : 14,
+          scale: reduce ? 1 : 0.992,
+        }}
+        transition={{
+          duration: reduce ? 0.18 : 0.52,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        style={{ willChange: "transform, opacity" }}
+      >
         <button
           type="button"
           onClick={onClose}
-          className="group absolute top-4 right-4 z-30 flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors hover:bg-white hover:text-black sm:top-6 sm:right-6 sm:h-12 sm:w-12"
+          className="group absolute top-4 end-4 z-30 flex min-h-[44px] min-w-[44px] cursor-pointer touch-manipulation items-center justify-center rounded-full border border-white/20 bg-black/50 shadow-sm transition-[transform,colors,box-shadow] duration-200 hover:bg-white hover:text-black hover:shadow-md active:scale-[0.94] sm:top-6 sm:end-6 sm:h-12 sm:w-12"
         >
           <svg
             viewBox="0 0 24 24"
@@ -340,69 +413,82 @@ const Modal = ({
           </svg>
         </button>
 
-        <div className="z-10 flex h-full w-full flex-col justify-between border-b border-white/10 bg-[#0A0A0A] p-5 sm:p-8 md:w-1/2 md:border-r md:border-b-0 md:p-16">
-          <div>
-            <div className="mb-12 flex items-center gap-4 font-mono text-[10px] tracking-[0.2em] text-[#ff2a2a] uppercase">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-[#ff2a2a]" />
-              {`${t("modal_active")} // ${project.sys}`}
+        <div className="z-10 flex h-full min-h-0 w-full flex-col border-b border-white/10 bg-[#0A0A0A] md:w-1/2 md:border-e md:border-b-0 md:border-white/10">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-5 pt-14 pb-6 sm:px-8 sm:pt-16 sm:pb-8 md:px-12 md:py-14 lg:p-16">
+            <div
+              className={`mb-8 flex shrink-0 items-center gap-3 font-mono text-[10px] text-[#ff2a2a] sm:mb-10 sm:gap-4 ${localeCase(lang)} ${trackKickerEm(lang, "0.2em")}`}
+            >
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#ff2a2a]" />
+              <span className="min-w-0 break-words">
+                {`${t("modal_active")} // ${project.sys}`}
+              </span>
             </div>
 
-            <h2 className="mb-8 break-words text-4xl leading-[0.85] font-black tracking-tighter uppercase sm:text-5xl md:text-6xl lg:text-8xl">
+            <h2
+              className={`mb-6 break-words font-black sm:mb-8 sm:text-5xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl ${localeCase(lang)} ${trackHeading(lang)} ${
+                lang === "fa"
+                  ? "text-[clamp(1.75rem,7vw,3.75rem)] leading-[1.12]"
+                  : "text-4xl leading-[0.88] sm:leading-[0.85]"
+              }`}
+            >
               <ProjectTitleDisplay project={project} lang={lang} />
             </h2>
 
-            <p className="max-w-md font-sans text-base leading-relaxed font-light opacity-60 sm:text-lg">
+            <p
+              className={`max-w-xl text-start font-sans text-base font-light opacity-60 sm:text-lg ${modalBody(lang)}`}
+            >
               {description}
             </p>
-          </div>
 
-          <div className="mt-12">
-            <div className="mb-6 h-[1px] w-full bg-white/10" />
-            <div className="grid grid-cols-2 gap-4 font-mono text-[10px] tracking-widest uppercase opacity-40">
-              <div>
-                {t("modal_type")}: {category}
-              </div>
-              <div>
-                {t("modal_year")}: {project.year}
-              </div>
-              <div>
-                {t("modal_role")}: Design & Dev
-              </div>
-              <div>
-                {t("modal_tech")}: Visual Art
+            <div className="mt-10 w-full shrink-0 border-t border-white/10 pt-8 sm:mt-12 sm:pt-10">
+              <div
+                className={`grid grid-cols-1 gap-x-6 gap-y-4 font-mono text-[10px] opacity-40 sm:grid-cols-2 ${localeCase(lang)} ${trackMeta(lang)}`}
+              >
+                <div className="min-w-0 break-words">
+                  <span className="text-white/90">{t("modal_type")}</span>
+                  <span className="mx-1.5 text-white/25">:</span>
+                  {category}
+                </div>
+                <div className="min-w-0 break-words">
+                  <span className="text-white/90">{t("modal_year")}</span>
+                  <span className="mx-1.5 text-white/25">:</span>
+                  <span className="tabular-nums">{project.year}</span>
+                </div>
+                <div className="min-w-0 break-words">
+                  <span className="text-white/90">{t("modal_role")}</span>
+                  <span className="mx-1.5 text-white/25">:</span>
+                  {role}
+                </div>
+                <div className="min-w-0 break-words">
+                  <span className="text-white/90">{t("modal_context")}</span>
+                  <span className="mx-1.5 text-white/25">:</span>
+                  {context}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="group relative h-full w-full overflow-y-auto overflow-x-hidden bg-[#111] md:w-1/2">
+        <div className="group relative h-full min-h-0 w-full overflow-y-auto overflow-x-hidden overscroll-y-contain bg-[#111] md:w-1/2">
           <div className="flex h-auto w-full flex-col">
-            <img
-              src={project.image}
-              alt={title}
-              className="h-auto w-full border-b border-white/10 object-cover"
+            <ModalImageGallery
+              key={project.id}
+              project={project}
+              title={title}
             />
-            {project.images?.map((imgUrl, idx) =>
-              imgUrl !== project.image ? (
-                <img
-                  key={idx}
-                  src={imgUrl}
-                  alt={`${title} ${idx}`}
-                  className="h-auto w-full border-b border-white/10 object-cover"
-                />
-              ) : null,
-            )}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
 const MiniGame = ({
   t,
+  lang,
 }: {
   t: (key: keyof (typeof TRANSLATIONS)["en"]) => string;
+  lang: LangKey;
 }) => {
   const [clickCount, setClickCount] = useState(0);
   const maxClicks = 50;
@@ -419,10 +505,14 @@ const MiniGame = ({
     <section className="relative z-20 overflow-hidden border-t border-black/10 bg-[#EBE8E1] px-4 py-16 text-[#0A0A0A] sm:px-6 sm:py-24 md:px-12 md:py-32">
       <div className="mx-auto flex w-full max-w-screen-xl flex-col items-center justify-between gap-8 md:gap-16 lg:max-w-[90vw] lg:flex-row lg:gap-16">
         <div className="w-full md:w-1/2">
-          <div className="mb-8 border-s-2 border-[#ff2a2a] px-4 font-mono text-[10px] tracking-widest uppercase opacity-50">
+          <div
+            className={`mb-8 border-s-2 border-[#ff2a2a] px-4 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
+          >
             {t("game_proto")}
           </div>
-          <h2 className="mb-6 text-3xl leading-[0.85] font-black tracking-tighter uppercase sm:text-5xl md:text-7xl">
+          <h2
+            className={`mb-6 text-3xl leading-[0.85] font-black sm:text-5xl md:text-7xl ${localeCase(lang)} ${trackHeading(lang)}`}
+          >
             {t("game_sys")}
             <br />
             <span className="text-[#ff2a2a]">{t("game_dec")}</span>
@@ -443,23 +533,27 @@ const MiniGame = ({
             }`}
           >
             <span
-              className={`px-4 text-center font-black tracking-tighter ${
+              className={`px-4 text-center font-black ${trackHeading(lang)} ${
                 clickCount >= maxClicks
                   ? "text-sm leading-tight normal-case md:text-lg"
-                  : "text-3xl uppercase md:text-5xl"
+                  : `text-3xl md:text-5xl ${localeCase(lang)}`
               }`}
             >
               {clickCount >= maxClicks ? t("game_btn2") : t("game_btn1")}
             </span>
             {clickCount < maxClicks && (
-              <span className="mt-2 font-mono text-[10px] tracking-widest uppercase opacity-50">
+              <span
+                className={`mt-2 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
+              >
                 {t("game_tap")}
               </span>
             )}
           </button>
 
           <div className="mt-12 w-full max-w-sm">
-            <div className="mb-2 flex justify-between font-mono text-[10px] font-bold tracking-widest uppercase">
+            <div
+              className={`mb-2 flex justify-between font-mono text-[10px] font-bold ${localeCase(lang)} ${trackMeta(lang)}`}
+            >
               <span>{t("game_prog")}</span>
               <span>{percent}%</span>
             </div>
@@ -485,15 +579,17 @@ export default function Page() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selected, setSelected] = useState<Project | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const t = (key: keyof (typeof TRANSLATIONS)["en"]) =>
     TRANSLATIONS[lang][key] ?? String(key);
 
   const cursorOuterRef = useRef<HTMLDivElement>(null);
   const cursorInnerRef = useRef<HTMLDivElement>(null);
+  const lastProgressRef = useRef(0);
 
   useEffect(() => {
-    if (mobileNavOpen) {
+    if (mobileNavOpen || selected) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -501,11 +597,19 @@ export default function Page() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [mobileNavOpen]);
+  }, [mobileNavOpen, selected]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = htmlLangAttr(lang);
+    root.dir = lang === "fa" ? "rtl" : "ltr";
+  }, [lang]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileNavOpen(false);
+      if (e.key !== "Escape") return;
+      setMobileNavOpen(false);
+      setSelected(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -559,7 +663,15 @@ export default function Page() {
           ? Math.max(0, Math.min(1, currentScroll / maxScroll))
           : 0;
 
-      setScrollProgress(progress);
+      const prev = lastProgressRef.current;
+      if (
+        Math.abs(progress - prev) > 0.003 ||
+        progress === 0 ||
+        progress === 1
+      ) {
+        lastProgressRef.current = progress;
+        setScrollProgress(progress);
+      }
       rafId = requestAnimationFrame(updateScroll);
     };
 
@@ -574,11 +686,12 @@ export default function Page() {
 
   return (
     <div
-      className="min-h-screen overflow-x-hidden bg-[#EBE8E1] font-sans text-[#0A0A0A] selection:bg-[#ff2a2a] selection:text-[#EBE8E1]"
+      lang={htmlLangAttr(lang)}
+      className={`min-h-screen overflow-x-hidden bg-[#EBE8E1] text-[#0A0A0A] selection:bg-[#ff2a2a] selection:text-[#EBE8E1] ${rootLocaleClasses(lang)} ${lang !== "fa" ? "font-sans" : ""}`}
       dir={lang === "fa" ? "rtl" : "ltr"}
     >
       {loading && (
-        <LoadingScreen onComplete={() => setLoading(false)} />
+        <LoadingScreen onComplete={() => setLoading(false)} lang={lang} />
       )}
 
       <div className="pointer-events-none fixed inset-0 z-[60] bg-noise opacity-[0.4] mix-blend-multiply" />
@@ -588,44 +701,47 @@ export default function Page() {
       <main className="relative z-10 overflow-x-hidden">
         <header className="pointer-events-none fixed top-0 start-0 z-[100] flex w-full items-start justify-between p-4 mix-blend-difference sm:p-6 md:p-10 text-[#EBE8E1]">
           <div className="pointer-events-auto min-w-0">
-            <h1 className="text-2xl leading-none font-black tracking-tighter uppercase sm:text-3xl">
+            <h1
+              className={`text-2xl leading-none font-black sm:text-3xl ${brandUppercase()} ${trackHeading(lang)}`}
+            >
               MADBAK
             </h1>
             <div className="mt-2 flex items-center gap-2">
               <span className="block h-1.5 w-1.5 shrink-0 bg-[#ff2a2a]" />
-              <p className="font-mono text-[8px] tracking-widest uppercase sm:text-[9px]">
+              <p
+                className={`min-w-0 font-mono text-[8px] sm:text-[9px] ${localeCase(lang)} ${trackMeta(lang)}`}
+              >
                 {t("header_arch")}
               </p>
             </div>
           </div>
 
-          <div className="pointer-events-auto hidden flex-col items-end gap-4 text-end lg:flex">
-            <div className="flex cursor-pointer gap-4 font-mono text-[10px] tracking-widest uppercase">
-              <button
-                type="button"
-                onClick={() => setLang("en")}
-                className={`min-h-[44px] min-w-[44px] touch-manipulation transition-colors hover:text-[#ff2a2a] lg:min-h-0 lg:min-w-0 ${lang === "en" ? "text-[#ff2a2a]" : ""}`}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang("fa")}
-                className={`min-h-[44px] min-w-[44px] touch-manipulation transition-colors hover:text-[#ff2a2a] lg:min-h-0 lg:min-w-0 ${lang === "fa" ? "text-[#ff2a2a]" : ""}`}
-              >
-                FA
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang("tr")}
-                className={`min-h-[44px] min-w-[44px] touch-manipulation transition-colors hover:text-[#ff2a2a] lg:min-h-0 lg:min-w-0 ${lang === "tr" ? "text-[#ff2a2a]" : ""}`}
-              >
-                TR
-              </button>
+          <div className="pointer-events-auto hidden flex-col items-end gap-3 text-end lg:flex">
+            <div
+              className={`flex shrink-0 items-stretch gap-0 rounded-full border border-white/15 bg-black/25 p-0.5 font-mono text-[10px] shadow-[0_2px_20px_rgba(0,0,0,0.12)] backdrop-blur-md ${trackMeta(lang)} ${brandUppercase()}`}
+              role="group"
+              aria-label="Language"
+            >
+              {(["en", "fa", "tr"] as const).map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => setLang(code)}
+                  className={`relative min-h-[40px] min-w-[2.75rem] touch-manipulation rounded-full px-2.5 py-2 transition-[transform,colors] duration-200 active:scale-95 lg:min-h-0 lg:min-w-[2.5rem] lg:px-2 lg:py-1.5 ${
+                    lang === code
+                      ? "bg-[#ff2a2a] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+                      : "text-white/85 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  {code}
+                </button>
+              ))}
             </div>
 
-            <div className="hidden md:block">
-              <p className="font-mono text-[9px] leading-relaxed tracking-[0.2em] uppercase">
+            <div className="hidden max-w-[14rem] md:block">
+              <p
+                className={`font-mono text-[9px] leading-relaxed ${localeCase(lang)} ${trackKickerEm(lang, "0.2em")}`}
+              >
                 {t("header_loc")}
                 <br />
                 {t("header_idx")}
@@ -639,7 +755,7 @@ export default function Page() {
               aria-expanded={mobileNavOpen}
               aria-controls="mobile-nav"
               onClick={() => setMobileNavOpen((o) => !o)}
-              className="flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full border border-white/20 bg-black/20 text-[#EBE8E1] backdrop-blur-sm transition-colors hover:bg-black/40"
+              className="flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full border border-white/20 bg-black/20 text-[#EBE8E1] backdrop-blur-sm transition-[transform,colors] duration-200 hover:bg-black/40 active:scale-90"
             >
               {mobileNavOpen ? (
                 <svg
@@ -677,50 +793,110 @@ export default function Page() {
           className={`fixed inset-0 z-[80] lg:hidden ${mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"}`}
           aria-hidden={!mobileNavOpen}
         >
-          <button
+          <motion.button
             type="button"
             tabIndex={mobileNavOpen ? 0 : -1}
-            className={`absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300 ${mobileNavOpen ? "opacity-100" : "opacity-0"}`}
+            className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            initial={false}
+            animate={{ opacity: mobileNavOpen ? 1 : 0 }}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0.18, ease: "easeOut" }
+                : { duration: 0.32, ease: [0.22, 1, 0.36, 1] }
+            }
+            style={{ willChange: "opacity" }}
             onClick={() => setMobileNavOpen(false)}
             aria-label="Close menu"
           />
-          <div
-            className={`absolute end-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-[#0A0A0A] p-6 text-[#EBE8E1] shadow-2xl transition-transform duration-300 ease-out sm:w-80 ${mobileNavOpen ? "translate-x-0" : "translate-x-full"}`}
+          <motion.div
+            className="absolute end-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-[#0A0A0A] p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] text-[#EBE8E1] shadow-2xl sm:w-80"
+            initial={false}
+            animate={
+              mobileNavOpen
+                ? { x: 0, opacity: 1 }
+                : { x: lang === "fa" ? "-100%" : "100%", opacity: 1 }
+            }
+            transition={
+              prefersReducedMotion
+                ? { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+                : { type: "spring", damping: 28, stiffness: 360, mass: 0.78 }
+            }
+            style={{ willChange: "transform" }}
           >
-            <p className="mb-8 font-mono text-[10px] tracking-widest uppercase text-white/50">
+            <p
+              className={`mb-8 font-mono text-[10px] leading-relaxed text-white/50 ${localeCase(lang)} ${trackMeta(lang)}`}
+            >
               {t("header_loc")}
               <br />
               {t("header_idx")}
             </p>
-            <div className="flex flex-col gap-2 border-b border-white/10 pb-6">
-              {(["en", "fa", "tr"] as const).map((code) => (
-                <button
+            <p
+              className={`mb-2 font-mono text-[9px] text-white/35 ${localeCase(lang)} ${trackMeta(lang)}`}
+            >
+              {lang === "fa" ? "زبان" : lang === "tr" ? "Dil" : "Language"}
+            </p>
+            <div className="flex flex-col gap-1.5 border-b border-white/10 pb-6">
+              {(["en", "fa", "tr"] as const).map((code, i) => (
+                <motion.button
                   key={code}
                   type="button"
                   onClick={() => {
                     setLang(code);
                     setMobileNavOpen(false);
                   }}
-                  className={`min-h-[48px] rounded-lg px-4 py-3 text-left font-mono text-sm tracking-widest uppercase transition-colors touch-manipulation ${lang === code ? "bg-[#ff2a2a] text-white" : "hover:bg-white/10"}`}
+                  initial={false}
+                  animate={
+                    mobileNavOpen
+                      ? { opacity: 1, x: 0 }
+                      : { opacity: 0, x: 10 }
+                  }
+                  transition={{
+                    delay:
+                      mobileNavOpen && !prefersReducedMotion
+                        ? 0.05 + i * 0.04
+                        : 0,
+                    duration: prefersReducedMotion ? 0.2 : 0.3,
+                    ease: [0.18, 1, 0.32, 1],
+                  }}
+                  className={`flex min-h-[52px] flex-col justify-center rounded-xl px-4 py-2.5 text-start font-mono transition-[transform,colors] duration-150 active:scale-[0.985] touch-manipulation ${trackMeta(lang)} ${lang === code ? "bg-[#ff2a2a] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]" : "hover:bg-white/10"}`}
                 >
-                  {code}
-                </button>
+                  <span
+                    className={`text-[15px] font-semibold leading-tight ${localeCase(lang)}`}
+                  >
+                    {LANGUAGE_DISPLAY[code]}
+                  </span>
+                  <span
+                    className={`mt-0.5 text-[10px] opacity-70 ${brandUppercase()}`}
+                  >
+                    {code}
+                  </span>
+                </motion.button>
               ))}
             </div>
-            <a
+            <motion.a
               href="#contact"
-              className="mt-6 min-h-[48px] rounded-lg border border-white/20 px-4 py-3 text-center font-mono text-xs tracking-widest uppercase transition-colors hover:border-[#ff2a2a] hover:text-[#ff2a2a]"
+              initial={false}
+              animate={
+                mobileNavOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
+              }
+              transition={{
+                delay:
+                  mobileNavOpen && !prefersReducedMotion ? 0.22 : 0,
+                duration: prefersReducedMotion ? 0.2 : 0.3,
+                ease: [0.18, 1, 0.32, 1],
+              }}
+              className={`mt-6 flex min-h-[48px] items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-center font-mono text-xs transition-[transform,colors] duration-200 hover:border-[#ff2a2a] hover:text-[#ff2a2a] active:scale-[0.99] ${localeCase(lang)} ${trackMeta(lang)}`}
               onClick={() => setMobileNavOpen(false)}
             >
               {t("foot_init")}
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
         </div>
 
-        <section className="pointer-events-none relative flex min-h-[72vh] flex-col items-center justify-center px-4 sm:min-h-[85vh] lg:h-[120vh] lg:min-h-0">
+        <section className="pointer-events-none relative flex min-h-[min(92svh,40rem)] flex-col items-center justify-center overflow-x-hidden px-4 sm:min-h-[85vh] lg:h-[120vh] lg:min-h-0">
           <div className="absolute inset-0 flex w-full flex-col items-center justify-center mix-blend-difference text-[#EBE8E1]">
             <h2
-              className="relative z-10 max-w-[100%] text-center text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black tracking-tighter uppercase select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap"
+              className={`relative z-10 max-w-[100%] text-center text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
               style={{ transform: `translateY(${scrollProgress * 200}px)` }}
             >
               MADBAK
@@ -730,14 +906,18 @@ export default function Page() {
               className="relative z-10 mt-6 max-w-[95vw] text-center select-none mix-blend-normal sm:mt-8 md:mt-12"
               style={{ transform: `translateY(${scrollProgress * 350}px)` }}
             >
-              <span className="inline-block rounded-full border border-[#ff2a2a]/40 bg-[#0A0A0A]/90 px-3 py-1.5 text-[10px] font-light uppercase tracking-[0.22em] text-[#ff2a2a] shadow-[0_0_24px_rgba(255,42,42,0.18)] backdrop-blur-sm sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.3em] md:px-6 md:py-2.5 md:text-xl md:tracking-[0.8em]">
+              <span
+                className={`inline-block max-w-[min(100%,42rem)] rounded-full border border-[#ff2a2a]/40 bg-[#0A0A0A]/90 px-3 py-1.5 text-[10px] font-light text-[#ff2a2a] shadow-[0_0_24px_rgba(255,42,42,0.18)] backdrop-blur-sm sm:px-4 sm:py-2 sm:text-xs md:px-6 md:py-2.5 md:text-xl ${localeCase(lang)} ${heroSubTracking(lang)}`}
+              >
                 {t("hero_dev")}
               </span>
             </p>
           </div>
 
           <div className="absolute bottom-20 flex -translate-x-1/2 flex-col items-center mix-blend-difference text-[#EBE8E1] start-1/2 sm:bottom-28 lg:bottom-32">
-            <span className="mb-4 font-mono text-[9px] tracking-widest uppercase opacity-50">
+            <span
+              className={`mb-4 font-mono text-[9px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
+            >
               {t("hero_scroll")}
             </span>
             <div className="relative h-16 w-[1px] overflow-hidden bg-white/20">
@@ -750,11 +930,17 @@ export default function Page() {
           <div className="mx-auto grid w-full max-w-screen-xl grid-cols-1 gap-12 sm:gap-16 md:gap-20 lg:max-w-[90vw] lg:grid-cols-12 lg:gap-24">
             <div className="flex flex-col justify-between lg:col-span-4">
               <div>
-                <div className="mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] tracking-widest uppercase">
+                <div
+                  className={`mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] ${localeCase(lang)} ${trackMeta(lang)}`}
+                >
                   <span>{t("about_op")}</span>
-                  <span>( ID: 001 )</span>
+                  <span className="unicode-bidi-isolate tabular-nums">
+                    ( ID: 001 )
+                  </span>
                 </div>
-                <h2 className="text-[11vw] leading-[0.85] font-black tracking-tighter uppercase sm:text-[10vw] md:text-[8vw] lg:text-[4.5vw] xl:text-[5.5vw]">
+                <h2
+                  className={`text-[11vw] leading-[0.85] font-black sm:text-[10vw] md:text-[8vw] lg:text-[4.5vw] xl:text-[5.5vw] ${localeCase(lang)} ${trackHeading(lang)}`}
+                >
                   {t("about_h1_1")}
                   <br />
                   {t("about_h1_2")}
@@ -789,35 +975,21 @@ export default function Page() {
             </div>
 
             <div className="flex flex-col justify-center lg:col-span-8">
-              <p className="mb-8 text-xl leading-[1.1] font-black tracking-tighter uppercase sm:mb-12 sm:text-3xl md:text-5xl">
-                {lang === "en" && (
-                  <>
-                    I’m Babak — creating under the name MADBAK. I don’t just
-                    design visuals — I build{" "}
-                    <span className="text-[#ff2a2a]">experiences</span>.
-                  </>
-                )}
-                {lang === "fa" && (
-                  <>
-                    من بابک هستم — با نام MADBAK خلق می‌کنم. من فقط جلوه‌های بصری
-                    طراحی نمی‌کنم — من{" "}
-                    <span className="text-[#ff2a2a]">تجربه‌ها</span> را می‌سازم.
-                  </>
-                )}
-                {lang === "tr" && (
-                  <>
-                    Ben Babak — MADBAK adıyla üretiyorum. Sadece görseller
-                    tasarlamıyorum —{" "}
-                    <span className="text-[#ff2a2a]">deneyimler</span> inşa
-                    ediyorum.
-                  </>
-                )}
+              <p
+                className={`mb-7 max-w-4xl text-xl font-black sm:mb-9 sm:text-3xl md:mb-10 md:text-5xl ${localeCase(lang)} ${leadProse(lang)} ${trackHeading(lang)}`}
+              >
+                {t("about_intro")}
               </p>
-              <p className="mb-12 max-w-3xl text-base leading-relaxed font-light opacity-70 sm:mb-16 sm:text-lg md:text-2xl">
-                {t("about_p2")}
-              </p>
+              <div
+                className={`mb-12 max-w-3xl space-y-6 text-base font-light opacity-70 sm:mb-16 sm:space-y-7 sm:text-lg md:space-y-8 md:text-2xl ${bodyProse(lang)}`}
+              >
+                <p>{t("about_p2")}</p>
+                <p>{t("about_p3")}</p>
+                <p>{t("about_p4")}</p>
+                <p>{t("about_p5")}</p>
+              </div>
 
-              <div className="grid grid-cols-1 gap-6 border-t border-black/10 pt-8 sm:grid-cols-2 sm:gap-8 sm:pt-10 md:grid-cols-4 md:pt-12">
+              <div className="grid grid-cols-1 gap-6 border-t border-black/10 pt-8 sm:grid-cols-2 sm:gap-8 sm:pt-10 lg:grid-cols-4 lg:pt-12">
                 {(
                   [
                     { l: t("stat_role"), v: t("val_role") },
@@ -827,10 +999,14 @@ export default function Page() {
                   ] as const
                 ).map((stat, idx) => (
                   <div key={idx}>
-                    <div className="mb-2 font-mono text-[10px] tracking-widest uppercase opacity-40">
+                    <div
+                      className={`mb-2 font-mono text-[10px] opacity-40 ${localeCase(lang)} ${trackMeta(lang)}`}
+                    >
                       {stat.l}
                     </div>
-                    <div className="text-sm font-black tracking-tight uppercase">
+                    <div
+                      className={`text-sm font-black ${localeCase(lang)} ${lang === "fa" ? "tracking-normal" : "tracking-tight"}`}
+                    >
                       {stat.v}
                     </div>
                   </div>
@@ -842,7 +1018,9 @@ export default function Page() {
 
         <section className="relative z-20 border-t border-black/10 bg-[#EBE8E1] py-16 sm:py-24 md:py-32">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 md:px-8 lg:max-w-[90vw]">
-            <div className="mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] tracking-widest uppercase sm:mb-12 md:mb-16">
+            <div
+              className={`mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] sm:mb-12 md:mb-16 ${localeCase(lang)} ${trackMeta(lang)}`}
+            >
               <span>{t("work_title")}</span>
               <span>({String(PROJECTS.length).padStart(2, "0")})</span>
             </div>
@@ -851,11 +1029,13 @@ export default function Page() {
               {PROJECTS.map((project) => {
                 const title = project.langs[lang]?.title;
                 const category = project.langs[lang]?.cat;
+                const role = project.langs[lang]?.role;
+                const context = project.langs[lang]?.context;
 
                 return (
                   <div
                     key={project.id}
-                    className="group relative cursor-pointer overflow-hidden border-b border-black/10 py-6 sm:py-8 md:py-12"
+                    className="group relative cursor-pointer overflow-hidden border-b border-black/10 py-6 touch-manipulation transition-[filter] duration-200 [-webkit-tap-highlight-color:transparent] active:brightness-[0.97] sm:py-8 md:py-12 md:active:brightness-100"
                     onClick={() => setSelected(project)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
@@ -868,35 +1048,52 @@ export default function Page() {
                   >
                     <div className="absolute inset-0 origin-bottom translate-y-full bg-[#0A0A0A] transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:translate-y-0" />
 
-                    <div className="relative z-10 flex flex-col items-start justify-between gap-4 transition-colors duration-300 group-hover:text-[#EBE8E1] md:flex-row md:items-center md:gap-12">
-                      <div className="flex items-center gap-8 md:w-2/3 md:gap-16">
+                    <div className="relative z-10 flex flex-col items-start justify-between gap-4 transition-colors duration-300 group-hover:text-[#EBE8E1] md:flex-row md:items-center md:gap-10 lg:gap-12">
+                      <div className="flex min-w-0 flex-1 items-center gap-6 sm:gap-8 md:w-2/3 md:gap-12 lg:gap-16">
                         <span className="hidden text-sm font-mono opacity-30 transition-opacity group-hover:opacity-100 md:block">
                           {project.id}
                         </span>
 
                         <div className="relative hidden h-16 w-16 shrink-0 origin-center overflow-hidden rounded-full border border-white/20 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100 md:block md:h-24 md:w-24 md:scale-0">
-                          <img
+                          <PortfolioImage
                             src={project.image}
-                            alt={title}
-                            className="h-full w-full object-cover"
+                            alt={title ?? ""}
+                            fill
+                            sizes="128px"
+                            className="h-full w-full"
                           />
                         </div>
 
-                        <h3 className="relative text-2xl leading-none font-black tracking-tighter uppercase sm:text-4xl md:text-6xl lg:text-7xl">
-                          <span className="relative z-10">
-                            <ProjectTitleDisplay
-                              project={project}
-                              lang={lang}
+                        <div className="relative min-w-0 flex-1">
+                          <h3
+                            className={`relative text-2xl leading-none font-black sm:text-4xl md:text-6xl lg:text-7xl ${localeCase(lang)} ${trackHeading(lang)}`}
+                          >
+                            <span className="relative z-10">
+                              <ProjectTitleDisplay
+                                project={project}
+                                lang={lang}
+                              />
+                            </span>
+                            <div
+                              className={`absolute top-1/2 z-20 h-1 w-[110%] -translate-y-1/2 bg-[#ff2a2a] transition-transform duration-500 ease-out group-hover:scale-x-100 md:h-2 ${lang === "fa" ? "right-[-5%] origin-right" : "left-[-5%] origin-left"} scale-x-0`}
                             />
-                          </span>
-                          <div
-                            className={`absolute top-1/2 z-20 h-1 w-[110%] -translate-y-1/2 bg-[#ff2a2a] transition-transform duration-500 ease-out group-hover:scale-x-100 md:h-2 ${lang === "fa" ? "right-[-5%] origin-right" : "left-[-5%] origin-left"} scale-x-0`}
-                          />
-                        </h3>
+                          </h3>
+                          <p
+                            className={`mt-2 max-w-3xl font-mono text-[9px] leading-relaxed opacity-45 sm:text-[10px] ${localeCase(lang)} ${trackMeta(lang)}`}
+                          >
+                            <span className="tabular-nums">{project.year}</span>
+                            <span className="mx-1.5 text-black/30">·</span>
+                            {role}
+                            <span className="mx-1.5 text-black/30">·</span>
+                            {context}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="flex w-full items-center justify-between md:w-1/3">
-                        <p className="font-mono text-[10px] tracking-widest uppercase opacity-50 group-hover:opacity-100 md:text-xs">
+                      <div className="flex w-full items-center justify-between gap-3 md:w-1/3 md:max-w-md md:gap-4 lg:max-w-lg">
+                        <p
+                          className={`min-w-0 flex-1 break-words text-end rtl:text-start font-mono text-[10px] opacity-50 group-hover:opacity-100 md:text-xs ${localeCase(lang)} ${trackMeta(lang)}`}
+                        >
                           {category}
                         </p>
                         <div
@@ -927,19 +1124,27 @@ export default function Page() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-center gap-3">
                 <span className="h-3 w-[3px] shrink-0 bg-[#ff2a2a]" aria-hidden />
-                <p className="font-sans text-xs font-semibold uppercase tracking-[0.34em] text-black/55 sm:text-[13px]">
+                <p
+                  className={`font-sans text-xs font-semibold text-black/55 sm:text-[13px] ${localeCase(lang)} ${nftSub1Track(lang)}`}
+                >
                   {t("nft_sub1")}
                 </p>
               </div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-black/45 sm:text-[13px]">
+              <p
+                className={`font-mono text-xs text-black/45 sm:text-[13px] ${localeCase(lang)} ${nftSub2Track(lang)}`}
+              >
                 {t("nft_sub2")}
               </p>
             </div>
 
             <div className="mt-8">
-              <h2 className="max-w-[20ch] text-[clamp(3.15rem,9.5vw,6.75rem)] leading-[0.88] font-black font-normal uppercase tracking-[0.02em] text-black">
+              <h2
+                className={`max-w-full break-words text-[clamp(3.15rem,9.5vw,6.75rem)] leading-[0.88] font-black font-normal text-black sm:max-w-[20ch] ${localeCase(lang)} ${nftTitleTracking(lang)}`}
+              >
                 {t("nft_h1")}
-                <span className="block text-[0.42em] font-normal tracking-[0.55em] text-black/45 sm:inline sm:pl-4 sm:text-[0.5em]">
+                <span
+                  className={`mt-1 block text-[0.42em] font-normal text-black/45 sm:mt-0 sm:inline sm:ps-4 sm:text-[0.5em] ${nftSpanTracking(lang)}`}
+                >
                   {t("nft_h2")}
                 </span>
               </h2>
@@ -968,10 +1173,12 @@ export default function Page() {
                       >
                         <div className="relative overflow-hidden transition-[filter] duration-300 group-hover:brightness-[1.03]">
                           <div className="relative aspect-[4/5] w-full md:aspect-[3/4]">
-                            <img
+                            <PortfolioImage
                               src={nft.image}
-                              alt={title}
-                              className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                              alt={title ?? ""}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 22rem"
+                              className="transition duration-500 group-hover:scale-[1.04]"
                             />
                             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-80 transition duration-300 group-hover:opacity-90" />
                           </div>
@@ -980,28 +1187,36 @@ export default function Page() {
                     </div>
 
                     <aside
-                      className={`flex min-h-0 flex-1 flex-col justify-center px-0 py-2 sm:px-2 sm:py-4 md:px-3 ${lang === "fa" ? "text-right" : "text-left"}`}
+                      className="flex min-h-0 flex-1 flex-col justify-center px-0 py-2 text-start sm:px-2 sm:py-4 md:px-3"
                     >
-                      <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#ff2a2a] sm:text-[13px]">
+                      <p
+                        className={`font-mono text-xs text-[#ff2a2a] sm:text-[13px] ${localeCase(lang)} ${trackKickerEm(lang, "0.28em")}`}
+                      >
                         {`${nft.platform} // ${nft.sys}`}
                       </p>
-                      <p className="mt-5 text-[clamp(2rem,5vw,3.35rem)] leading-[1.02] font-black uppercase tracking-[0.035em] text-black">
+                      <p
+                        className={`mt-5 break-words text-[clamp(2rem,5vw,3.35rem)] leading-[1.02] font-black text-black ${localeCase(lang)} ${nftCardTitleTrack(lang)}`}
+                      >
                         {title}
                       </p>
                       <dl className="mt-7 space-y-5 pt-1">
                         <div>
-                          <dt className="font-mono text-xs uppercase tracking-[0.24em] text-[#ff2a2a] sm:text-[13px]">
+                          <dt
+                            className={`font-mono text-xs text-[#ff2a2a] sm:text-[13px] ${localeCase(lang)} ${nftDtTrack(lang)}`}
+                          >
                             {t("modal_type")}
                           </dt>
-                          <dd className="mt-2 font-sans text-[1.1rem] font-semibold tracking-[0.02em] text-black/90 sm:text-[1.2rem] md:text-[1.25rem]">
+                          <dd className="mt-2 font-sans text-[1.1rem] font-semibold text-black/90 sm:text-[1.2rem] md:text-[1.25rem]">
                             {category}
                           </dd>
                         </div>
                         <div>
-                          <dt className="font-mono text-xs uppercase tracking-[0.24em] text-[#ff2a2a] sm:text-[13px]">
+                          <dt
+                            className={`font-mono text-xs text-[#ff2a2a] sm:text-[13px] ${localeCase(lang)} ${nftDtTrack(lang)}`}
+                          >
                             {t("modal_year")}
                           </dt>
-                          <dd className="mt-2 font-sans text-[1.1rem] font-semibold tracking-[0.02em] text-black/90 sm:text-[1.2rem] md:text-[1.25rem]">
+                          <dd className="mt-2 font-sans text-[1.1rem] font-semibold text-black/90 sm:text-[1.2rem] md:text-[1.25rem]">
                             {nft.year}
                           </dd>
                         </div>
@@ -1010,7 +1225,7 @@ export default function Page() {
                         href={nft.href}
                         target="_blank"
                         rel="noreferrer"
-                        className={`mt-9 inline-flex w-fit items-center gap-2 font-mono text-sm uppercase tracking-[0.22em] text-[#ff2a2a] underline decoration-[#ff2a2a]/50 underline-offset-[7px] transition hover:text-black hover:decoration-[#ff2a2a] sm:text-[15px] ${lang === "fa" ? "flex-row-reverse" : ""}`}
+                        className={`mt-9 inline-flex w-fit min-w-0 max-w-full items-center gap-2 break-words font-mono text-sm text-[#ff2a2a] underline decoration-[#ff2a2a]/50 underline-offset-[7px] transition hover:text-black hover:decoration-[#ff2a2a] sm:text-[15px] ${localeCase(lang)} ${nftLinkTrack(lang)} ${lang === "fa" ? "flex-row-reverse" : ""}`}
                       >
                         {t("nft_view")}
                         <span aria-hidden>→</span>
@@ -1023,11 +1238,13 @@ export default function Page() {
           </div>
         </section>
 
-        <MiniGame t={t} />
+        <MiniGame t={t} lang={lang} />
 
         <ContactSection t={t} lang={lang} />
 
-        <footer className="bg-[#0A0A0A] px-4 py-6 text-center font-mono text-[10px] tracking-widest text-white/40 uppercase sm:p-6">
+        <footer
+          className={`bg-[#0A0A0A] px-4 py-6 text-center font-mono text-[10px] text-white/40 sm:p-6 ${brandUppercase()} ${trackMeta(lang)}`}
+        >
           © 2026 MADBAK IND.
         </footer>
       </main>
@@ -1043,12 +1260,17 @@ export default function Page() {
         />
       </div>
 
-      <Modal
-        project={selected}
-        onClose={() => setSelected(null)}
-        t={t}
-        lang={lang}
-      />
+      <AnimatePresence mode="wait">
+        {selected && (
+          <Modal
+            key={selected.id}
+            project={selected}
+            onClose={() => setSelected(null)}
+            t={t}
+            lang={lang}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

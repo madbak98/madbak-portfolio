@@ -110,3 +110,57 @@ body {
 .animate-orbit-20s {
   animation: orbit-dial 20s linear infinite;
 }
+
+/* —— Multilingual: EN/TR use Geist; FA uses Vazirmatn + RTL-friendly metrics —— */
+.lang-fa {
+  font-family: var(--font-fa), Tahoma, sans-serif;
+  font-feature-settings: "kern" 1;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+.lang-latin {
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Turkish: diacritics (ğ ü ş ı …) + long compound words */
+.lang-tr {
+  font-feature-settings: "kern" 1, "liga" 1, "locl" 1;
+}
+
+.lang-tr p,
+.lang-tr dd {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+}
+
+/* Persian: avoid faux-wide uppercase spacing; keep mono labels readable */
+.lang-fa .font-mono,
+.lang-fa [class*="font-mono"] {
+  font-family: var(--font-fa), Tahoma, sans-serif;
+  font-feature-settings: "kern" 1;
+  font-synthesis: none;
+}
+
+/* Explicit mixed content (digits, Latin, slashes) */
+.lang-fa .unicode-bidi-isolate {
+  unicode-bidi: isolate;
+}
+
+.lang-fa p,
+.lang-fa .prose-p {
+  line-height: 1.75;
+  letter-spacing: normal;
+}
+
+.lang-fa .leading-relaxed {
+  line-height: 1.75;
+}
+
+/* Long translated strings */
+.lang-fa .break-words,
+.lang-latin .break-words {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
