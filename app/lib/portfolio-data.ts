@@ -96,6 +96,8 @@ export const TRANSLATIONS = {
     contact_available: "Currently Available",
     contact_social_x: "X",
     contact_social_ig: "Instagram",
+    contact_social_tg: "TELEGRAM",
+    contact_social_wa: "WHATSAPP",
     nft_view: "View Asset",
   },
   fa: {
@@ -191,6 +193,8 @@ export const TRANSLATIONS = {
     contact_available: "در دسترس",
     contact_social_x: "ایکس",
     contact_social_ig: "اینستاگرام",
+    contact_social_tg: "تلگرام",
+    contact_social_wa: "واتساپ",
     nft_view: "مشاهده اثر",
   },
   tr: {
@@ -286,6 +290,8 @@ export const TRANSLATIONS = {
     contact_available: "Şu an müsait",
     contact_social_x: "X",
     contact_social_ig: "Instagram",
+    contact_social_tg: "TELEGRAM",
+    contact_social_wa: "WHATSAPP",
     nft_view: "Varlığı Görüntüle",
   },
 } as const;
@@ -623,13 +629,17 @@ export const NFT_ITEMS = [
 
 /**
  * Social profiles — edit here, or set in `.env.local`:
- * `NEXT_PUBLIC_SOCIAL_INSTAGRAM` and `NEXT_PUBLIC_SOCIAL_X`
+ * `NEXT_PUBLIC_SOCIAL_*` overrides below.
  */
 export const SOCIAL_LINKS = {
   instagram:
     process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM ??
     "https://www.instagram.com/madbak98/",
   x: process.env.NEXT_PUBLIC_SOCIAL_X ?? "https://x.com/Lilosama98",
+  telegram:
+    process.env.NEXT_PUBLIC_SOCIAL_TELEGRAM ?? "https://t.me/Lilosaama",
+  whatsapp:
+    process.env.NEXT_PUBLIC_SOCIAL_WHATSAPP ?? "https://wa.me/905010050395",
 } as const;
 
 export const CONTACT_EMAIL = "madbak98@gmail.com";
