@@ -928,8 +928,8 @@ export default function Page() {
 
         <section className="relative z-20 bg-[#EBE8E1] px-4 py-16 sm:px-6 sm:py-24 md:px-8 md:py-32 lg:px-12 lg:py-48">
           <div className="mx-auto grid w-full max-w-screen-xl grid-cols-1 gap-12 sm:gap-16 md:gap-20 lg:max-w-[90vw] lg:grid-cols-12 lg:gap-24">
-            <div className="flex flex-col justify-between lg:col-span-4">
-              <div>
+            <div className="flex min-w-0 flex-col justify-between lg:col-span-4">
+              <div className="min-w-0">
                 <div
                   className={`mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] ${localeCase(lang)} ${trackMeta(lang)}`}
                 >
@@ -939,7 +939,7 @@ export default function Page() {
                   </span>
                 </div>
                 <h2
-                  className={`text-[11vw] leading-[0.85] font-black sm:text-[10vw] md:text-[8vw] lg:text-[4.5vw] xl:text-[5.5vw] ${localeCase(lang)} ${trackHeading(lang)}`}
+                  className={`max-w-full break-words text-[clamp(1.875rem,8.5vw,3rem)] leading-[0.88] font-black sm:text-[clamp(1.875rem,7.5vw,2.85rem)] md:text-[clamp(1.75rem,6.25vw,2.65rem)] lg:text-[clamp(1.25rem,2.35vw,1.875rem)] xl:text-[clamp(1.35rem,2.55vw,2rem)] ${localeCase(lang)} ${trackHeading(lang)}`}
                 >
                   {t("about_h1_1")}
                   <br />
