@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useState, useEffect, useRef } from "react";
+import React, { memo, useState, useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
@@ -13,8 +13,8 @@ import {
   TRANSLATIONS,
   type LangKey,
 } from "./lib/portfolio-data";
+import { MobileNavOverlay, SiteNav } from "./components/SiteNav";
 import {
-  LANGUAGE_DISPLAY,
   bodyProse,
   brandUppercase,
   htmlLangAttr,
@@ -276,7 +276,7 @@ const LoadingScreen = ({
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#EBE8E1] font-mono transition-opacity duration-700 ${
+      className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#EBE8E1] font-mono transition-opacity duration-700 ${
         flicker ? "scale-105 opacity-0 blur-md" : "opacity-100"
       }`}
     >
@@ -579,7 +579,33 @@ export default function Page() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selected, setSelected] = useState<Project | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const reduceMotion = Boolean(prefersReducedMotion);
+
+  const navigateToHash = useCallback(
+    (hash: string) => {
+      const behavior: ScrollBehavior = reduceMotion ? "auto" : "smooth";
+      if (hash === "hero") {
+        window.scrollTo({ top: 0, behavior });
+        setMobileNavOpen(false);
+        return;
+      }
+      const el = document.getElementById(hash);
+      if (el) {
+        el.scrollIntoView({ behavior, block: "start" });
+      }
+      setMobileNavOpen(false);
+    },
+    [reduceMotion],
+  );
+
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 28);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const t = (key: keyof (typeof TRANSLATIONS)["en"]) =>
     TRANSLATIONS[lang][key] ?? String(key);
@@ -698,202 +724,31 @@ export default function Page() {
 
       <ThreeScene scrollProgress={scrollProgress} />
 
-      <main className="relative z-10 overflow-x-hidden">
-        <header className="pointer-events-none fixed top-0 start-0 z-[100] flex w-full items-start justify-between p-4 mix-blend-difference sm:p-6 md:p-10 text-[#EBE8E1]">
-          <div className="pointer-events-auto min-w-0">
-            <h1
-              className={`text-2xl leading-none font-black sm:text-3xl ${brandUppercase()} ${trackHeading(lang)}`}
-            >
-              MADBAK
-            </h1>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="block h-1.5 w-1.5 shrink-0 bg-[#ff2a2a]" />
-              <p
-                className={`min-w-0 font-mono text-[8px] sm:text-[9px] ${localeCase(lang)} ${trackMeta(lang)}`}
-              >
-                {t("header_arch")}
-              </p>
-            </div>
-          </div>
+      <main className="relative z-10 overflow-x-hidden pt-14 sm:pt-[3.75rem]">
+        <SiteNav
+          lang={lang}
+          setLang={setLang}
+          t={t}
+          mobileNavOpen={mobileNavOpen}
+          setMobileNavOpen={setMobileNavOpen}
+          scrolled={navScrolled}
+          onNavigate={navigateToHash}
+        />
+        <MobileNavOverlay
+          lang={lang}
+          t={t}
+          mobileNavOpen={mobileNavOpen}
+          setMobileNavOpen={setMobileNavOpen}
+          setLang={setLang}
+          prefersReducedMotion={reduceMotion}
+          onNavigate={navigateToHash}
+        />
 
-          <div className="pointer-events-auto hidden flex-col items-end gap-3 text-end lg:flex">
-            <div
-              className={`flex shrink-0 items-stretch gap-0 rounded-full border border-white/15 bg-black/25 p-0.5 font-mono text-[10px] shadow-[0_2px_20px_rgba(0,0,0,0.12)] backdrop-blur-md ${trackMeta(lang)} ${brandUppercase()}`}
-              role="group"
-              aria-label="Language"
-            >
-              {(["en", "fa", "tr"] as const).map((code) => (
-                <button
-                  key={code}
-                  type="button"
-                  onClick={() => setLang(code)}
-                  className={`relative min-h-[40px] min-w-[2.75rem] touch-manipulation rounded-full px-2.5 py-2 transition-[transform,colors] duration-200 active:scale-95 lg:min-h-0 lg:min-w-[2.5rem] lg:px-2 lg:py-1.5 ${
-                    lang === code
-                      ? "bg-[#ff2a2a] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
-                      : "text-white/85 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  {code}
-                </button>
-              ))}
-            </div>
-
-            <div className="hidden max-w-[14rem] md:block">
-              <p
-                className={`font-mono text-[9px] leading-relaxed ${localeCase(lang)} ${trackKickerEm(lang, "0.2em")}`}
-              >
-                {t("header_loc")}
-                <br />
-                {t("header_idx")}
-              </p>
-            </div>
-          </div>
-
-          <div className="pointer-events-auto lg:hidden">
-            <button
-              type="button"
-              aria-expanded={mobileNavOpen}
-              aria-controls="mobile-nav"
-              onClick={() => setMobileNavOpen((o) => !o)}
-              className="flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full border border-white/20 bg-black/20 text-[#EBE8E1] backdrop-blur-sm transition-[transform,colors] duration-200 hover:bg-black/40 active:scale-90"
-            >
-              {mobileNavOpen ? (
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              ) : (
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden
-                >
-                  <line x1="4" y1="8" x2="20" y2="8" />
-                  <line x1="4" y1="12" x2="20" y2="12" />
-                  <line x1="4" y1="16" x2="20" y2="16" />
-                </svg>
-              )}
-              <span className="sr-only">Menu</span>
-            </button>
-          </div>
-        </header>
-
-        <div
-          id="mobile-nav"
-          className={`fixed inset-0 z-[80] lg:hidden ${mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"}`}
-          aria-hidden={!mobileNavOpen}
+        <section
+          id="hero"
+          tabIndex={-1}
+          className="pointer-events-none relative flex min-h-[min(92svh,40rem)] flex-col items-center justify-center overflow-x-hidden px-4 sm:min-h-[85vh] lg:h-[120vh] lg:min-h-0"
         >
-          <motion.button
-            type="button"
-            tabIndex={mobileNavOpen ? 0 : -1}
-            className="absolute inset-0 bg-black/70 backdrop-blur-md"
-            initial={false}
-            animate={{ opacity: mobileNavOpen ? 1 : 0 }}
-            transition={
-              prefersReducedMotion
-                ? { duration: 0.18, ease: "easeOut" }
-                : { duration: 0.32, ease: [0.22, 1, 0.36, 1] }
-            }
-            style={{ willChange: "opacity" }}
-            onClick={() => setMobileNavOpen(false)}
-            aria-label="Close menu"
-          />
-          <motion.div
-            className="absolute end-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-[#0A0A0A] p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] text-[#EBE8E1] shadow-2xl sm:w-80"
-            initial={false}
-            animate={
-              mobileNavOpen
-                ? { x: 0, opacity: 1 }
-                : { x: lang === "fa" ? "-100%" : "100%", opacity: 1 }
-            }
-            transition={
-              prefersReducedMotion
-                ? { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
-                : { type: "spring", damping: 28, stiffness: 360, mass: 0.78 }
-            }
-            style={{ willChange: "transform" }}
-          >
-            <p
-              className={`mb-8 font-mono text-[10px] leading-relaxed text-white/50 ${localeCase(lang)} ${trackMeta(lang)}`}
-            >
-              {t("header_loc")}
-              <br />
-              {t("header_idx")}
-            </p>
-            <p
-              className={`mb-2 font-mono text-[9px] text-white/35 ${localeCase(lang)} ${trackMeta(lang)}`}
-            >
-              {lang === "fa" ? "زبان" : lang === "tr" ? "Dil" : "Language"}
-            </p>
-            <div className="flex flex-col gap-1.5 border-b border-white/10 pb-6">
-              {(["en", "fa", "tr"] as const).map((code, i) => (
-                <motion.button
-                  key={code}
-                  type="button"
-                  onClick={() => {
-                    setLang(code);
-                    setMobileNavOpen(false);
-                  }}
-                  initial={false}
-                  animate={
-                    mobileNavOpen
-                      ? { opacity: 1, x: 0 }
-                      : { opacity: 0, x: 10 }
-                  }
-                  transition={{
-                    delay:
-                      mobileNavOpen && !prefersReducedMotion
-                        ? 0.05 + i * 0.04
-                        : 0,
-                    duration: prefersReducedMotion ? 0.2 : 0.3,
-                    ease: [0.18, 1, 0.32, 1],
-                  }}
-                  className={`flex min-h-[52px] flex-col justify-center rounded-xl px-4 py-2.5 text-start font-mono transition-[transform,colors] duration-150 active:scale-[0.985] touch-manipulation ${trackMeta(lang)} ${lang === code ? "bg-[#ff2a2a] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]" : "hover:bg-white/10"}`}
-                >
-                  <span
-                    className={`text-[15px] font-semibold leading-tight ${localeCase(lang)}`}
-                  >
-                    {LANGUAGE_DISPLAY[code]}
-                  </span>
-                  <span
-                    className={`mt-0.5 text-[10px] opacity-70 ${brandUppercase()}`}
-                  >
-                    {code}
-                  </span>
-                </motion.button>
-              ))}
-            </div>
-            <motion.a
-              href="#contact"
-              initial={false}
-              animate={
-                mobileNavOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
-              }
-              transition={{
-                delay:
-                  mobileNavOpen && !prefersReducedMotion ? 0.22 : 0,
-                duration: prefersReducedMotion ? 0.2 : 0.3,
-                ease: [0.18, 1, 0.32, 1],
-              }}
-              className={`mt-6 flex min-h-[48px] items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-center font-mono text-xs transition-[transform,colors] duration-200 hover:border-[#ff2a2a] hover:text-[#ff2a2a] active:scale-[0.99] ${localeCase(lang)} ${trackMeta(lang)}`}
-              onClick={() => setMobileNavOpen(false)}
-            >
-              {t("foot_init")}
-            </motion.a>
-          </motion.div>
-        </div>
-
-        <section className="pointer-events-none relative flex min-h-[min(92svh,40rem)] flex-col items-center justify-center overflow-x-hidden px-4 sm:min-h-[85vh] lg:h-[120vh] lg:min-h-0">
           <div className="absolute inset-0 flex w-full flex-col items-center justify-center mix-blend-difference text-[#EBE8E1]">
             <h2
               className={`relative z-10 max-w-[100%] text-center text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
@@ -926,7 +781,10 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="relative z-20 bg-[#EBE8E1] px-4 py-16 sm:px-6 sm:py-24 md:px-8 md:py-32 lg:px-12 lg:py-48">
+        <section
+          id="about"
+          className="relative z-20 scroll-mt-[5.5rem] bg-[#EBE8E1] px-4 py-16 sm:px-6 sm:py-24 md:px-8 md:py-32 lg:px-12 lg:py-48"
+        >
           <div className="mx-auto grid w-full max-w-screen-xl grid-cols-1 gap-12 sm:gap-16 md:gap-20 lg:max-w-[90vw] lg:grid-cols-12 lg:gap-24">
             <div className="flex min-w-0 flex-col justify-between lg:col-span-4">
               <div className="min-w-0">
@@ -1016,7 +874,10 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="relative z-20 border-t border-black/10 bg-[#EBE8E1] py-16 sm:py-24 md:py-32">
+        <section
+          id="works"
+          className="relative z-20 scroll-mt-[5.5rem] border-t border-black/10 bg-[#EBE8E1] py-16 sm:py-24 md:py-32"
+        >
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 md:px-8 lg:max-w-[90vw]">
             <div
               className={`mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] sm:mb-12 md:mb-16 ${localeCase(lang)} ${trackMeta(lang)}`}

@@ -90,7 +90,7 @@ export function ContactSection({
     <section
       id="contact"
       ref={ref}
-      className="relative flex min-h-[68vh] items-center justify-center overflow-hidden bg-[#ff2a2a] px-4 py-12 pb-[max(3rem,env(safe-area-inset-bottom))] pt-[max(3rem,env(safe-area-inset-top))] text-[#0A0A0A] sm:min-h-[75vh] sm:px-6 sm:py-16 md:px-8 md:py-20 lg:min-h-[82vh] lg:px-14"
+      className="relative flex min-h-[68vh] scroll-mt-[5.5rem] items-center justify-center overflow-hidden bg-[#ff2a2a] px-4 py-12 pb-[max(3rem,env(safe-area-inset-bottom))] pt-[max(3rem,env(safe-area-inset-top))] text-[#0A0A0A] sm:min-h-[75vh] sm:px-6 sm:py-16 md:px-8 md:py-20 lg:min-h-[82vh] lg:px-14"
     >
       <div className="absolute inset-0 bg-noise opacity-30 mix-blend-multiply" />
 
