@@ -121,6 +121,72 @@ body {
   animation: orbit-dial 20s linear infinite;
 }
 
+/* Mini-game: restrained feedback — premium creative-tech, not spectacle */
+@keyframes mini-game-glitch {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-0.35px, 0.25px, 0);
+  }
+}
+
+.mini-game-glitching {
+  animation: mini-game-glitch 0.1s ease-out 1;
+}
+
+@keyframes mini-game-burst {
+  0% {
+    opacity: 0.72;
+    transform: translate3d(-50%, -50%, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(
+        calc(-50% + var(--tx, 0px)),
+        calc(-50% + var(--ty, 0px)),
+        0
+      )
+      scaleX(0.35);
+  }
+}
+
+.mini-game-particle {
+  animation: mini-game-burst 0.48s cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+}
+
+@keyframes mini-game-tap {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(1.028);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.mini-game-tap-flash {
+  animation: mini-game-tap 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-game-glitching {
+    animation: none;
+  }
+
+  .mini-game-particle {
+    animation: none;
+    opacity: 0;
+  }
+
+  .mini-game-tap-flash {
+    animation: none;
+  }
+}
+
 /* —— Multilingual: EN/TR use Geist; FA uses Vazirmatn + RTL-friendly metrics —— */
 .lang-fa {
   font-family: var(--font-fa), Tahoma, sans-serif;

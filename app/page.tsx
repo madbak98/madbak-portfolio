@@ -35,6 +35,7 @@ import {
   nftLinkTrack,
 } from "./lib/locale-ui";
 import { ContactSection } from "./components/ContactSection";
+import { MiniGame } from "./components/MiniGame";
 
 /* ==========================================
    2. 3D SCENE (Vanilla Three.js)
@@ -480,93 +481,6 @@ const Modal = ({
         </div>
       </motion.div>
     </motion.div>
-  );
-};
-
-const MiniGame = ({
-  t,
-  lang,
-}: {
-  t: (key: keyof (typeof TRANSLATIONS)["en"]) => string;
-  lang: LangKey;
-}) => {
-  const [clickCount, setClickCount] = useState(0);
-  const maxClicks = 50;
-
-  const handleClick = () => {
-    if (clickCount < maxClicks) {
-      setClickCount((prev) => prev + 1);
-    }
-  };
-
-  const percent = Math.floor((clickCount / maxClicks) * 100);
-
-  return (
-    <section className="relative z-20 overflow-hidden border-t border-black/10 bg-[#EBE8E1] px-4 py-16 text-[#0A0A0A] sm:px-6 sm:py-24 md:px-12 md:py-32">
-      <div className="mx-auto flex w-full max-w-screen-xl flex-col items-center justify-between gap-8 md:gap-16 lg:max-w-[90vw] lg:flex-row lg:gap-16">
-        <div className="w-full md:w-1/2">
-          <div
-            className={`mb-8 border-s-2 border-[#ff2a2a] px-4 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
-          >
-            {t("game_proto")}
-          </div>
-          <h2
-            className={`mb-6 text-3xl leading-[0.85] font-black sm:text-5xl md:text-7xl ${localeCase(lang)} ${trackHeading(lang)}`}
-          >
-            {t("game_sys")}
-            <br />
-            <span className="text-[#ff2a2a]">{t("game_dec")}</span>
-          </h2>
-          <p className="text-base font-light opacity-60 sm:text-lg">
-            {clickCount >= maxClicks ? t("game_desc2") : t("game_desc1")}
-          </p>
-        </div>
-
-        <div className="flex w-full flex-col items-center md:w-1/2">
-          <button
-            type="button"
-            onClick={handleClick}
-            className={`relative flex h-44 min-h-[176px] w-44 min-w-[176px] cursor-pointer touch-manipulation flex-col items-center justify-center rounded-full border border-black transition-all duration-75 active:scale-95 sm:h-48 sm:w-48 md:h-64 md:w-64 ${
-              clickCount >= maxClicks
-                ? "scale-105 border-[#ff2a2a] bg-[#ff2a2a] text-[#EBE8E1] shadow-[0_0_50px_rgba(255,42,42,0.5)]"
-                : "hover:scale-105 hover:bg-black hover:text-[#EBE8E1] active:scale-95"
-            }`}
-          >
-            <span
-              className={`px-4 text-center font-black ${trackHeading(lang)} ${
-                clickCount >= maxClicks
-                  ? "text-sm leading-tight normal-case md:text-lg"
-                  : `text-3xl md:text-5xl ${localeCase(lang)}`
-              }`}
-            >
-              {clickCount >= maxClicks ? t("game_btn2") : t("game_btn1")}
-            </span>
-            {clickCount < maxClicks && (
-              <span
-                className={`mt-2 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
-              >
-                {t("game_tap")}
-              </span>
-            )}
-          </button>
-
-          <div className="mt-12 w-full max-w-sm">
-            <div
-              className={`mb-2 flex justify-between font-mono text-[10px] font-bold ${localeCase(lang)} ${trackMeta(lang)}`}
-            >
-              <span>{t("game_prog")}</span>
-              <span>{percent}%</span>
-            </div>
-            <div className="relative h-2 w-full overflow-hidden bg-black/10">
-              <div
-                className="absolute top-0 start-0 h-full bg-[#ff2a2a] transition-all duration-200"
-                style={{ width: `${percent}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 };
 
