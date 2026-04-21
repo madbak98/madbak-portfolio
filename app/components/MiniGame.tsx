@@ -6,9 +6,10 @@ import {
   useRef,
   useState,
 } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import { useReducedMotion } from "motion/react";
 
+import { SecretTerminal } from "./SecretTerminal";
 import { TRANSLATIONS, type LangKey } from "../lib/portfolio-data";
 import { localeCase, trackHeading, trackMeta } from "../lib/locale-ui";
 
@@ -22,6 +23,7 @@ const SCRAMBLE_MS = 200;
 const PARTICLE_COUNT = 12;
 const RARE_CHANCE = 0.045;
 const TOAST_MS = 2200;
+const LONG_PRESS_MS = 900;
 
 const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -67,7 +69,15 @@ function pickTone(): ParticleTone {
 
 type RareKind = "invert" | "toast_fail" | "toast_access";
 
-export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
+export function MiniGame({
+  t,
+  lang,
+  onNavigateToProjects,
+}: {
+  t: TFn;
+  lang: LangKey;
+  onNavigateToProjects?: () => void;
+}) {
   const reduce = useReducedMotion();
   const [progress, setProgress] = useState(0);
   const [glitchKey, setGlitchKey] = useState(0);
@@ -80,6 +90,16 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
   const particleId = useRef(0);
   const clickTimesRef = useRef<number[]>([]);
   const timersRef = useRef<(ReturnType<typeof setTimeout> | null)[]>([]);
+  const [secretOpen, setSecretOpen] = useState(false);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressInjectClickRef = useRef(false);
+
+  const clearLongPress = useCallback(() => {
+    if (longPressTimerRef.current != null) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
 
   const complete = progress >= MAX_PROGRESS;
   const pct = Math.min(100, Math.round(progress));
@@ -159,6 +179,32 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
     }
   }, [complete, reduce, rare, spawnParticles, fireGlitch]);
 
+  const onInjectPointerDown = useCallback(() => {
+    clearLongPress();
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTimerRef.current = null;
+      suppressInjectClickRef.current = true;
+      setSecretOpen(true);
+    }, LONG_PRESS_MS);
+  }, [clearLongPress]);
+
+  const onInjectPointerEnd = useCallback(() => {
+    clearLongPress();
+  }, [clearLongPress]);
+
+  const onInjectClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (suppressInjectClickRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        suppressInjectClickRef.current = false;
+        return;
+      }
+      handleInject();
+    },
+    [handleInject],
+  );
+
   useEffect(() => {
     const ref = timersRef;
     return () => {
@@ -166,8 +212,9 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
         if (id != null) clearTimeout(id);
       });
       ref.current = [];
+      clearLongPress();
     };
-  }, []);
+  }, [clearLongPress]);
 
   const glitchOn = !reduce && glitchKey % 2 === 1;
 
@@ -178,11 +225,15 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
   const showLatinScramble = scramble && !reduce && lang !== "fa";
   const showFaScramble = scramble && !reduce && lang === "fa";
 
+  const isFa = lang === "fa";
+
   return (
     <section
-      className={`relative z-20 overflow-hidden border-t border-black/10 bg-[#EBE8E1] px-4 py-16 text-[#0A0A0A] sm:px-6 sm:py-24 md:px-12 md:py-32 ${
+      dir={isFa ? "rtl" : "ltr"}
+      lang={isFa ? "fa" : undefined}
+      className={`mini-game-section relative z-20 overflow-hidden border-t border-black/10 bg-[#EBE8E1] px-4 py-16 text-[#0A0A0A] sm:px-6 sm:py-24 md:px-12 md:py-32 ${
         glitchOn ? "mini-game-glitching" : ""
-      }`}
+      } ${isFa ? "mini-game-section--fa" : ""}`}
     >
       {!reduce && injectFx > 0 && (
         <div
@@ -201,16 +252,24 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
       )}
 
       <div className="relative z-20 mx-auto flex w-full max-w-screen-xl flex-col items-center justify-between gap-8 md:gap-16 lg:max-w-[90vw] lg:flex-row lg:gap-16">
-        <div className="w-full md:w-1/2">
+        <div
+          className={`w-full md:w-1/2 ${isFa ? "mini-game-fa-copy text-start" : ""}`}
+        >
           <div
-            className={`mb-8 border-s-2 border-[#ff2a2a] px-4 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)} ${
-              showFaScramble ? "mini-game-fa-scramble" : ""
-            }`}
+            className={`font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)} ${
+              isFa
+                ? "mb-9 border-s-2 border-[#ff2a2a] ps-4 pe-4 leading-[1.65] tracking-[0] [font-feature-settings:'kern'_1] [font-synthesis:none]"
+                : "mb-8 border-s-2 border-[#ff2a2a] px-4"
+            } ${showFaScramble ? "mini-game-fa-scramble" : ""}`}
           >
             {showLatinScramble ? scrambleString(proto) : proto}
           </div>
           <h2
-            className={`mb-6 text-3xl leading-[0.85] font-black transition-opacity duration-150 sm:text-5xl md:text-7xl ${localeCase(lang)} ${trackHeading(lang)} ${
+            className={`font-black transition-opacity duration-150 ${localeCase(lang)} ${
+              isFa
+                ? "mini-game-fa-heading mb-7 max-w-[min(100%,36rem)] text-start text-3xl leading-[1.18] tracking-[0] break-words text-pretty sm:mb-8 sm:text-5xl sm:leading-[1.14] md:mb-9 md:text-7xl md:leading-[1.1] [font-feature-settings:'kern'_1] [font-synthesis:none]"
+                : `mb-6 text-3xl leading-[0.85] sm:text-5xl md:text-7xl ${trackHeading(lang)}`
+            } ${
               showLatinScramble ? "opacity-[0.94]" : ""
             } ${showFaScramble ? "mini-game-fa-scramble" : ""}`}
             style={
@@ -223,11 +282,10 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
             }
           >
             {lang === "fa" ? (
-              <>
-                {sys}
-                <br />
-                <span className="text-[#ff2a2a]">{dec}</span>
-              </>
+              <span className="flex flex-col gap-3 sm:gap-4">
+                <span className="block">{sys}</span>
+                <span className="block text-[#ff2a2a]">{dec}</span>
+              </span>
             ) : showLatinScramble ? (
               <>
                 {scrambleString(sys)}
@@ -242,12 +300,18 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
               </>
             )}
           </h2>
-          <p className="text-base font-light opacity-60 sm:text-lg">
+          <p
+            className={
+              isFa
+                ? "max-w-prose text-start text-base font-light leading-[1.85] opacity-60 sm:text-lg sm:leading-[1.82] [font-feature-settings:'kern'_1]"
+                : "text-base font-light opacity-60 sm:text-lg"
+            }
+          >
             {complete ? t("game_desc2") : t("game_desc1")}
           </p>
         </div>
 
-        <div className="flex w-full flex-col items-center md:w-1/2">
+        <div className="flex w-full min-w-0 flex-col items-center md:w-1/2">
           <div className="relative flex min-h-[200px] min-w-[200px] items-center justify-center sm:min-h-[208px] sm:min-w-[208px] md:min-h-[272px] md:min-w-[272px]">
             {particles.map((p) => {
               const toneClass =
@@ -276,12 +340,16 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
 
             <button
               type="button"
-              onClick={handleInject}
-              disabled={complete}
+              aria-disabled={complete}
+              onPointerDown={onInjectPointerDown}
+              onPointerUp={onInjectPointerEnd}
+              onPointerLeave={onInjectPointerEnd}
+              onPointerCancel={onInjectPointerEnd}
+              onClick={onInjectClick}
               style={{ WebkitTapHighlightColor: "transparent" }}
               className={`relative z-20 flex h-44 min-h-[176px] w-44 min-w-[176px] touch-manipulation select-none flex-col items-center justify-center overflow-visible rounded-full border transition-[transform,box-shadow,background-color,border-color,color] duration-300 ease-out will-change-transform sm:h-48 sm:w-48 md:h-64 md:w-64 ${
                 complete
-                  ? "border-[#ff2a2a] bg-[#0A0A0A] text-[#EBE8E1] shadow-[0_0_28px_rgba(255,42,42,0.2)]"
+                  ? "pointer-events-auto border-[#ff2a2a] bg-[#0A0A0A] text-[#EBE8E1] shadow-[0_0_28px_rgba(255,42,42,0.2)]"
                   : "border-black hover:scale-[1.015] hover:bg-black hover:text-[#EBE8E1] active:scale-[0.985]"
               }`}
             >
@@ -290,7 +358,11 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
                 className={`flex flex-col items-center px-4 ${!reduce && !complete ? "mini-game-tap-flash" : ""}`}
               >
                 <span
-                  className={`text-center font-black transition-all duration-300 ${trackHeading(lang)} ${
+                  className={`text-center font-black transition-all duration-300 ${
+                    isFa
+                      ? "tracking-[0] [font-feature-settings:'kern'_1]"
+                      : trackHeading(lang)
+                  } ${
                     complete
                       ? "text-xs leading-tight text-[#ff2a2a] sm:text-sm md:text-base"
                       : `text-3xl md:text-5xl ${localeCase(lang)}`
@@ -300,7 +372,9 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
                 </span>
                 {!complete && (
                   <span
-                    className={`mt-2 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
+                    className={`mt-2 font-mono text-[10px] opacity-50 ${localeCase(lang)} ${
+                      isFa ? "tracking-[0] leading-normal" : trackMeta(lang)
+                    }`}
                   >
                     {t("game_tap")}
                   </span>
@@ -310,21 +384,23 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
           </div>
 
           <div
-            className="mt-10 w-full max-w-sm"
+            className="mt-10 w-full max-w-sm min-w-0"
             aria-live="polite"
             aria-atomic="true"
           >
             <div
-              className={`mb-2 flex justify-between gap-3 font-mono text-[10px] font-bold ${localeCase(lang)} ${trackMeta(lang)}`}
+              className={`mb-2 flex justify-between gap-3 font-mono text-[10px] font-bold ${localeCase(lang)} ${
+                isFa ? "tracking-[0] leading-normal" : trackMeta(lang)
+              }`}
             >
-              <span className="min-w-0 truncate tabular-nums">
+              <span className="min-w-0 min-h-[1.25em] truncate tabular-nums text-start">
                 {t(LOG_KEYS[logIdx]!)}
               </span>
               <span className="shrink-0 tabular-nums">{pct}%</span>
             </div>
             <div className="relative h-2 w-full overflow-hidden bg-black/10">
               <div
-                className="absolute top-0 start-0 h-full w-full origin-left bg-[#ff2a2a] will-change-transform"
+                className="absolute top-0 start-0 h-full w-full origin-start bg-[#ff2a2a] will-change-transform"
                 style={{
                   transform: `scaleX(${progress / MAX_PROGRESS})`,
                   transition:
@@ -334,7 +410,11 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
             </div>
             {complete && (
               <p
-                className={`mt-3 font-mono text-[9px] tracking-[0.18em] text-[#ff2a2a]/90 ${localeCase(lang)} ${trackMeta(lang)}`}
+                className={`mt-3 font-mono text-[9px] text-[#ff2a2a]/90 ${localeCase(lang)} ${
+                  isFa
+                    ? "tracking-[0] leading-relaxed"
+                    : "tracking-[0.18em]"
+                } ${isFa ? "" : trackMeta(lang)}`}
               >
                 {t("game_complete_sub")}
               </p>
@@ -343,6 +423,16 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
         </div>
       </div>
 
+      {secretOpen ? (
+        <SecretTerminal
+          onClose={() => setSecretOpen(false)}
+          onNavigateProjects={() => {
+            onNavigateToProjects?.();
+            setSecretOpen(false);
+          }}
+        />
+      ) : null}
+
       {!reduce && (rare === "toast_fail" || rare === "toast_access") && (
         <div
           className="pointer-events-none absolute bottom-6 left-1/2 z-[30] max-w-[90vw] -translate-x-1/2 px-3"
@@ -350,7 +440,9 @@ export function MiniGame({ t, lang }: { t: TFn; lang: LangKey }) {
           aria-live="polite"
         >
           <p
-            className={`border border-[#ff2a2a]/35 bg-[#0A0A0A] px-4 py-2.5 font-mono text-[9px] tracking-[0.22em] text-[#EBE8E1] shadow-[0_8px_32px_rgba(0,0,0,0.35)] ${localeCase(lang)} ${trackMeta(lang)} mini-game-surprise-toast`}
+            className={`border border-[#ff2a2a]/35 bg-[#0A0A0A] px-4 py-2.5 font-mono text-[9px] text-[#EBE8E1] shadow-[0_8px_32px_rgba(0,0,0,0.35)] ${localeCase(lang)} ${
+              isFa ? "tracking-[0] leading-relaxed" : `tracking-[0.22em] ${trackMeta(lang)}`
+            } mini-game-surprise-toast`}
           >
             {rare === "toast_fail"
               ? t("game_surprise_fail")

@@ -1,3 +1,7 @@
+/** About / Operator column portrait. Swap for e.g. `/about-operator.jpg` when self-hosting. */
+export const ABOUT_OPERATOR_IMAGE_SRC =
+  "https://github.com/madbak98/My-image/blob/main/IMG_3080.JPG?raw=true";
+
 export const TRANSLATIONS = {
   en: {
     header_arch: "Creative Archive",
@@ -29,6 +33,7 @@ export const TRANSLATIONS = {
       "I’m especially interested in what people call \"vibe coding\" — blending creative direction with technical execution to build work that feels alive, intentional, and precise.",
     about_p5:
       "Everything I create is built around atmosphere, detail, and control — not just how it looks, but how it behaves.",
+    about_operator_image_alt: "Portrait — MADBAK",
     stat_role: "Role",
     stat_stack: "Stack",
     stat_engine: "Engine",
@@ -123,6 +128,7 @@ export const TRANSLATIONS = {
       "به‌ویژه به چیزی که «vibe coding» نامیده می‌شود علاقه‌مندم — ترکیب جهت خلاقانه با اجرای فنی برای ساخت آثاری که زنده، آگاهانه و دقیق به نظر برسند.",
     about_p5:
       "همهٔ آنچه می‌سازم بر فضا، جزئیات و کنترل استوار است — نه‌تنها این‌که چگونه به نظر می‌رسد، بلکه چگونه رفتار می‌کند.",
+    about_operator_image_alt: "پرتره — MADBAK",
     stat_role: "نقش",
     stat_stack: "تکنولوژی",
     stat_engine: "موتور رندر",
@@ -217,6 +223,7 @@ export const TRANSLATIONS = {
       "İnsanların “vibe coding” dediği şeye özellikle ilgi duyuyorum — yaratıcı yönetimi teknik uygulamayla harmanlayarak canlı, kasıtlı ve keskin hissedilen işler üretmek.",
     about_p5:
       "Ürettiğim her şey atmosfer, detay ve kontrol etrafında şekillenir — yalnızca nasıl göründüğü değil, nasıl davrandığı da önemlidir.",
+    about_operator_image_alt: "Portre — MADBAK",
     stat_role: "Rol",
     stat_stack: "Teknoloji",
     stat_engine: "Render Motoru",

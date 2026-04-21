@@ -8,6 +8,7 @@ import { PortfolioImage } from "./components/PortfolioImage";
 import { ModalImageGallery } from "./components/ModalImageGallery";
 
 import {
+  ABOUT_OPERATOR_IMAGE_SRC,
   NFT_ITEMS,
   PROJECTS,
   TRANSLATIONS,
@@ -17,10 +18,12 @@ import { MobileNavOverlay, SiteNav } from "./components/SiteNav";
 import {
   bodyProse,
   brandUppercase,
+  displayStackLeading,
   htmlLangAttr,
   leadProse,
   localeCase,
   modalBody,
+  nftDisplayLeading,
   rootLocaleClasses,
   trackHeading,
   trackKickerEm,
@@ -298,7 +301,7 @@ const LoadingScreen = ({
           />
         </div>
         <div
-          className={`mt-8 text-center text-4xl font-black ${brandUppercase()} ${trackHeading(lang)} text-black/5`}
+          className={`fa-wordmark-latin mt-8 text-center font-sans text-4xl font-black ${brandUppercase()} ${trackHeading(lang)} text-black/5`}
         >
           MADBAK
         </div>
@@ -328,7 +331,7 @@ const ProjectTitleDisplay = memo(function ProjectTitleDisplay({
     return (
       <span
         dir="auto"
-        className={`flex flex-col gap-0 leading-[0.9] ${className}`.trim()}
+        className={`flex flex-col ${lang === "fa" ? "gap-1.5 leading-[1.12] sm:gap-2 sm:leading-[1.1]" : "gap-0 leading-[0.9]"} ${className}`.trim()}
       >
         {lines.map((line, i) => (
           <span key={i} className="block">
@@ -436,7 +439,7 @@ const Modal = ({
             </h2>
 
             <p
-              className={`max-w-xl text-start font-sans text-base font-light opacity-60 sm:text-lg ${modalBody(lang)}`}
+              className={`max-w-xl text-start text-base font-light opacity-60 sm:text-lg ${modalBody(lang)} ${lang !== "fa" ? "font-sans" : ""}`}
             >
               {description}
             </p>
@@ -671,7 +674,7 @@ export default function Page() {
         >
           <div className="absolute inset-0 flex w-full flex-col items-center justify-center mix-blend-difference text-[#EBE8E1]">
             <h2
-              className={`relative z-10 max-w-[100%] text-center text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
+              className={`fa-wordmark-latin relative z-10 max-w-[100%] text-center font-sans text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
               style={{ transform: `translateY(${scrollProgress * 200}px)` }}
             >
               MADBAK
@@ -717,12 +720,23 @@ export default function Page() {
                   </span>
                 </div>
                 <h2
-                  className={`max-w-full break-words text-[clamp(1.875rem,8.5vw,3rem)] leading-[0.88] font-black sm:text-[clamp(1.875rem,7.5vw,2.85rem)] md:text-[clamp(1.75rem,6.25vw,2.65rem)] lg:text-[clamp(1.25rem,2.35vw,1.875rem)] xl:text-[clamp(1.35rem,2.55vw,2rem)] ${localeCase(lang)} ${trackHeading(lang)}`}
+                  className={`max-w-full break-words text-[clamp(1.875rem,8.5vw,3rem)] font-black sm:text-[clamp(1.875rem,7.5vw,2.85rem)] md:text-[clamp(1.75rem,6.25vw,2.65rem)] lg:text-[clamp(1.25rem,2.35vw,1.875rem)] xl:text-[clamp(1.35rem,2.55vw,2rem)] ${displayStackLeading(lang)} ${localeCase(lang)} ${trackHeading(lang)}`}
                 >
                   {t("about_h1_1")}
                   <br />
                   {t("about_h1_2")}
                 </h2>
+                <figure className="group relative mt-6 w-full min-w-0 sm:mt-8">
+                  <div className="relative aspect-[3/4] w-full max-w-full overflow-hidden border border-black/12 bg-[#0A0A0A]/[0.06] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+                    <PortfolioImage
+                      src={ABOUT_OPERATOR_IMAGE_SRC}
+                      alt={t("about_operator_image_alt")}
+                      fill
+                      sizes="(max-width: 640px) min(100vw - 2rem, 36rem), (max-width: 1023px) min(100vw - 3rem, 40rem), (max-width: 1536px) 30vw, 380px"
+                      className="object-cover object-center transition-[filter,transform] duration-[480ms] ease-out group-hover:brightness-[1.025] group-hover:contrast-[1.02] motion-reduce:transition-none"
+                    />
+                  </div>
+                </figure>
               </div>
               <div className="mt-24 hidden lg:flex">
                 <svg
@@ -853,7 +867,7 @@ export default function Page() {
 
                         <div className="relative min-w-0 flex-1">
                           <h3
-                            className={`relative text-2xl leading-none font-black sm:text-4xl md:text-6xl lg:text-7xl ${localeCase(lang)} ${trackHeading(lang)}`}
+                            className={`relative text-2xl font-black sm:text-4xl md:text-6xl lg:text-7xl ${lang === "fa" ? "leading-[1.12] sm:leading-[1.1] md:leading-[1.08]" : "leading-none"} ${localeCase(lang)} ${trackHeading(lang)}`}
                           >
                             <span className="relative z-10">
                               <ProjectTitleDisplay
@@ -912,7 +926,7 @@ export default function Page() {
               <div className="flex items-center gap-3">
                 <span className="h-3 w-[3px] shrink-0 bg-[#ff2a2a]" aria-hidden />
                 <p
-                  className={`font-sans text-xs font-semibold text-black/55 sm:text-[13px] ${localeCase(lang)} ${nftSub1Track(lang)}`}
+                  className={`text-xs font-semibold text-black/55 sm:text-[13px] ${lang !== "fa" ? "font-sans" : ""} ${localeCase(lang)} ${nftSub1Track(lang)}`}
                 >
                   {t("nft_sub1")}
                 </p>
@@ -926,7 +940,7 @@ export default function Page() {
 
             <div className="mt-8">
               <h2
-                className={`max-w-full break-words text-[clamp(3.15rem,9.5vw,6.75rem)] leading-[0.88] font-black font-normal text-black sm:max-w-[20ch] ${localeCase(lang)} ${nftTitleTracking(lang)}`}
+                className={`max-w-full break-words text-[clamp(3.15rem,9.5vw,6.75rem)] font-black font-normal text-black sm:max-w-[20ch] ${nftDisplayLeading(lang)} ${localeCase(lang)} ${nftTitleTracking(lang)}`}
               >
                 {t("nft_h1")}
                 <span
@@ -982,7 +996,7 @@ export default function Page() {
                         {`${nft.platform} // ${nft.sys}`}
                       </p>
                       <p
-                        className={`mt-5 break-words text-[clamp(2rem,5vw,3.35rem)] leading-[1.02] font-black text-black ${localeCase(lang)} ${nftCardTitleTrack(lang)}`}
+                        className={`mt-5 break-words text-[clamp(2rem,5vw,3.35rem)] font-black text-black ${lang === "fa" ? "leading-[1.14] sm:leading-[1.1]" : "leading-[1.02]"} ${localeCase(lang)} ${nftCardTitleTrack(lang)}`}
                       >
                         {title}
                       </p>
@@ -993,7 +1007,9 @@ export default function Page() {
                           >
                             {t("modal_type")}
                           </dt>
-                          <dd className="mt-2 font-sans text-[1.1rem] font-semibold text-black/90 sm:text-[1.2rem] md:text-[1.25rem]">
+                          <dd
+                            className={`mt-2 text-[1.1rem] font-semibold text-black/90 sm:text-[1.2rem] md:text-[1.25rem] ${lang !== "fa" ? "font-sans" : ""}`}
+                          >
                             {category}
                           </dd>
                         </div>
@@ -1003,7 +1019,9 @@ export default function Page() {
                           >
                             {t("modal_year")}
                           </dt>
-                          <dd className="mt-2 font-sans text-[1.1rem] font-semibold text-black/90 sm:text-[1.2rem] md:text-[1.25rem]">
+                          <dd
+                            className={`mt-2 text-[1.1rem] font-semibold text-black/90 sm:text-[1.2rem] md:text-[1.25rem] ${lang !== "fa" ? "font-sans" : ""}`}
+                          >
                             {nft.year}
                           </dd>
                         </div>
@@ -1025,7 +1043,11 @@ export default function Page() {
           </div>
         </section>
 
-        <MiniGame t={t} lang={lang} />
+        <MiniGame
+          t={t}
+          lang={lang}
+          onNavigateToProjects={() => navigateToHash("works")}
+        />
 
         <ContactSection t={t} lang={lang} />
 

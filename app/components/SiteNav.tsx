@@ -38,7 +38,7 @@ export function SiteNav({
   scrolled: boolean;
   onNavigate: (hash: string) => void;
 }) {
-  const linkClass = `group relative font-mono text-[10px] uppercase tracking-[0.18em] text-[#EBE8E1]/75 transition-colors duration-200 hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${localeCase(lang)} ${trackMeta(lang)}`;
+  const linkClass = `group relative font-mono text-[10px] uppercase ${lang === "fa" ? "tracking-[0]" : "tracking-[0.18em]"} text-[#EBE8E1]/75 transition-colors duration-200 hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${localeCase(lang)} ${trackMeta(lang)}`;
 
   const linkUnderline = (
     <span
@@ -63,14 +63,16 @@ export function SiteNav({
               e.preventDefault();
               onNavigate("hero");
             }}
-            className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${trackHeading(lang)}`}
+            className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)}`}
             aria-label={t("nav_logo_aria")}
           >
             <span
               className="block h-2 w-2 shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110"
               aria-hidden
             />
-            <span className="text-lg font-black leading-none tracking-tight sm:text-xl">
+            <span
+              className={`fa-wordmark-latin font-sans text-lg font-black leading-none sm:text-xl ${lang === "fa" ? "tracking-[0]" : "tracking-tight"}`}
+            >
               MADBAK
             </span>
           </a>

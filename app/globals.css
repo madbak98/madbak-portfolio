@@ -14,6 +14,8 @@
   --color-cream: var(--cream);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Persian stack (Vazirmatn variable from layout); use font-persian in FA contexts */
+  --font-persian: var(--font-fa), Tahoma, "Segoe UI", sans-serif;
 
   --animate-scroll-line: scroll-line 2s ease-in-out infinite;
   --animate-portfolio-fade-in: portfolio-fade-in 0.5s ease-out forwards;
@@ -261,6 +263,37 @@ body {
   animation: mini-game-surprise-toast 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
+/* Secret terminal overlay */
+@keyframes secret-terminal-glitch {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    filter: contrast(1);
+  }
+  40% {
+    transform: translate3d(-1px, 0.5px, 0);
+    filter: contrast(1.03);
+  }
+  70% {
+    transform: translate3d(0.5px, -0.5px, 0);
+    filter: contrast(0.99);
+  }
+}
+
+.secret-terminal-glitch {
+  animation: secret-terminal-glitch 0.2s ease-out 1;
+}
+
+@keyframes secret-terminal-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.secret-terminal-caret {
+  animation: secret-terminal-caret 1s step-end infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mini-game-glitching {
     animation: none;
@@ -294,14 +327,39 @@ body {
     opacity: 1;
     transform: none;
   }
+
+  .secret-terminal-glitch {
+    animation: none;
+  }
+
+  .secret-terminal-caret {
+    animation: none;
+    opacity: 1;
+  }
 }
 
-/* —— Multilingual: EN/TR use Geist; FA uses Vazirmatn + RTL-friendly metrics —— */
+/* —— Persian (FA): Vazirmatn — premium stack, zero synthetic tracking, RTL-safe —— */
 .lang-fa {
-  font-family: var(--font-fa), Tahoma, sans-serif;
+  font-family: var(--font-persian);
+  letter-spacing: 0;
   font-feature-settings: "kern" 1;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings: real weights only, no faux bold */
+.lang-fa .font-black,
+.lang-fa b,
+.lang-fa strong {
+  font-synthesis: none;
+}
+
+/* Latin wordmark / lockups stay Geist inside FA locale */
+.lang-fa .fa-wordmark-latin,
+.lang-fa #hero h2 {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  letter-spacing: inherit;
 }
 
 .lang-latin {
@@ -320,12 +378,13 @@ body {
   hyphenate-limit-chars: 6 3 3;
 }
 
-/* Persian: avoid faux-wide uppercase spacing; keep mono labels readable */
+/* Mono labels in FA: still Vazirmatn for readability (no Geist mono on Persian) */
 .lang-fa .font-mono,
 .lang-fa [class*="font-mono"] {
-  font-family: var(--font-fa), Tahoma, sans-serif;
+  font-family: var(--font-persian);
   font-feature-settings: "kern" 1;
   font-synthesis: none;
+  letter-spacing: 0;
 }
 
 /* Explicit mixed content (digits, Latin, slashes) */
@@ -335,12 +394,13 @@ body {
 
 .lang-fa p,
 .lang-fa .prose-p {
-  line-height: 1.75;
-  letter-spacing: normal;
+  line-height: 1.8;
+  letter-spacing: 0;
+  text-wrap: pretty;
 }
 
 .lang-fa .leading-relaxed {
-  line-height: 1.75;
+  line-height: 1.8;
 }
 
 /* Long translated strings */
@@ -348,4 +408,24 @@ body {
 .lang-latin .break-words {
   overflow-wrap: anywhere;
   word-break: normal;
+}
+
+/* Mini-game (System / Decryption): Persian RTL — spacing, no synthetic tracking */
+.mini-game-section--fa {
+  direction: rtl;
+}
+
+.mini-game-section--fa .mini-game-fa-heading,
+.mini-game-section--fa .mini-game-fa-copy {
+  letter-spacing: 0 !important;
+  font-family: var(--font-persian);
+}
+
+.mini-game-section--fa .mini-game-fa-heading {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+.mini-game-section--fa .mini-game-fa-copy {
+  line-height: 1.65;
 }

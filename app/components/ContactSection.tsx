@@ -107,10 +107,10 @@ export function ContactSection({
         </div>
 
         <h2
-          className={`mb-8 font-black sm:mb-12 ${localeCase(lang)} ${lang === "fa" ? "tracking-tight" : "tracking-[-0.02em]"}`}
+          className={`mb-8 font-black sm:mb-12 ${localeCase(lang)} ${lang === "fa" ? "tracking-[0]" : "tracking-[-0.02em]"}`}
           style={{
             fontSize: "clamp(2rem, 7vw, 5rem)",
-            lineHeight: lang === "fa" ? 1.08 : 0.95,
+            lineHeight: lang === "fa" ? 1.12 : 0.95,
           }}
         >
           {t("contact_title_1")}
@@ -132,10 +132,10 @@ export function ContactSection({
             aria-hidden
           />
           <span
-            className="font-sans transition-colors duration-300 group-hover:text-black/80"
+            className={`transition-colors duration-300 group-hover:text-black/80 ${lang !== "fa" ? "font-sans" : ""}`}
             style={{
               fontSize: "clamp(1.25rem, 3vw, 2rem)",
-              letterSpacing: lang === "fa" ? "0.02em" : "0.05em",
+              letterSpacing: lang === "fa" ? "0" : "0.05em",
             }}
           >
             {CONTACT_EMAIL}
@@ -171,7 +171,7 @@ export function ContactSection({
                 </span>
               </div>
               <span
-                className={`font-sans text-lg text-[#0A0A0A] ${contactSansEm(lang)}`}
+                className={`text-lg text-[#0A0A0A] ${lang !== "fa" ? "font-sans" : ""} ${contactSansEm(lang)}`}
               >
                 {social.handle}
               </span>
@@ -196,7 +196,7 @@ export function ContactSection({
         >
           <div className="max-w-xl text-start">
             <p
-              className={`mb-2 font-sans text-xs text-black/70 ${localeCase(lang)} ${contactFooterLabel(lang)} ${bodyProse(lang)}`}
+              className={`mb-2 text-xs text-black/70 ${lang !== "fa" ? "font-sans" : ""} ${localeCase(lang)} ${contactFooterLabel(lang)} ${bodyProse(lang)}`}
             >
               {t("contact_commissions")}
             </p>

@@ -12,13 +12,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "latin-ext"],
 });
 
-/** Persian UI — readable, modern; pairs with RTL in the client tree */
+/**
+ * Persian UI: Vazirmatn via next/font (production-ready, full Arabic + Latin glyphs).
+ * Peyda is not available in next/font/google; local Peyda could be added later under /public/fonts.
+ */
 const vazirmatn = Vazirmatn({
   variable: "--font-fa",
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
   adjustFontFallback: true,
+  preload: true,
 });
 
 export const metadata: Metadata = {
