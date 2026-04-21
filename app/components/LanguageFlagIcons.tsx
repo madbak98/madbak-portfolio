@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import Image from "next/image";
 
 import type { LangKey } from "../lib/portfolio-data";
 
@@ -69,61 +70,20 @@ export function FlagTr({ className = "" }: { className?: string }) {
 }
 
 /**
- * Historical Iran — soft tricolor + restrained Lion & Sun mark.
+ * Historical Iran — Lion & Sun (local asset, tuned to match muted nav treatment).
+ * Source image stored at /public/flags/iran-lion-sun.jpg
  */
 export function FlagFa({ className = "" }: { className?: string }) {
-  const g = "#4f5e52";
-  const w = "#d9d4cb";
-  const r = "#7a4a48";
-  const gold = "#8f7a52";
-  const sunFill = "#c4b89a";
-  const lion = "#252525";
-
-  const rays = [0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-    const rad = (deg * Math.PI) / 180;
-    const c = Math.cos(rad);
-    const s = Math.sin(rad);
-    return (
-      <line
-        key={deg}
-        x1={30 + c * 6}
-        y1={18 + s * 6}
-        x2={30 + c * 8.5}
-        y2={18 + s * 8.5}
-        stroke={gold}
-        strokeWidth="0.75"
-        strokeLinecap="round"
-        opacity="0.75"
-      />
-    );
-  });
-
   return (
-    <svg
-      viewBox="0 0 60 36"
-      className={`${box} ${className}`.trim()}
+    <Image
+      src="/flags/iran-lion-sun.jpg"
+      alt=""
+      width={894}
+      height={511}
+      sizes="24px"
+      className={`${box} object-cover object-[center_42%] contrast-[0.94] saturate-[0.82] brightness-[0.99] ${className}`.trim()}
       aria-hidden
-    >
-      <rect y="0" width="60" height="12" fill={g} />
-      <rect y="12" width="60" height="12" fill={w} />
-      <rect y="24" width="60" height="12" fill={r} />
-      <circle cx="30" cy="18" r="4.5" fill="none" stroke={gold} strokeWidth="0.85" opacity="0.85" />
-      <circle cx="30" cy="18" r="2.8" fill={sunFill} fillOpacity="0.28" />
-      {rays}
-      <path
-        fill={lion}
-        fillOpacity="0.78"
-        d="M21.2 18.4c.6-1.1 1.8-1.7 3-1.5 1 .2 1.7.9 2.1 1.7.4-.4 1.1-.6 1.7-.4.5.2.9.6 1.1 1.1.3-.2.8-.3 1.2-.1.4.2.7.6.8 1l.1.4c.1.5-.1 1-.6 1.2-.4.2-.9.1-1.3-.2-.1.4-.5.8-1 .9-.5.1-1 0-1.4-.3-.2.3-.7.5-1.2.4-.4-.1-.7-.3-1-.6-.2.2-.6.4-1 .3-.4-.1-.7-.3-.9-.6l-.2.2c-.4.3-1 .3-1.5-.1-.5-.3-.7-.9-.5-1.4.1-.3.3-.6.6-.8-.4-.2-.7-.6-.7-1.1 0-.5.4-1 .9-1.2z"
-      />
-      <path
-        fill="none"
-        stroke={lion}
-        strokeOpacity="0.5"
-        strokeWidth="0.4"
-        strokeLinecap="round"
-        d="M19.5 19.6c1.4.5 3 .4 4.3-.4"
-      />
-    </svg>
+    />
   );
 }
 
