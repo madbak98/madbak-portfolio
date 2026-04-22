@@ -150,7 +150,7 @@ export const TRANSLATIONS = {
     game_sys: "سیستم",
     game_dec: "رمزگشایی",
     game_desc1:
-      "روی نود بزنید تا بسته‌ها تزریق شوند — یک اسکچ کوچک تعاملی.",
+      "روی نود بزنید تا بسته‌ها تزریق شوند, یک اسکچ کوچک تعاملی.",
     game_desc2: "همین بود. ممنون که بازی کردید.",
     game_btn1: "تزریق",
     game_btn2: "قرار نیست اتفاق خاصی بیفته :)",
@@ -178,7 +178,7 @@ export const TRANSLATIONS = {
     work_h1: "آثار",
     work_h2: "منتخب",
     work_desc:
-      "مجموعه‌ای منتخب از آثار دیجیتال — جلوه‌های بصری سطح بالا، فراداده‌های دقیق و تجربه‌های غوطه‌ور.",
+      "مجموعه‌ای منتخب از آثار دیجیتال , جلوه‌های بصری سطح بالا، فراداده‌های دقیق و تجربه‌های غوطه‌ور.",
     view_details: "مشاهده گالری",
     nft_sub1: "۰۵ — دارایی‌های دیجیتال",
     nft_sub2: "روی زنجیره · تایید شده",
@@ -220,13 +220,13 @@ export const TRANSLATIONS = {
     about_intro_before: "Ben Babak; ",
     about_intro_after: " adıyla üretiyorum.",
     about_p2:
-      "Çalışmam grafik tasarım, video kurgusu ve modern web geliştirmenin kesişiminde. Sadece görsellere odaklanmıyorum — tasarım, hareket ve kodun birlikte çalıştığı dijital deneyimler inşa ediyorum.",
+      "Çalışmam grafik tasarım, video kurgusu ve modern web geliştirmenin kesişiminde. Sadece görsellere odaklanmıyorum , tasarım, hareket ve kodun birlikte çalıştığı dijital deneyimler inşa ediyorum.",
     about_p3:
       "Grafik tasarım ve video kurgusuyla başladım; kompozisyon, ritim ve görsel anlatı konusunda güçlü bir his geliştirdim. Zamanla ön uç geliştirme ve programlamaya geçerek fikirleri etkileşimli, gerçek zamanlı deneyimlere dönüştürdüm.",
     about_p4:
-      "İnsanların “vibe coding” dediği şeye özellikle ilgi duyuyorum — yaratıcı yönetimi teknik uygulamayla harmanlayarak canlı, kasıtlı ve keskin hissedilen işler üretmek.",
+      "İnsanların “vibe coding” dediği şeye özellikle ilgi duyuyorum , yaratıcı yönetimi teknik uygulamayla harmanlayarak canlı, kasıtlı ve keskin hissedilen işler üretmek.",
     about_p5:
-      "Ürettiğim her şey atmosfer, detay ve kontrol etrafında şekillenir — yalnızca nasıl göründüğü değil, nasıl davrandığı da önemlidir.",
+      "Ürettiğim her şey atmosfer, detay ve kontrol etrafında şekillenir , yalnızca nasıl göründüğü değil, nasıl davrandığı da önemlidir.",
     about_operator_image_alt: "Portre — MADBAK",
     stat_role: "Rol",
     stat_stack: "Teknoloji",
