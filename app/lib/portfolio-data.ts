@@ -26,13 +26,13 @@ export const TRANSLATIONS = {
     about_intro_before: "I’m Babak, creating under the name ",
     about_intro_after: ".",
     about_p2:
-      "My work sits at the intersection of graphic design, video editing, and modern web development. I don’t just focus on visuals — I build digital experiences where design, motion, and code work together.",
+      "My work sits at the intersection of graphic design, video editing, and modern web development. I don’t just focus on visuals , I build digital experiences where design, motion, and code work together.",
     about_p3:
-      "I started with graphic design and video editing, developing a strong sense of composition, rhythm, and visual storytelling. Over time, I expanded into front-end development and programming, turning ideas into interactive, real-time experiences.",
+      "I started with graphic design and video editing, developing a strong sense of composition, rhythm, and visual storytelling. Over time, I expanded into frontend development and programming, turning ideas into interactive, real time experiences.",
     about_p4:
-      "I’m especially interested in what people call \"vibe coding\" — blending creative direction with technical execution to build work that feels alive, intentional, and precise.",
+      "I’m especially interested in what people call \"vibe coding\" , blending creative direction with technical execution to build work that feels alive, intentional, and precise.",
     about_p5:
-      "Everything I create is built around atmosphere, detail, and control — not just how it looks, but how it behaves.",
+      "Everything I create is built around atmosphere, detail, and control , not just how it looks, but how it behaves.",
     about_operator_image_alt: "Portrait — MADBAK",
     stat_role: "Role",
     stat_stack: "Stack",
