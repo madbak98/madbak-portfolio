@@ -263,6 +263,82 @@ body {
   animation: mini-game-surprise-toast 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
+@keyframes mini-game-bat-enter {
+  0% {
+    opacity: 0;
+    filter: blur(1px);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes mini-game-bat-hover {
+  0%,
+  100% {
+    transform: translate3d(-50%, -50%, 0);
+  }
+  50% {
+    transform: translate3d(-50%, calc(-50% - 2px), 0);
+  }
+}
+
+.mini-game-bat {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99990;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-999px, -999px, 0);
+  will-change: transform, opacity;
+  transition: opacity 0.35s ease;
+}
+
+.mini-game-bat--visible {
+  animation: mini-game-bat-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) 1;
+  opacity: 1;
+}
+
+.mini-game-bat--idle-hidden {
+  opacity: 0.28;
+}
+
+.mini-game-bat-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(-50%, -50%, 0);
+  animation: mini-game-bat-hover 2.1s ease-in-out infinite;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 0 10px rgba(255, 42, 42, 0.1));
+}
+
+.mini-game-bat-inner--reduce {
+  animation: mini-game-bat-hover 3.2s ease-in-out infinite;
+}
+
+.mini-game-bat-img {
+  display: block;
+  max-width: none;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .mini-game-bat {
+    display: none;
+  }
+}
+
 /* Secret terminal overlay */
 @keyframes secret-terminal-glitch {
   0%,
@@ -326,6 +402,16 @@ body {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  .mini-game-bat--visible,
+  .mini-game-bat-inner,
+  .mini-game-bat-inner--reduce {
+    animation: none;
+  }
+
+  .mini-game-bat {
+    opacity: 1;
   }
 
   .secret-terminal-glitch {

@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import type { CSSProperties, MouseEvent } from "react";
 import { useReducedMotion } from "motion/react";
 
@@ -24,6 +25,10 @@ const PARTICLE_COUNT = 12;
 const RARE_CHANCE = 0.045;
 const TOAST_MS = 2200;
 const LONG_PRESS_MS = 900;
+
+/** Pixel bat: place your exact art at `public/mini-game-bat.png` (this path). */
+const BAT_IMAGE_SRC = "/mini-game-bat.png";
+const BAT_DISPLAY_PX = 56;
 
 const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -93,6 +98,18 @@ export function MiniGame({
   const [secretOpen, setSecretOpen] = useState(false);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suppressInjectClickRef = useRef(false);
+  const batRef = useRef<HTMLDivElement | null>(null);
+  const batRafRef = useRef<number | null>(null);
+  const batIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const batTargetRef = useRef({ x: 0, y: 0 });
+  const batRenderRef = useRef({ x: 0, y: 0 });
+  const batLastXRef = useRef(0);
+  const batSideRef = useRef<1 | -1>(1);
+  const lastPointerRef = useRef<{ x: number; y: number; hasValue: boolean }>({
+    x: 0,
+    y: 0,
+    hasValue: false,
+  });
 
   const clearLongPress = useCallback(() => {
     if (longPressTimerRef.current != null) {
@@ -179,6 +196,8 @@ export function MiniGame({
     }
   }, [complete, reduce, rare, spawnParticles, fireGlitch]);
 
+  const batCompanionActive = progress >= MAX_PROGRESS;
+
   const onInjectPointerDown = useCallback(() => {
     clearLongPress();
     longPressTimerRef.current = setTimeout(() => {
@@ -200,10 +219,97 @@ export function MiniGame({
         suppressInjectClickRef.current = false;
         return;
       }
+      lastPointerRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+        hasValue: true,
+      };
       handleInject();
     },
     [handleInject],
   );
+
+  useEffect(() => {
+    if (!batCompanionActive || typeof window === "undefined") return;
+    const node = batRef.current;
+    if (!node) return;
+    const canFollow =
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!canFollow) return;
+
+    const sideOffset = 32;
+    const liftOffset = -16;
+    const starter = lastPointerRef.current.hasValue
+      ? lastPointerRef.current
+      : { x: window.innerWidth * 0.5, y: window.innerHeight * 0.5 };
+
+    batTargetRef.current.x = starter.x + batSideRef.current * sideOffset;
+    batTargetRef.current.y = starter.y + liftOffset;
+    batRenderRef.current.x = starter.x + batSideRef.current * sideOffset;
+    batRenderRef.current.y = starter.y + liftOffset;
+    batLastXRef.current = batRenderRef.current.x;
+    node.classList.remove("mini-game-bat--idle-hidden");
+
+    const queueIdle = () => {
+      if (reduce) return;
+      if (batIdleTimerRef.current != null) {
+        clearTimeout(batIdleTimerRef.current);
+      }
+      batIdleTimerRef.current = setTimeout(() => {
+        node.classList.add("mini-game-bat--idle-hidden");
+        batIdleTimerRef.current = null;
+      }, 2800);
+    };
+
+    const onMouseMove = (event: globalThis.MouseEvent) => {
+      const dx = event.clientX - lastPointerRef.current.x;
+      if (Math.abs(dx) > 1.2) {
+        batSideRef.current = dx > 0 ? 1 : -1;
+      }
+      lastPointerRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+        hasValue: true,
+      };
+      batTargetRef.current.x = event.clientX + batSideRef.current * sideOffset;
+      batTargetRef.current.y = event.clientY + liftOffset;
+      if (!reduce) {
+        node.classList.remove("mini-game-bat--idle-hidden");
+        queueIdle();
+      }
+    };
+
+    const tick = () => {
+      const render = batRenderRef.current;
+      const target = batTargetRef.current;
+      const easing = reduce ? 0.3 : 0.14;
+      render.x += (target.x - render.x) * easing;
+      render.y += (target.y - render.y) * easing;
+
+      const dx = render.x - batLastXRef.current;
+      batLastXRef.current = render.x;
+      const tilt = Math.max(-10, Math.min(10, dx * 0.9));
+
+      node.style.transform = `translate3d(${render.x}px, ${render.y}px, 0) rotate(${tilt}deg)`;
+      batRafRef.current = window.requestAnimationFrame(tick);
+    };
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    queueIdle();
+    batRafRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      if (batIdleTimerRef.current != null) {
+        clearTimeout(batIdleTimerRef.current);
+        batIdleTimerRef.current = null;
+      }
+      if (batRafRef.current != null) {
+        window.cancelAnimationFrame(batRafRef.current);
+        batRafRef.current = null;
+      }
+    };
+  }, [batCompanionActive, reduce]);
 
   useEffect(() => {
     const ref = timersRef;
@@ -213,6 +319,14 @@ export function MiniGame({
       });
       ref.current = [];
       clearLongPress();
+      if (batIdleTimerRef.current != null) {
+        clearTimeout(batIdleTimerRef.current);
+        batIdleTimerRef.current = null;
+      }
+      if (batRafRef.current != null) {
+        cancelAnimationFrame(batRafRef.current);
+        batRafRef.current = null;
+      }
     };
   }, [clearLongPress]);
 
@@ -450,6 +564,36 @@ export function MiniGame({
           </p>
         </div>
       )}
+
+      {batCompanionActive && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              ref={batRef}
+              className="mini-game-bat mini-game-bat--visible"
+              aria-hidden
+            >
+              <div
+                className={`mini-game-bat-inner ${reduce ? "mini-game-bat-inner--reduce" : ""}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- pixel art: crisp native scaling, not next/image */}
+                <img
+                  src={BAT_IMAGE_SRC}
+                  alt=""
+                  width={BAT_DISPLAY_PX}
+                  height={BAT_DISPLAY_PX}
+                  className="mini-game-bat-img"
+                  style={{
+                    width: BAT_DISPLAY_PX,
+                    height: BAT_DISPLAY_PX,
+                  }}
+                  draggable={false}
+                  decoding="async"
+                />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </section>
   );
 }
