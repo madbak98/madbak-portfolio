@@ -2,6 +2,10 @@
 
 import React, { memo, useState, useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { PortfolioImage } from "./components/PortfolioImage";
@@ -51,6 +55,7 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
     geometry?: THREE.IcosahedronGeometry;
     originalPositions?: Float32Array | number[];
     scrollProgress?: number;
+    _dustScroll?: number;
   }>({});
 
   useEffect(() => {
@@ -118,14 +123,19 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
     scene.add(mouseLight);
 
     const geometry = new THREE.IcosahedronGeometry(1.8, geoDetail);
-    const material = new THREE.MeshStandardMaterial({
+    /** High-end minimal chrome with anisotropic highlights */
+    const chromeMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
-      roughness: 0.0,
       metalness: 1.0,
-      envMapIntensity: 2.5,
+      roughness: 0.14,
+      envMapIntensity: 1.1,
+      clearcoat: 0.08,
+      clearcoatRoughness: 0.26,
+      anisotropy: 0.62,
+      anisotropyRotation: Math.PI * 0.22,
     });
 
-    const star = new THREE.Mesh(geometry, material);
+    const star = new THREE.Mesh(geometry, chromeMaterial);
     scene.add(star);
 
     objectsRef.current.star = star;
@@ -142,15 +152,52 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
     }
     dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
 
+    const baseDustSize = isMobile ? 0.014 : 0.016;
     const dustMat = new THREE.PointsMaterial({
-      size: 0.015,
-      color: 0xffffff,
+      size: baseDustSize,
+      color: 0xe8e4dc,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.18,
       blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
     const dust = new THREE.Points(dustGeo, dustMat);
     scene.add(dust);
+
+    const ChromaticAberrationShader = {
+      uniforms: {
+        tDiffuse: { value: null },
+        amount: { value: 0 },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform sampler2D tDiffuse;
+        uniform float amount;
+        varying vec2 vUv;
+        void main() {
+          vec2 shift = vec2(amount * 0.0055, amount * 0.0021);
+          float r = texture2D(tDiffuse, vUv + shift).r;
+          float g = texture2D(tDiffuse, vUv).g;
+          float b = texture2D(tDiffuse, vUv - shift).b;
+          vec4 base = texture2D(tDiffuse, vUv);
+          gl_FragColor = vec4(r, g, b, base.a);
+        }
+      `,
+    };
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const chromaticPass = new ShaderPass(ChromaticAberrationShader);
+    composer.addPass(chromaticPass);
+    const outputPass = new OutputPass();
+    composer.addPass(outputPass);
+    composer.setSize(window.innerWidth, window.innerHeight);
 
     const mouse = new THREE.Vector2(0, 0);
     const targetMouse = new THREE.Vector2(0, 0);
@@ -163,27 +210,68 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
 
     let animationFrameId: number;
     const clock = new THREE.Clock();
+    /** Scroll velocity (0–1 progress / sec) — spike = fast wheel/trackpad */
+    let prevScrollProg = 0;
+    let rgbGlitch = 0;
+    const SCROLL_GLITCH_VEL = 0.42;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+      const dtSafe = Math.min(Math.max(dt, 1e-5), 0.08);
       const time = clock.getElapsedTime();
       const currentScroll = objectsRef.current.scrollProgress || 0;
 
-      mouse.x = THREE.MathUtils.lerp(mouse.x, targetMouse.x, 0.05);
-      mouse.y = THREE.MathUtils.lerp(mouse.y, targetMouse.y, 0.05);
-      mouseLight.position.set(mouse.x * 5, mouse.y * 5, 2);
+      const scrollVelocity =
+        Math.abs(currentScroll - prevScrollProg) / dtSafe;
+      prevScrollProg = currentScroll;
 
-      const targetCamZ = 7 - currentScroll * 4;
-      const targetCamY = currentScroll * 2 + mouse.y * 0.5;
-      const targetCamX = mouse.x * 0.5;
+      if (scrollVelocity > SCROLL_GLITCH_VEL) {
+        rgbGlitch = Math.min(1, Math.max(rgbGlitch, 0.92));
+      }
+      rgbGlitch *= 0.84;
+      chromaticPass.uniforms.amount.value = rgbGlitch;
 
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, 0.05);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, 0.05);
-      camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, 0.05);
-      camera.lookAt(0, currentScroll * 1.5, 0);
+      mouse.x = THREE.MathUtils.lerp(mouse.x, targetMouse.x, 0.055);
+      mouse.y = THREE.MathUtils.lerp(mouse.y, targetMouse.y, 0.055);
+      mouseLight.position.set(mouse.x * 5.2, mouse.y * 5.2, 2.2);
 
-      star.rotation.y = time * 0.15 + currentScroll * 3 + mouse.x * 0.2;
-      star.rotation.z = time * 0.1 + mouse.y * 0.2;
+      /** Immersive entry: extra zoom for scrollProgress ∈ [0, 0.2] */
+      const entryPhase = Math.min(1, currentScroll / 0.2);
+      const entryZoom = (1 - entryPhase) * 1.28;
+
+      const targetCamZ = 7 - currentScroll * 4 - entryZoom;
+      const targetCamY = currentScroll * 2 + mouse.y * 0.52;
+      const targetCamX = mouse.x * 0.52;
+
+      camera.position.z = THREE.MathUtils.lerp(
+        camera.position.z,
+        targetCamZ,
+        0.052,
+      );
+      camera.position.y = THREE.MathUtils.lerp(
+        camera.position.y,
+        targetCamY,
+        0.052,
+      );
+      camera.position.x = THREE.MathUtils.lerp(
+        camera.position.x,
+        targetCamX,
+        0.052,
+      );
+
+      const lookX = mouse.x * 0.62;
+      const lookY = currentScroll * 1.52 + mouse.y * 0.14;
+      const lookZ = mouse.x * -0.16;
+      camera.lookAt(lookX, lookY, lookZ);
+
+      /** Liquid-like chrome response as scroll progresses */
+      const liq = THREE.MathUtils.smoothstep(currentScroll, 0, 1);
+      chromeMaterial.envMapIntensity = 1.08 + liq * 2.35;
+      chromeMaterial.roughness = THREE.MathUtils.lerp(0.18, 0.1, liq);
+
+      star.rotation.y = time * 0.14 + currentScroll * 3 + mouse.x * 0.2;
+      star.rotation.z = time * 0.095 + mouse.y * 0.2;
 
       const posAttribute = geometry.attributes.position;
       const original = objectsRef.current.originalPositions;
@@ -206,9 +294,21 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
       posAttribute.needsUpdate = true;
       geometry.computeVertexNormals();
 
-      dust.rotation.y = time * 0.05;
+      /** Parallax dust: drift opposite scroll direction */
+      const lastDustScroll = objectsRef.current._dustScroll ?? currentScroll;
+      const dScroll = currentScroll - lastDustScroll;
+      objectsRef.current._dustScroll = currentScroll;
+      dust.position.y -= dScroll * 78;
+      dust.position.z += dScroll * 42;
 
-      renderer.render(scene, camera);
+      dust.rotation.y = time * 0.038;
+
+      const flicker = 0.5 + 0.5 * Math.sin(time * 4.1);
+      const twinkle = 0.5 + 0.5 * Math.sin(time * 6.3 + 0.7);
+      dustMat.opacity = 0.11 + 0.09 * flicker;
+      dustMat.size = baseDustSize * (1 + 0.055 * twinkle);
+
+      composer.render();
     };
 
     animate();
@@ -219,6 +319,7 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener("resize", handleResize);
 
@@ -229,9 +330,13 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
       mount.removeChild(renderer.domElement);
 
       geometry.dispose();
-      material.dispose();
+      chromeMaterial.dispose();
       dustGeo.dispose();
       dustMat.dispose();
+      chromaticPass.material.dispose();
+      outputPass.material.dispose();
+      composer.renderTarget1.dispose();
+      composer.renderTarget2.dispose();
       renderer.dispose();
       envTexture.dispose();
     };
