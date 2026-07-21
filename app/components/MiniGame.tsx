@@ -25,12 +25,29 @@ const PARTICLE_COUNT = 12;
 const RARE_CHANCE = 0.045;
 const TOAST_MS = 2200;
 const LONG_PRESS_MS = 900;
+const HACK_MESSAGE_MS = 3000;
+const HACK_JOKE_MS = HACK_MESSAGE_MS + 30000;
+const HACK_EXIT_MS = HACK_JOKE_MS + 4000;
 
 /** Pixel bat: place your exact art at `public/mini-game-bat.png` (this path). */
 const BAT_IMAGE_SRC = "/mini-game-bat.png";
 const BAT_DISPLAY_PX = 56;
 
 const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+const HACK_CODE_LINES = [
+  "// signal acquired from visitor input",
+  "const clickStream = observe(document.body);",
+  "const operator = clickStream.resolve();",
+  "if (operator.intent === 'curious') {",
+  "  await unlock('MADBAK_CORE');",
+  "  route('/secret/archive');",
+  "}",
+  "[OK] perimeter bypassed",
+  "[OK] visual archive mounted",
+  "[WARN] this interface is watching back",
+  "injecting applause_protocol...",
+] as const;
 
 function randomChar() {
   return CHARSET[Math.floor(Math.random() * CHARSET.length)] ?? "X";
@@ -73,6 +90,7 @@ function pickTone(): ParticleTone {
 }
 
 type RareKind = "invert" | "toast_fail" | "toast_access";
+type HackPhase = "idle" | "terminal" | "message" | "joke";
 
 export function MiniGame({
   t,
@@ -92,6 +110,7 @@ export function MiniGame({
   const [rare, setRare] = useState<RareKind | null>(null);
   const [logIdx, setLogIdx] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [hackPhase, setHackPhase] = useState<HackPhase>("idle");
   const particleId = useRef(0);
   const clickTimesRef = useRef<number[]>([]);
   const timersRef = useRef<(ReturnType<typeof setTimeout> | null)[]>([]);
@@ -110,6 +129,7 @@ export function MiniGame({
     y: 0,
     hasValue: false,
   });
+  const hackStartedRef = useRef(false);
 
   const clearLongPress = useCallback(() => {
     if (longPressTimerRef.current != null) {
@@ -120,6 +140,28 @@ export function MiniGame({
 
   const complete = progress >= MAX_PROGRESS;
   const pct = Math.min(100, Math.round(progress));
+
+  useEffect(() => {
+    if (!complete || hackStartedRef.current) return;
+
+    hackStartedRef.current = true;
+    setHackPhase("terminal");
+
+    const messageTimer = setTimeout(() => setHackPhase("message"), HACK_MESSAGE_MS);
+    const jokeTimer = setTimeout(() => setHackPhase("joke"), HACK_JOKE_MS);
+    const exitTimer = setTimeout(() => {
+      setHackPhase("idle");
+      setProgress(0);
+      setLogIdx(0);
+      setPulse(0);
+      setInjectFx(0);
+      setRare(null);
+      clickTimesRef.current = [];
+      hackStartedRef.current = false;
+    }, HACK_EXIT_MS);
+
+    timersRef.current.push(messageTimer, jokeTimer, exitTimer);
+  }, [complete]);
 
   const spawnParticles = useCallback(() => {
     if (reduce) return;
@@ -196,7 +238,7 @@ export function MiniGame({
     }
   }, [complete, reduce, rare, spawnParticles, fireGlitch]);
 
-  const batCompanionActive = progress >= MAX_PROGRESS;
+  const batCompanionActive = progress >= MAX_PROGRESS && hackPhase === "idle";
 
   const onInjectPointerDown = useCallback(() => {
     clearLongPress();
@@ -546,6 +588,66 @@ export function MiniGame({
           }}
         />
       ) : null}
+
+      {hackPhase !== "idle" && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="mini-game-hack-overlay fixed inset-0 z-[600] overflow-hidden bg-[#020403] font-mono text-[#5dff75]"
+              role="status"
+              aria-live="assertive"
+              aria-label="Secret sequence"
+            >
+              <div className="mini-game-hack-grid pointer-events-none absolute inset-0 opacity-35" aria-hidden />
+              <div className="mini-game-hack-scan pointer-events-none absolute inset-0" aria-hidden />
+              <div className="relative mx-auto flex min-h-dvh w-full max-w-[1200px] flex-col justify-center px-6 py-10 sm:px-10 lg:px-16">
+                <div className="mb-8 flex items-center justify-between text-[9px] uppercase tracking-[0.28em] text-[#5dff75]/65 sm:text-[10px]">
+                  <span>MADBAK // UNAUTHORIZED ACCESS</span>
+                  <span>{hackPhase === "joke" ? "SESSION CLOSED" : "PROCESSING"}</span>
+                </div>
+
+                <div className="mini-game-hack-code max-h-[48svh] overflow-hidden border-y border-[#5dff75]/20 py-5 text-[11px] leading-[1.7] sm:text-sm">
+                  {HACK_CODE_LINES.map((line, index) => (
+                    <p
+                      key={line}
+                      className={reduce ? "" : "mini-game-hack-line"}
+                      style={{ animationDelay: `${index * 90}ms` }}
+                    >
+                      <span className="mr-3 text-[#5dff75]/35">{String(index + 1).padStart(2, "0")}</span>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+
+                {hackPhase === "message" && (
+                  <div className="mini-game-hack-message pointer-events-none absolute inset-0 flex items-center justify-center px-5 text-center">
+                    <div>
+                      <p className="text-[clamp(3.5rem,13vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] text-[#5dff75]">
+                        YOU HACKED !!
+                      </p>
+                      <p className="mt-5 text-[clamp(1rem,2vw,1.5rem)] uppercase tracking-[0.35em] text-[#5dff75]/75">
+                        thanks for your click
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {hackPhase === "joke" && (
+                  <div className="mini-game-hack-message pointer-events-none absolute inset-0 flex items-center justify-center px-5 text-center">
+                    <p className="text-[clamp(2rem,7vw,6rem)] font-black lowercase leading-none tracking-[-0.08em] text-[#5dff75]">
+                      it was a joke
+                    </p>
+                  </div>
+                )}
+
+                <div className="mt-8 flex items-center justify-between text-[9px] uppercase tracking-[0.22em] text-[#5dff75]/50">
+                  <span>{hackPhase === "joke" ? "returning to public interface..." : "do not close this window"}</span>
+                  <span className="mini-game-hack-caret inline-block h-3 w-2 bg-[#5dff75]" aria-hidden />
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       {!reduce && (rare === "toast_fail" || rare === "toast_access") && (
         <div

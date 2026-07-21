@@ -1,9 +1,9 @@
 "use client";
 
-import { memo, useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { memo, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 
-import { PROJECTS, type LangKey } from "../lib/portfolio-data";
+import { NFT_ITEMS, PROJECTS, type LangKey } from "../lib/portfolio-data";
 import { PortfolioImage } from "./PortfolioImage";
 import { localeCase, trackHeading, trackMeta } from "../lib/locale-ui";
 
@@ -42,18 +42,6 @@ const GENRES: {
       tr: "Hareketli bir akışta sentetik kimlik, stil ve görsel üretim.",
     },
   },
-  {
-    id: "fashion",
-    number: "03",
-    variant: "fashion",
-    projectIds: ["04"],
-    title: { en: "FASHION / CAMPAIGN", fa: "فشن / کمپین", tr: "MODA / KAMPANYA" },
-    description: {
-      en: "Luxury references, pop symbols, and a campaign imagined as a moving image.",
-      fa: "ارجاع‌های لوکس، نمادهای پاپ و کمپینی که مثل یک تصویر متحرک ساخته شده است.",
-      tr: "Lüks referanslar, pop sembolleri ve hareketli bir görüntü gibi tasarlanan kampanya.",
-    },
-  },
 ];
 
 const WEB_PROJECTS = [
@@ -78,6 +66,15 @@ const WEB_PROJECTS = [
     },
   },
 ];
+
+const WEB_CARD_SLOTS = [
+  "col-span-2 row-span-3 sm:col-span-6 sm:row-span-3 lg:col-span-6 lg:row-span-3",
+  "col-span-1 row-span-2 sm:col-span-2 sm:row-span-3 lg:col-span-2 lg:row-span-3",
+  "col-span-1 row-span-2 sm:col-span-2 sm:row-span-3 lg:col-span-4 lg:row-span-3",
+  "col-span-2 row-span-2 sm:col-span-2 sm:row-span-3 lg:col-span-2 lg:row-span-3",
+  "col-span-2 row-span-3 sm:col-span-3 sm:row-span-3 lg:col-span-4 lg:row-span-3",
+  "col-span-2 row-span-3 sm:col-span-3 sm:row-span-3 lg:col-span-4 lg:row-span-3",
+] as const;
 
 const ProjectTitleDisplay = memo(function ProjectTitleDisplay({
   project,
@@ -288,9 +285,9 @@ function GenreSection({
   const headingY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [40, -40]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden" dir={lang === "fa" ? "rtl" : "ltr"}>
-      <header className="relative flex min-h-[70svh] items-end overflow-hidden bg-[#080808] px-5 pb-12 pt-24 text-[#F4F0E8] sm:px-8 sm:pb-16 lg:px-12">
-        <motion.div className="pointer-events-none absolute -end-[8vw] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(8rem,28vw,30rem)] font-black uppercase leading-none tracking-[-0.13em] text-white/[0.05]" style={{ y: headingY }} aria-hidden>
+    <section id={genre.id} ref={ref} className="relative scroll-mt-24 overflow-hidden" dir={lang === "fa" ? "rtl" : "ltr"}>
+      <header className="relative flex min-h-[46svh] items-end overflow-hidden bg-[#080808] px-5 pb-10 pt-20 text-[#F4F0E8] sm:min-h-[52svh] sm:px-8 sm:pb-14 lg:px-12">
+        <motion.div className="pointer-events-none absolute -right-[2.8rem] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(10rem,30vw,32rem)] font-black uppercase leading-none tracking-[-0.13em] text-white/[0.05]" style={{ y: headingY }} aria-hidden>
           {genre.number}
         </motion.div>
         <div className="relative z-10 mx-auto w-full max-w-[1400px]">
@@ -314,19 +311,26 @@ function GenreSection({
 
 function WebProjectCard({
   project,
-  index,
+  slotClass,
   lang,
 }: {
   project: (typeof WEB_PROJECTS)[number];
-  index: number;
+  slotClass: string;
   lang: LangKey;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduce = useReducedMotion();
+  const [activeImage, setActiveImage] = useState(0);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 0.5, 1], reduce ? [0, 0, 0] : [34, 0, -34]);
-  const railX = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "-34%"]);
-  const layoutClass = WEB_PROJECTS.length === 1 ? "lg:col-span-12" : index === 0 ? "lg:col-span-8" : "lg:col-span-4";
+
+  useEffect(() => {
+    if (reduce || project.images.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveImage((current) => (current + 1) % project.images.length);
+    }, 4200);
+    return () => window.clearInterval(timer);
+  }, [project.images.length, reduce]);
 
   return (
     <motion.a
@@ -334,30 +338,39 @@ function WebProjectCard({
       href={project.href}
       target="_blank"
       rel="noreferrer"
-      className={`group relative block min-h-[32rem] overflow-hidden rounded-[2rem] border border-black/10 bg-[#10151b] outline-none focus-visible:ring-2 focus-visible:ring-[#A9BDC6] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F4F0E8] sm:min-h-[38rem] ${layoutClass}`}
+      className={`group relative block min-h-[22rem] overflow-hidden rounded-[2rem] border border-black/10 bg-[#10151b] outline-none focus-visible:ring-2 focus-visible:ring-[#A9BDC6] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F4F0E8] sm:min-h-[26rem] ${slotClass}`}
       style={{ y }}
       aria-label={`${project.title} — ${project.label[lang]}`}
     >
-      <motion.div className="absolute inset-y-0 flex w-max items-center gap-5 p-5 sm:gap-8 sm:p-8" style={{ x: railX }}>
-        {project.images.map((src, imageIndex) => (
-          <div key={src} className="relative h-[78%] w-[min(76vw,48rem)] shrink-0 overflow-hidden rounded-[1.25rem] border border-white/15 bg-[#0A0E12] sm:h-[82%]">
-            <PortfolioImage
-              src={src}
-              alt={`${project.title} ${imageIndex + 1}`}
-              fill
-              priority={imageIndex === 0}
-              sizes="48rem"
-              className="object-cover transition duration-700 group-hover:scale-[1.02]"
-            />
-          </div>
-        ))}
-      </motion.div>
+      <div className="absolute inset-0 p-5 sm:p-8">
+        <div className="relative h-full w-full overflow-hidden rounded-[1.25rem] border border-white/15 bg-[#0A0E12]">
+          <AnimatePresence initial={false} mode="wait">
+            <motion.div
+              key={project.images[activeImage]}
+              className="absolute inset-0"
+              initial={reduce ? false : { opacity: 0, x: 28, scale: 0.985 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={reduce ? undefined : { opacity: 0, x: -28, scale: 0.985 }}
+              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <PortfolioImage
+                src={project.images[activeImage]}
+                alt={`${project.title} preview ${activeImage + 1}`}
+                fill
+                priority={activeImage === 0}
+                sizes="(max-width: 768px) 90vw, 44rem"
+                className="object-contain transition duration-700 group-hover:scale-[1.02]"
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#070b13] via-transparent to-[#07132c]/10" />
-      <div className="absolute start-6 top-6 z-10 font-mono text-[9px] uppercase tracking-[0.22em] text-white/55 sm:start-8 sm:top-8">MADBAK / WEB {String(index + 1).padStart(3, "0")}</div>
+      <div className="absolute start-6 top-6 z-10 font-mono text-[9px] uppercase tracking-[0.22em] text-white/55 sm:start-8 sm:top-8">MADBAK / WEB 001</div>
       <div className="absolute bottom-6 start-6 end-6 z-10 flex items-end justify-between gap-6 text-white sm:bottom-8 sm:start-8 sm:end-8">
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#A9BDC6]">{project.label[lang]}</p>
-          <h3 className="mt-3 text-[clamp(2rem,6vw,5.5rem)] font-black uppercase leading-[0.78] tracking-[-0.09em]">{project.title}</h3>
+          <h3 className="mt-3 max-w-full overflow-hidden text-[clamp(1.65rem,4.6vw,4.75rem)] font-black uppercase leading-[0.82] tracking-[-0.08em] whitespace-nowrap">{project.title}</h3>
         </div>
         <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-white/60 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1">↗</span>
       </div>
@@ -367,7 +380,7 @@ function WebProjectCard({
 
 function WebProjectsSection({ lang }: { lang: LangKey }) {
   return (
-    <section className="relative overflow-hidden border-t border-black/10 bg-[#F4F0E8] px-5 py-20 text-[#1C1A17] sm:px-8 sm:py-28 lg:px-12" dir={lang === "fa" ? "rtl" : "ltr"}>
+    <section id="websites" className="relative scroll-mt-24 overflow-hidden border-t border-black/10 bg-[#F4F0E8] px-5 py-20 text-[#1C1A17] sm:px-8 sm:py-28 lg:px-12" dir={lang === "fa" ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-[1400px]">
         <header className="mb-12 flex flex-col gap-6 border-t-2 border-[#1C1A17] pt-5 sm:mb-16 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -379,12 +392,91 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
           </p>
         </header>
 
-        <div className="grid grid-cols-12 gap-5 sm:gap-7">
+        <div className="grid auto-rows-[7rem] grid-cols-2 gap-4 sm:auto-rows-[8rem] sm:grid-cols-6 sm:gap-6 lg:grid-cols-12">
           {WEB_PROJECTS.map((project, index) => (
-            <WebProjectCard key={project.title} project={project} index={index} lang={lang} />
+            <WebProjectCard key={project.title} project={project} slotClass={WEB_CARD_SLOTS[index] ?? WEB_CARD_SLOTS[0]} lang={lang} />
+          ))}
+          {WEB_CARD_SLOTS.slice(WEB_PROJECTS.length).map((slotClass, index) => (
+            <div
+              key={`empty-web-slot-${index}`}
+              className={`relative min-h-[7rem] overflow-hidden rounded-[2rem] border border-dashed border-[#1C1A17]/18 bg-[#EDE8DD]/35 sm:min-h-[8rem] ${slotClass}`}
+              aria-hidden="true"
+            >
+              <span className="absolute bottom-5 end-5 font-mono text-[9px] tracking-[0.24em] text-[#1C1A17]/25">
+                {String(index + WEB_PROJECTS.length + 1).padStart(2, "0")}
+              </span>
+            </div>
           ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+function NFTSection({ lang }: { lang: LangKey }) {
+  const ref = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const headingY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [40, -40]);
+  const railX = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "-34%"]);
+
+  return (
+    <section id="nfts" ref={ref} className="relative scroll-mt-24 overflow-hidden" dir={lang === "fa" ? "rtl" : "ltr"}>
+      <header className="relative flex min-h-[46svh] items-end overflow-hidden bg-[#080808] px-5 pb-10 pt-20 text-[#F4F0E8] sm:min-h-[52svh] sm:px-8 sm:pb-14 lg:px-12">
+        <motion.div className="pointer-events-none absolute -right-[2.8rem] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(10rem,30vw,32rem)] font-black leading-none tracking-[-0.13em] text-white/[0.05]" style={{ y: headingY }} aria-hidden>
+          03
+        </motion.div>
+        <div className="relative z-10 mx-auto w-full max-w-[1400px]">
+          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-[#A9BDC6]">
+            <span>03 / 03</span>
+            <span>{NFT_ITEMS.length} {lang === "fa" ? "اثر" : "editions"}</span>
+          </div>
+          <motion.h2 className={`mt-6 max-w-[11ch] text-[clamp(3.75rem,12vw,12rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`} style={{ y: headingY }}>
+            {lang === "fa" ? "کالکشن NFT" : "NFT COLLECTION"}
+          </motion.h2>
+          <p className={`mt-7 max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
+            {lang === "fa" ? "تمام نسخه‌ها در یک فید متحرک؛ هر اثر به صفحه‌ی اصلی خودش لینک شده است." : "Every edition in one moving feed, with each piece linked to its original mint page."}
+          </p>
+        </div>
+      </header>
+
+      <article className="relative min-h-[86svh] overflow-hidden border-t border-white/10 bg-[#10151b] px-5 py-8 text-[#F4F0E8] sm:px-8 lg:px-12">
+        <div className="mx-auto flex min-h-[78svh] max-w-[1400px] flex-col justify-between">
+          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-[#A9BDC6]">
+            <span>Foundation / 1 of 1</span>
+            <span>{NFT_ITEMS.length} frames</span>
+          </div>
+          <div className="relative my-10 h-[48svh] overflow-hidden border-y border-[#A9BDC6]/25 sm:h-[56svh]">
+            <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
+              {[...NFT_ITEMS, ...NFT_ITEMS].map((nft, i) => (
+                <a
+                  key={`${nft.id}-${i}`}
+                  href={nft.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] outline-none focus-visible:ring-2 focus-visible:ring-[#A9BDC6] sm:h-[82%]"
+                  aria-label={`${nft.langs[lang]?.title ?? "NFT"} — ${nft.langs[lang]?.cat ?? "1/1"}`}
+                >
+                  <PortfolioImage src={nft.image} alt={nft.langs[lang]?.title ?? "NFT"} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" priority={i === 0} />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12 font-mono text-[9px] uppercase tracking-[0.18em] text-white/75">
+                    {nft.langs[lang]?.title}
+                  </div>
+                </a>
+              ))}
+            </motion.div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#10151b] via-transparent to-[#10151b]" />
+            <motion.h3 className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] text-[#F4F0E8] mix-blend-difference" style={{ y: headingY }}>
+              {lang === "fa" ? "دارایی‌ها" : "ON-CHAIN"}
+            </motion.h3>
+          </div>
+          <div className="flex flex-col gap-4 border-t border-white/15 pt-5 sm:flex-row sm:items-end sm:justify-between">
+            <p className={`max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
+              {lang === "fa" ? "مجموعه‌ای از آثار دیجیتال مستقل، هرکدام با صفحه‌ی اختصاصی برای مشاهده و مینت." : "A collection of independent digital pieces, each with its own page for viewing and minting."}
+            </p>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C45C4A]">{NFT_ITEMS.length} / {NFT_ITEMS.length} · verified editions</span>
+          </div>
+        </div>
+      </article>
     </section>
   );
 }
@@ -399,13 +491,15 @@ export function WorksScroll({
       <header className="relative flex min-h-[74svh] items-end overflow-hidden border-t border-white/10 px-5 pb-12 pt-24 sm:px-8 sm:pb-16 lg:px-12" dir={lang === "fa" ? "rtl" : "ltr"}>
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(169,189,198,0.16),transparent_38%)]" aria-hidden />
         <div className="relative z-10 mx-auto w-full max-w-[1400px]">
-          <p className={`font-mono text-[10px] uppercase tracking-[0.3em] text-[#A9BDC6] ${localeCase(lang)} ${trackMeta(lang)}`}>{lang === "fa" ? "آرشیو پروژه‌ها" : "PROJECT ARCHIVE"}</p>
-          <h2 className={`mt-5 max-w-[9ch] text-[clamp(5rem,17vw,16rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`}>
-            {lang === "fa" ? "آثار" : "WORKS"}
-          </h2>
-          <p className={`mt-8 max-w-sm text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
-            {lang === "fa" ? "هر ژانر، یک فصل مستقل با ریتم و زبان تصویری مخصوص خودش." : lang === "tr" ? "Her tür, kendi ritmi ve görsel dili olan bağımsız bir bölüm." : "Each genre is its own chapter, with a distinct visual language and motion rhythm."}
-          </p>
+          <div>
+            <p className={`font-mono text-[10px] uppercase tracking-[0.3em] text-[#A9BDC6] ${localeCase(lang)} ${trackMeta(lang)}`}>{lang === "fa" ? "آرشیو پروژه‌ها" : "PROJECT ARCHIVE"}</p>
+            <h2 className={`mt-5 max-w-[9ch] text-[clamp(5rem,17vw,16rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`}>
+              {lang === "fa" ? "آثار" : "WORKS"}
+            </h2>
+            <p className={`mt-8 max-w-sm text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
+              {lang === "fa" ? "هر ژانر، یک فصل مستقل با ریتم و زبان تصویری مخصوص خودش." : lang === "tr" ? "Her tür, kendi ritmi ve görsel dili olan bağımsız bir bölüm." : "Each genre is its own chapter, with a distinct visual language and motion rhythm."}
+            </p>
+          </div>
         </div>
       </header>
 
@@ -417,6 +511,8 @@ export function WorksScroll({
           .filter((project): project is Project => Boolean(project));
         return <GenreSection key={genre.id} genre={genre} projects={projects} lang={lang} />;
       })}
+
+      <NFTSection lang={lang} />
     </section>
   );
 }

@@ -263,6 +263,91 @@ body {
   animation: mini-game-surprise-toast 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
+@keyframes mini-game-hack-line {
+  from {
+    opacity: 0;
+    transform: translate3d(-12px, 0, 0);
+  }
+  to {
+    opacity: 0.92;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes mini-game-hack-scan {
+  0%,
+  100% {
+    transform: translateY(-12%);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(12%);
+    opacity: 0.48;
+  }
+}
+
+@keyframes mini-game-hack-message {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) skewX(-2deg);
+    filter: blur(8px);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.02) skewX(0deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes mini-game-hack-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.mini-game-hack-overlay {
+  isolation: isolate;
+  background-image: radial-gradient(circle at 50% 40%, rgba(44, 255, 92, 0.08), transparent 42%);
+}
+
+.mini-game-hack-grid {
+  background-image:
+    linear-gradient(rgba(93, 255, 117, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(93, 255, 117, 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 78%);
+}
+
+.mini-game-hack-scan {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 5px,
+    rgba(93, 255, 117, 0.06) 6px,
+    transparent 7px
+  );
+  animation: mini-game-hack-scan 5s linear infinite;
+}
+
+.mini-game-hack-line {
+  opacity: 0;
+  animation: mini-game-hack-line 0.36s ease-out forwards;
+}
+
+.mini-game-hack-message {
+  animation: mini-game-hack-message 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  text-shadow: 0 0 12px rgba(93, 255, 117, 0.5), 0 0 42px rgba(93, 255, 117, 0.28);
+}
+
+.mini-game-hack-caret {
+  animation: mini-game-hack-caret 0.8s step-end infinite;
+}
+
 @keyframes mini-game-bat-enter {
   0% {
     opacity: 0;
@@ -401,6 +486,23 @@ body {
   .mini-game-surprise-toast {
     animation: none;
     opacity: 1;
+    transform: none;
+  }
+
+  .mini-game-hack-scan,
+  .mini-game-hack-line,
+  .mini-game-hack-message,
+  .mini-game-hack-caret {
+    animation: none;
+  }
+
+  .mini-game-hack-line {
+    opacity: 0.92;
+  }
+
+  .mini-game-hack-message {
+    opacity: 1;
+    filter: none;
     transform: none;
   }
 

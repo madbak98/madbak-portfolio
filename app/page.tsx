@@ -1029,6 +1029,7 @@ export default function Page() {
 
         <WorksScroll lang={lang} />
 
+        {false && (
         <section
           id="nfts"
           className="relative z-20 border-t border-black/10 bg-[#EBE8E1] px-4 py-16 text-[#0A0A0A] sm:px-6 sm:py-20 md:px-8 md:py-24 lg:px-16 lg:py-28"
@@ -1154,6 +1155,7 @@ export default function Page() {
             </div>
           </div>
         </section>
+        )}
 
         <MiniGame
           t={t}
