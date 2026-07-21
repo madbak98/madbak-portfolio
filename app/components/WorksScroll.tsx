@@ -1,7 +1,16 @@
 "use client";
 
-import { memo, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { memo, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import Image from "next/image";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
 
 import { NFT_ITEMS, PROJECTS, type LangKey } from "../lib/portfolio-data";
 import { PortfolioImage } from "./PortfolioImage";
@@ -65,16 +74,71 @@ const WEB_PROJECTS = [
       tr: "Gelecekteki web yönü — sakin, dokunsal ve sürükleyici anlatı için tasarlandı.",
     },
   },
+  {
+    title: "ART GALLERY",
+    href: "https://muse-24-art-gallery.vercel.app/",
+    featured: true as const,
+    year: "2026",
+    images: [
+      "/projects/art-gallery/art-gallery-home.png",
+      "/projects/art-gallery/art-gallery-selected-works.png",
+      "/projects/art-gallery/art-gallery-exhibition.png",
+      "/projects/art-gallery/art-gallery-about.png",
+      "/projects/art-gallery/art-gallery-visit.png",
+    ],
+    imageAlts: [
+      "Art Gallery homepage with editorial typography and featured abstract artwork",
+      "Art Gallery selected works section",
+      "Art Gallery full-screen exhibition page",
+      "Art Gallery about section",
+      "Art Gallery visit and location section",
+    ],
+    label: {
+      en: "Art Gallery / Cultural Website",
+      fa: "گالری هنری / وب‌سایت فرهنگی",
+      tr: "Sanat Galerisi / Kültürel Web Sitesi",
+    },
+    liveLabel: {
+      en: "Live Website",
+      fa: "وب‌سایت زنده",
+      tr: "Canlı Site",
+    },
+    description: {
+      en: "An editorial cultural website for MUSE / 24 — quiet typography, living archive, and present-tense looking.",
+      fa: "وب‌سایت فرهنگی ادیتوریال برای MUSE / 24 — تایپوگرافی آرام، آرشیو زنده و نگاه در زمان حال.",
+      tr: "MUSE / 24 için editoryal bir kültürel site — sakin tipografi, yaşayan arşiv ve şimdiki zamana bakış.",
+    },
+  },
 ];
 
 const WEB_CARD_SLOTS = [
-  "col-span-2 row-span-3 sm:col-span-6 sm:row-span-3 lg:col-span-6 lg:row-span-3",
-  "col-span-1 row-span-2 sm:col-span-2 sm:row-span-3 lg:col-span-2 lg:row-span-3",
-  "col-span-1 row-span-2 sm:col-span-2 sm:row-span-3 lg:col-span-4 lg:row-span-3",
-  "col-span-2 row-span-2 sm:col-span-2 sm:row-span-3 lg:col-span-2 lg:row-span-3",
-  "col-span-2 row-span-3 sm:col-span-3 sm:row-span-3 lg:col-span-4 lg:row-span-3",
-  "col-span-2 row-span-3 sm:col-span-3 sm:row-span-3 lg:col-span-4 lg:row-span-3",
+  "col-span-2 sm:col-span-3 lg:col-span-6",
+  "col-span-2 sm:col-span-3 lg:col-span-6",
 ] as const;
+
+const SIGMA_META_CATEGORY: Record<LangKey, string> = {
+  en: "Web3 Growth Platform",
+  fa: "پلتفرم رشد وب۳",
+  tr: "Web3 Büyüme Platformu",
+};
+
+const ART_GALLERY_META_TITLE: Record<LangKey, string> = {
+  en: "Art Gallery",
+  fa: "گالری هنری",
+  tr: "Sanat Galerisi",
+};
+
+const ART_GALLERY_META_CATEGORY: Record<LangKey, string> = {
+  en: "Cultural Website",
+  fa: "وب‌سایت فرهنگی",
+  tr: "Kültürel Web Sitesi",
+};
+
+const LIVE_WEBSITE_LABEL: Record<LangKey, string> = {
+  en: "Live Website",
+  fa: "وب‌سایت زنده",
+  tr: "Canlı Site",
+};
 
 const ProjectTitleDisplay = memo(function ProjectTitleDisplay({
   project,
@@ -309,70 +373,199 @@ function GenreSection({
   );
 }
 
-function WebProjectCard({
-  project,
+function EditorialWebCard({
+  title,
+  href,
+  images,
+  imageAlts,
+  meta,
   slotClass,
-  lang,
+  frameTone = "warm",
 }: {
-  project: (typeof WEB_PROJECTS)[number];
+  title: string;
+  href: string;
+  images: readonly string[];
+  imageAlts?: readonly string[];
+  meta: readonly string[];
   slotClass: string;
-  lang: LangKey;
+  frameTone?: "warm" | "dark";
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduce = useReducedMotion();
   const [activeImage, setActiveImage] = useState(0);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], reduce ? [0, 0, 0] : [34, 0, -34]);
+  const [isPointerFine, setIsPointerFine] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const springX = useSpring(tiltX, { stiffness: 220, damping: 26, mass: 0.4 });
+  const springY = useSpring(tiltY, { stiffness: 220, damping: 26, mass: 0.4 });
+  const liftY = useSpring(0, { stiffness: 260, damping: 28, mass: 0.35 });
+  const cardScale = useSpring(1, { stiffness: 260, damping: 28, mass: 0.35 });
+
+  const tiltEnabled = Boolean(!reduce && isPointerFine);
 
   useEffect(() => {
-    if (reduce || project.images.length < 2) return;
+    const media = window.matchMedia("(pointer: fine)");
+    const sync = () => setIsPointerFine(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (reduce || images.length < 2) return;
+    if (isPointerFine && isHovering) return;
     const timer = window.setInterval(() => {
-      setActiveImage((current) => (current + 1) % project.images.length);
-    }, 4200);
+      setActiveImage((current) => (current + 1) % images.length);
+    }, 4800);
     return () => window.clearInterval(timer);
-  }, [project.images.length, reduce]);
+  }, [images.length, isHovering, isPointerFine, reduce]);
+
+  const resetTilt = () => {
+    tiltX.set(0);
+    tiltY.set(0);
+    liftY.set(0);
+    cardScale.set(1);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLAnchorElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (isPointerFine && images.length > 1) {
+      const ratio = Math.min(0.999, Math.max(0, (event.clientX - rect.left) / rect.width));
+      setActiveImage(Math.floor(ratio * images.length));
+    }
+    if (!tiltEnabled) return;
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    tiltX.set(Math.max(-3, Math.min(3, -py * 6)));
+    tiltY.set(Math.max(-3, Math.min(3, px * 6)));
+  };
+
+  const frameBg = frameTone === "dark" ? "bg-[#141414]" : "bg-[#E8E4DC]";
 
   return (
     <motion.a
       ref={ref}
-      href={project.href}
+      href={href}
       target="_blank"
-      rel="noreferrer"
-      className={`group relative block min-h-[22rem] overflow-hidden rounded-[2rem] border border-black/10 bg-[#10151b] outline-none focus-visible:ring-2 focus-visible:ring-[#A9BDC6] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F4F0E8] sm:min-h-[26rem] ${slotClass}`}
-      style={{ y }}
-      aria-label={`${project.title} — ${project.label[lang]}`}
+      rel="noopener noreferrer"
+      onPointerEnter={() => {
+        setIsHovering(true);
+        if (tiltEnabled) {
+          liftY.set(-6);
+          cardScale.set(1.012);
+        }
+      }}
+      onPointerLeave={() => {
+        setIsHovering(false);
+        setActiveImage(0);
+        resetTilt();
+      }}
+      onPointerMove={handlePointerMove}
+      className={`group relative flex h-full flex-col rounded-[1.5rem] border border-[#1C1A17]/08 bg-[#F7F3EB] text-[#1C1A17] outline-none [transform-style:preserve-3d] focus-visible:ring-2 focus-visible:ring-[#A9BDC6] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F4F0E8] sm:rounded-[1.75rem] lg:rounded-[2rem] ${slotClass}`}
+      style={{
+        rotateX: tiltEnabled ? springX : 0,
+        rotateY: tiltEnabled ? springY : 0,
+        y: tiltEnabled ? liftY : 0,
+        scale: tiltEnabled ? cardScale : 1,
+        transformPerspective: 1400,
+        boxShadow: isHovering && tiltEnabled
+          ? "inset 0 1px 0 rgba(255,255,255,0.72), 0 1px 2px rgba(28,26,23,0.05), 0 22px 48px -14px rgba(28,26,23,0.2)"
+          : "inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 2px rgba(28,26,23,0.04), 0 16px 36px -14px rgba(28,26,23,0.14)",
+      }}
+      aria-label={`${title} — ${meta[0] ?? title}`}
     >
-      <div className="absolute inset-0 p-5 sm:p-8">
-        <div className="relative h-full w-full overflow-hidden rounded-[1.25rem] border border-white/15 bg-[#0A0E12]">
+      <div className="relative flex min-h-0 flex-1 flex-col p-4 sm:p-5 lg:p-6">
+        <div
+          className={`relative aspect-[4/3] w-full overflow-hidden rounded-[1.25rem] border border-[#1C1A17]/10 sm:aspect-[16/10] sm:rounded-[1.5rem] lg:rounded-[1.75rem] ${frameBg} shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_10px_28px_-12px_rgba(28,26,23,0.28)] transition-[box-shadow,border-color] duration-500 group-hover:border-[#1C1A17]/14 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_14px_34px_-12px_rgba(28,26,23,0.34)]`}
+        >
           <AnimatePresence initial={false} mode="wait">
             <motion.div
-              key={project.images[activeImage]}
+              key={images[activeImage]}
               className="absolute inset-0"
-              initial={reduce ? false : { opacity: 0, x: 28, scale: 0.985 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={reduce ? undefined : { opacity: 0, x: -28, scale: 0.985 }}
-              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduce ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             >
-              <PortfolioImage
-                src={project.images[activeImage]}
-                alt={`${project.title} preview ${activeImage + 1}`}
+              <Image
+                src={images[activeImage]}
+                alt={imageAlts?.[activeImage] ?? `${title} preview ${activeImage + 1}`}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 42rem"
                 priority={activeImage === 0}
-                sizes="(max-width: 768px) 90vw, 44rem"
-                className="object-contain transition duration-700 group-hover:scale-[1.02]"
+                quality={92}
+                className="object-contain object-center p-2 sm:p-2.5"
+                draggable={false}
               />
             </motion.div>
           </AnimatePresence>
+
+          {images.length > 1 ? (
+            <div className="absolute bottom-3 end-3 z-10 flex gap-1.5 sm:bottom-4 sm:end-4" aria-hidden>
+              {images.map((src, index) => (
+                <span
+                  key={src}
+                  className={`h-1 w-1 rounded-full transition-all duration-300 sm:h-1.5 sm:w-1.5 ${
+                    index === activeImage
+                      ? frameTone === "dark"
+                        ? "scale-125 bg-white"
+                        : "scale-125 bg-[#1C1A17]"
+                      : frameTone === "dark"
+                        ? "bg-white/35"
+                        : "bg-[#1C1A17]/25"
+                  }`}
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
-      </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#070b13] via-transparent to-[#07132c]/10" />
-      <div className="absolute start-6 top-6 z-10 font-mono text-[9px] uppercase tracking-[0.22em] text-white/55 sm:start-8 sm:top-8">MADBAK / WEB 001</div>
-      <div className="absolute bottom-6 start-6 end-6 z-10 flex items-end justify-between gap-6 text-white sm:bottom-8 sm:start-8 sm:end-8">
-        <div className="min-w-0 flex-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#A9BDC6]">{project.label[lang]}</p>
-          <h3 className="mt-3 max-w-full overflow-hidden text-[clamp(1.65rem,4.6vw,4.75rem)] font-black uppercase leading-[0.82] tracking-[-0.08em] whitespace-nowrap">{project.title}</h3>
+
+        <div className="mt-4 flex items-end justify-between gap-4 sm:mt-5 sm:gap-6">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[9px] uppercase tracking-[0.22em] text-[#6E6A63] sm:text-[10px]">
+              {meta.map((item, index) => (
+                <span key={`${item}-${index}`} className="contents">
+                  {index > 0 ? (
+                    <span className="text-[#1C1A17]/25" aria-hidden>
+                      /
+                    </span>
+                  ) : null}
+                  <span
+                    className={
+                      index === 0
+                        ? "text-[#C45C4A]"
+                        : index === meta.length - 1
+                          ? "text-[#1C1A17]/70"
+                          : undefined
+                    }
+                  >
+                    {item}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <h3 className="mt-2 text-[clamp(1.75rem,4.2vw,3.5rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-[#1C1A17]">
+              {title}
+            </h3>
+          </div>
+
+          <span
+            className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1C1A17] text-white shadow-[0_8px_18px_-10px_rgba(28,26,23,0.55)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 sm:h-11 sm:w-11"
+            aria-hidden
+          >
+            <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+              <path
+                d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
         </div>
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-white/60 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1">↗</span>
       </div>
     </motion.a>
   );
@@ -380,7 +573,7 @@ function WebProjectCard({
 
 function WebProjectsSection({ lang }: { lang: LangKey }) {
   return (
-    <section id="websites" className="relative scroll-mt-24 overflow-hidden border-t border-black/10 bg-[#F4F0E8] px-5 py-20 text-[#1C1A17] sm:px-8 sm:py-28 lg:px-12" dir={lang === "fa" ? "rtl" : "ltr"}>
+    <section id="websites" className="relative scroll-mt-24 overflow-x-clip border-t border-black/10 bg-[#F4F0E8] px-5 py-20 text-[#1C1A17] sm:px-8 sm:py-28 lg:px-12" dir={lang === "fa" ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-[1400px]">
         <header className="mb-12 flex flex-col gap-6 border-t-2 border-[#1C1A17] pt-5 sm:mb-16 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -392,21 +585,37 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
           </p>
         </header>
 
-        <div className="grid auto-rows-[7rem] grid-cols-2 gap-4 sm:auto-rows-[8rem] sm:grid-cols-6 sm:gap-6 lg:grid-cols-12">
-          {WEB_PROJECTS.map((project, index) => (
-            <WebProjectCard key={project.title} project={project} slotClass={WEB_CARD_SLOTS[index] ?? WEB_CARD_SLOTS[0]} lang={lang} />
-          ))}
-          {WEB_CARD_SLOTS.slice(WEB_PROJECTS.length).map((slotClass, index) => (
-            <div
-              key={`empty-web-slot-${index}`}
-              className={`relative min-h-[7rem] overflow-hidden rounded-[2rem] border border-dashed border-[#1C1A17]/18 bg-[#EDE8DD]/35 sm:min-h-[8rem] ${slotClass}`}
-              aria-hidden="true"
-            >
-              <span className="absolute bottom-5 end-5 font-mono text-[9px] tracking-[0.24em] text-[#1C1A17]/25">
-                {String(index + WEB_PROJECTS.length + 1).padStart(2, "0")}
-              </span>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-6 sm:gap-6 lg:grid-cols-12 lg:gap-7">
+          {WEB_PROJECTS.map((project, index) => {
+            const slotClass = WEB_CARD_SLOTS[index] ?? WEB_CARD_SLOTS[0];
+            const isFeatured = "featured" in project && project.featured;
+            const meta = isFeatured
+              ? [
+                  ART_GALLERY_META_TITLE[lang],
+                  ART_GALLERY_META_CATEGORY[lang],
+                  "2026",
+                  LIVE_WEBSITE_LABEL[lang],
+                ]
+              : [
+                  project.label[lang],
+                  SIGMA_META_CATEGORY[lang],
+                  "2026",
+                  LIVE_WEBSITE_LABEL[lang],
+                ];
+
+            return (
+              <EditorialWebCard
+                key={project.title}
+                title={project.title}
+                href={project.href}
+                images={project.images}
+                imageAlts={"imageAlts" in project ? project.imageAlts : undefined}
+                meta={meta}
+                slotClass={slotClass}
+                frameTone={isFeatured ? "warm" : "dark"}
+              />
+            );
+          })}
         </div>
       </div>
     </section>
