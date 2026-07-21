@@ -23,16 +23,16 @@ export const TRANSLATIONS = {
     about_op: "Operator",
     about_h1_1: "DESIGNED",
     about_h1_2: "PRESENCE",
-    about_intro_before: "I’m Babak, creating under the name ",
+    about_intro_before: "I’M BABAK — creating as ",
     about_intro_after: ".",
     about_p2:
-      "My work sits at the intersection of graphic design, video editing, and modern web development. I don’t just focus on visuals , I build digital experiences where design, motion, and code work together.",
+      "A Junior Frontend Developer with a background in graphic design, passionate about building modern, responsive, and visually engaging web experiences.",
     about_p3:
-      "I started with graphic design and video editing, developing a strong sense of composition, rhythm, and visual storytelling. Over time, I expanded into frontend development and programming, turning ideas into interactive, real time experiences.",
+      "I enjoy transforming ideas into clean, interactive interfaces using React, Next.js, TypeScript, and modern frontend technologies.",
     about_p4:
-      "I’m especially interested in what people call \"vibe coding\" , blending creative direction with technical execution to build work that feels alive, intentional, and precise.",
+      "My design background helps me create products that not only function well but also deliver thoughtful user experiences.",
     about_p5:
-      "Everything I create is built around atmosphere, detail, and control , not just how it looks, but how it behaves.",
+      "I’m currently focused on building production-ready projects, improving my engineering skills, and growing as a frontend developer.",
     about_operator_image_alt: "Portrait — MADBAK",
     stat_role: "Role",
     stat_stack: "Stack",
@@ -98,6 +98,8 @@ export const TRANSLATIONS = {
     contact_social_ig: "Instagram",
     contact_social_tg: "TELEGRAM",
     contact_social_wa: "WHATSAPP",
+    contact_social_li: "LinkedIn",
+    contact_social_gh: "GitHub",
     nft_view: "View Asset",
   },
   fa: {
@@ -120,16 +122,16 @@ export const TRANSLATIONS = {
     about_op: "اپراتور",
     about_h1_1: "حضور",
     about_h1_2: "طراحی‌شده",
-    about_intro_before: "من بابک هستم و با نام ",
-    about_intro_after: " خلق می‌کنم.",
+    about_intro_before: "من بابک هستم — با نام ",
+    about_intro_after: ".",
     about_p2:
-      "کار من در تقاطع طراحی گرافیک، تدوین ویدیو و توسعهٔ وب مدرن قرار دارد. فقط به ظاهر کار نمی‌پردازم , تجربه‌های دیجیتالی می‌سازم که طراحی، موشن و کد با هم کار می‌کنند.",
+      "توسعه‌دهنده فرانت‌اند با پیش‌زمینه طراحی گرافیک که به ساخت وب‌سایت‌های مدرن، واکنش‌گرا و از نظر بصری جذاب علاقه‌مند است.",
     about_p3:
-      "از طراحی گرافیک و تدوین ویدیو شروع کردم و حس قوی از ترکیب‌بندی، ریتم و روایت بصری توسعه دادم. به‌مرور به فرانت‌اند و برنامه‌نویسی گسترش دادم و ایده‌ها را به تجربه‌های تعاملی و بلادرنگ تبدیل می‌کنم.",
+      "تمرکز من تبدیل ایده‌ها به رابط‌های کاربری تمیز و تعاملی با استفاده از React، Next.js و TypeScript است.",
     about_p4:
-      "به‌ویژه به چیزی که «vibe coding» نامیده می‌شود علاقه‌مندم, ترکیب جهت خلاقانه با اجرای فنی برای ساخت آثاری که زنده، آگاهانه و دقیق به نظر برسند.",
+      "ترکیب طراحی و برنامه‌نویسی به من کمک می‌کند محصولاتی بسازم که هم زیبا باشند و هم تجربه کاربری مناسبی ارائه دهند.",
     about_p5:
-      "همهٔ آنچه می‌سازم بر فضا، جزئیات و کنترل استوار است , نه‌تنها این‌که چگونه به نظر می‌رسد، بلکه چگونه رفتار می‌کند.",
+      "در حال حاضر روی توسعه مهارت‌های فرانت‌اند، ساخت پروژه‌های واقعی و همکاری با تیم‌های محصول تمرکز دارم.",
     about_operator_image_alt: "پرتره — MADBAK",
     stat_role: "نقش",
     stat_stack: "تکنولوژی",
@@ -195,6 +197,8 @@ export const TRANSLATIONS = {
     contact_social_ig: "اینستاگرام",
     contact_social_tg: "تلگرام",
     contact_social_wa: "واتساپ",
+    contact_social_li: "لینکدین",
+    contact_social_gh: "گیت‌هاب",
     nft_view: "مشاهده اثر",
   },
   tr: {
@@ -217,16 +221,16 @@ export const TRANSLATIONS = {
     about_op: "Operatör",
     about_h1_1: "TASARLANMIŞ",
     about_h1_2: "VARLIK",
-    about_intro_before: "Ben Babak; ",
+    about_intro_before: "BEN BABAK — ",
     about_intro_after: " adıyla üretiyorum.",
     about_p2:
-      "Çalışmam grafik tasarım, video kurgusu ve modern web geliştirmenin kesişiminde. Sadece görsellere odaklanmıyorum , tasarım, hareket ve kodun birlikte çalıştığı dijital deneyimler inşa ediyorum.",
+      "Grafik tasarım geçmişine sahip bir Junior Frontend Developer olarak; modern, duyarlı ve görsel olarak etkileyici web deneyimleri oluşturmaya tutkuluyum.",
     about_p3:
-      "Grafik tasarım ve video kurgusuyla başladım; kompozisyon, ritim ve görsel anlatı konusunda güçlü bir his geliştirdim. Zamanla ön uç geliştirme ve programlamaya geçerek fikirleri etkileşimli, gerçek zamanlı deneyimlere dönüştürdüm.",
+      "Fikirleri React, Next.js, TypeScript ve modern frontend teknolojileriyle temiz, etkileşimli arayüzlere dönüştürmekten keyif alıyorum.",
     about_p4:
-      "İnsanların “vibe coding” dediği şeye özellikle ilgi duyuyorum , yaratıcı yönetimi teknik uygulamayla harmanlayarak canlı, kasıtlı ve keskin hissedilen işler üretmek.",
+      "Tasarım geçmişim, yalnızca iyi çalışan değil aynı zamanda düşünülmüş kullanıcı deneyimleri sunan ürünler yaratmama yardımcı oluyor.",
     about_p5:
-      "Ürettiğim her şey atmosfer, detay ve kontrol etrafında şekillenir , yalnızca nasıl göründüğü değil, nasıl davrandığı da önemlidir.",
+      "Şu anda production-ready projeler geliştirmeye, mühendislik becerilerimi güçlendirmeye ve bir frontend developer olarak büyümeye odaklanıyorum.",
     about_operator_image_alt: "Portre — MADBAK",
     stat_role: "Rol",
     stat_stack: "Teknoloji",
@@ -292,6 +296,8 @@ export const TRANSLATIONS = {
     contact_social_ig: "Instagram",
     contact_social_tg: "TELEGRAM",
     contact_social_wa: "WHATSAPP",
+    contact_social_li: "LinkedIn",
+    contact_social_gh: "GitHub",
     nft_view: "Varlığı Görüntüle",
   },
 } as const;
@@ -640,6 +646,11 @@ export const SOCIAL_LINKS = {
     process.env.NEXT_PUBLIC_SOCIAL_TELEGRAM ?? "https://t.me/Lilosaama",
   whatsapp:
     process.env.NEXT_PUBLIC_SOCIAL_WHATSAPP ?? "https://wa.me/905010050395",
+  linkedin:
+    process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN ??
+    "https://www.linkedin.com/in/babak-ravanbakhsh-16535a327/",
+  github:
+    process.env.NEXT_PUBLIC_SOCIAL_GITHUB ?? "https://github.com/madbak98",
 } as const;
 
 export const CONTACT_EMAIL = "madbak98@gmail.com";

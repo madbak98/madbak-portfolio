@@ -43,11 +43,20 @@ import {
 } from "./lib/locale-ui";
 import { ContactSection } from "./components/ContactSection";
 import { MiniGame } from "./components/MiniGame";
+import { WorksScroll } from "./components/WorksScroll";
 
 /* ==========================================
    2. 3D SCENE (Vanilla Three.js)
 ========================================== */
-const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
+const ThreeScene = ({
+  scrollProgress,
+  introReady,
+  reduceMotion,
+}: {
+  scrollProgress: number;
+  introReady: boolean;
+  reduceMotion: boolean;
+}) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const objectsRef = useRef<{
     camera?: THREE.PerspectiveCamera;
@@ -56,7 +65,16 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
     originalPositions?: Float32Array | number[];
     scrollProgress?: number;
     _dustScroll?: number;
-  }>({});
+    introReady?: boolean;
+    reduceMotion?: boolean;
+    introProgress?: number;
+    _reducedGeomRestored?: boolean;
+  }>({
+    introReady,
+    reduceMotion,
+    introProgress: reduceMotion ? 1 : 0,
+    scrollProgress,
+  });
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -136,10 +154,13 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
     });
 
     const star = new THREE.Mesh(geometry, chromeMaterial);
+    const startReduced = Boolean(objectsRef.current.reduceMotion);
+    star.scale.setScalar(startReduced ? 1 : 0.86);
     scene.add(star);
 
     objectsRef.current.star = star;
     objectsRef.current.geometry = geometry;
+    objectsRef.current.introProgress = startReduced ? 1 : 0;
     objectsRef.current.originalPositions = new Float32Array(
       geometry.attributes.position.array,
     );
@@ -265,13 +286,29 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
       const lookZ = mouse.x * -0.16;
       camera.lookAt(lookX, lookY, lookZ);
 
+      /** Soft cinematic intro scale (structure unchanged; gated by reduced motion) */
+      const reduce = Boolean(objectsRef.current.reduceMotion);
+      let intro = objectsRef.current.introProgress ?? 0;
+      if (reduce) {
+        intro = 1;
+      } else if (objectsRef.current.introReady) {
+        intro = Math.min(1, intro + dtSafe * 0.42);
+      }
+      objectsRef.current.introProgress = intro;
+      const introEase = 1 - (1 - intro) ** 3;
+      star.scale.setScalar(THREE.MathUtils.lerp(0.86, 1, introEase));
+      const cinemaFloat = reduce ? 0 : Math.sin(time * 0.28) * 0.055 * introEase;
+      star.position.y = cinemaFloat;
+
       /** Liquid-like chrome response as scroll progresses */
       const liq = THREE.MathUtils.smoothstep(currentScroll, 0, 1);
       chromeMaterial.envMapIntensity = 1.08 + liq * 2.35;
       chromeMaterial.roughness = THREE.MathUtils.lerp(0.18, 0.1, liq);
 
-      star.rotation.y = time * 0.14 + currentScroll * 3 + mouse.x * 0.2;
-      star.rotation.z = time * 0.095 + mouse.y * 0.2;
+      const rotMul = reduce ? 0 : introEase;
+      star.rotation.y =
+        time * 0.11 * rotMul + currentScroll * 3 + mouse.x * 0.2;
+      star.rotation.z = time * 0.075 * rotMul + mouse.y * 0.2;
 
       const posAttribute = geometry.attributes.position;
       const original = objectsRef.current.originalPositions;
@@ -279,7 +316,8 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
       const distortAmt = 0.15 + currentScroll * 0.5;
       const frequency = 1.5;
 
-      if (original) {
+      if (original && !reduce) {
+        objectsRef.current._reducedGeomRestored = false;
         for (let i = 0; i < posAttribute.count; i++) {
           v.fromArray(original, i * 3);
           const noise =
@@ -289,10 +327,18 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
           v.normalize().multiplyScalar(1.8 + noise * distortAmt);
           posAttribute.setXYZ(i, v.x, v.y, v.z);
         }
+        posAttribute.needsUpdate = true;
+        geometry.computeVertexNormals();
+      } else if (
+        original &&
+        reduce &&
+        !objectsRef.current._reducedGeomRestored
+      ) {
+        posAttribute.array.set(original);
+        posAttribute.needsUpdate = true;
+        geometry.computeVertexNormals();
+        objectsRef.current._reducedGeomRestored = true;
       }
-
-      posAttribute.needsUpdate = true;
-      geometry.computeVertexNormals();
 
       /** Parallax dust: drift opposite scroll direction */
       const lastDustScroll = objectsRef.current._dustScroll ?? currentScroll;
@@ -345,6 +391,22 @@ const ThreeScene = ({ scrollProgress }: { scrollProgress: number }) => {
   useEffect(() => {
     objectsRef.current.scrollProgress = scrollProgress;
   }, [scrollProgress]);
+
+  useEffect(() => {
+    objectsRef.current.introReady = introReady;
+  }, [introReady]);
+
+  useEffect(() => {
+    objectsRef.current.reduceMotion = reduceMotion;
+    if (reduceMotion) {
+      objectsRef.current.introProgress = 1;
+      const star = objectsRef.current.star;
+      if (star) {
+        star.scale.setScalar(1);
+        star.position.y = 0;
+      }
+    }
+  }, [reduceMotion]);
 
   return (
     <div
@@ -750,7 +812,11 @@ export default function Page() {
 
       <div className="pointer-events-none fixed inset-0 z-[60] bg-noise opacity-[0.4] mix-blend-multiply" />
 
-      <ThreeScene scrollProgress={scrollProgress} />
+      <ThreeScene
+        scrollProgress={scrollProgress}
+        introReady={!loading}
+        reduceMotion={reduceMotion}
+      />
 
       <main className="relative z-10 overflow-x-hidden pt-14 sm:pt-[3.75rem]">
         <SiteNav
@@ -778,23 +844,65 @@ export default function Page() {
           className="pointer-events-none relative flex min-h-[min(92svh,40rem)] flex-col items-center justify-center overflow-x-hidden px-4 sm:min-h-[85vh] lg:h-[120vh] lg:min-h-0"
         >
           <div className="absolute inset-0 flex w-full flex-col items-center justify-center mix-blend-difference text-[#EBE8E1]">
-            <h2
-              className={`fa-wordmark-latin relative z-10 max-w-[100%] text-center font-sans text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
+            <div
+              className="relative z-10"
               style={{ transform: `translateY(${scrollProgress * 200}px)` }}
             >
-              MADBAK
-            </h2>
+              <motion.h2
+                className={`fa-wordmark-latin max-w-[100%] text-center font-sans text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
+                initial={
+                  reduceMotion ? false : { opacity: 0, y: 56 }
+                }
+                animate={
+                  loading
+                    ? reduceMotion
+                      ? { opacity: 0 }
+                      : { opacity: 0, y: 56 }
+                    : { opacity: 1, y: 0 }
+                }
+                transition={{
+                  duration: reduceMotion ? 0.01 : 1.15,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: reduceMotion || loading ? 0 : 0.06,
+                }}
+                style={{ willChange: reduceMotion ? undefined : "transform, opacity" }}
+              >
+                MADBAK
+              </motion.h2>
+            </div>
 
-            <p
-              className="relative z-10 mt-6 max-w-[95vw] text-center select-none mix-blend-normal sm:mt-8 md:mt-12"
+            <div
+              className="relative z-10 mt-6 max-w-[95vw] text-center sm:mt-8 md:mt-12"
               style={{ transform: `translateY(${scrollProgress * 350}px)` }}
             >
-              <span
-                className={`inline-block max-w-[min(100%,42rem)] rounded-full border border-[#ff2a2a]/40 bg-[#0A0A0A]/90 px-3 py-1.5 text-[10px] font-light text-[#ff2a2a] shadow-[0_0_24px_rgba(255,42,42,0.18)] backdrop-blur-sm sm:px-4 sm:py-2 sm:text-xs md:px-6 md:py-2.5 md:text-xl ${localeCase(lang)} ${heroSubTracking(lang)}`}
+              <motion.p
+                className="select-none mix-blend-normal"
+                initial={
+                  reduceMotion ? false : { opacity: 0, y: 28 }
+                }
+                animate={
+                  loading
+                    ? reduceMotion
+                      ? { opacity: 0 }
+                      : { opacity: 0, y: 28 }
+                    : { opacity: 1, y: 0 }
+                }
+                transition={{
+                  duration: reduceMotion ? 0.01 : 0.95,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: reduceMotion || loading ? 0 : 0.38,
+                }}
+                style={{
+                  willChange: reduceMotion ? undefined : "transform, opacity",
+                }}
               >
-                {t("hero_dev")}
-              </span>
-            </p>
+                <span
+                  className={`inline-block max-w-[min(100%,42rem)] rounded-full border border-[#ff2a2a]/40 bg-[#0A0A0A]/90 px-3 py-1.5 text-[10px] font-light text-[#ff2a2a] shadow-[0_0_24px_rgba(255,42,42,0.18)] backdrop-blur-sm sm:px-4 sm:py-2 sm:text-xs md:px-6 md:py-2.5 md:text-xl ${localeCase(lang)} ${heroSubTracking(lang)}`}
+                >
+                  {t("hero_dev")}
+                </span>
+              </motion.p>
+            </div>
           </div>
 
           <div className="absolute bottom-20 flex -translate-x-1/2 flex-col items-center mix-blend-difference text-[#EBE8E1] start-1/2 sm:bottom-28 lg:bottom-32">
@@ -919,108 +1027,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section
-          id="works"
-          className="relative z-20 scroll-mt-[5.5rem] border-t border-black/10 bg-[#EBE8E1] py-16 sm:py-24 md:py-32"
-        >
-          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 md:px-8 lg:max-w-[90vw]">
-            <div
-              className={`mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] sm:mb-12 md:mb-16 ${localeCase(lang)} ${trackMeta(lang)}`}
-            >
-              <span>{t("work_title")}</span>
-              <span>({String(PROJECTS.length).padStart(2, "0")})</span>
-            </div>
-
-            <div className="flex flex-col">
-              {PROJECTS.map((project) => {
-                const title = project.langs[lang]?.title;
-                const category = project.langs[lang]?.cat;
-                const role = project.langs[lang]?.role;
-                const context = project.langs[lang]?.context;
-
-                return (
-                  <div
-                    key={project.id}
-                    className="group relative cursor-pointer overflow-hidden border-b border-black/10 py-6 touch-manipulation transition-[filter] duration-200 [-webkit-tap-highlight-color:transparent] active:brightness-[0.97] sm:py-8 md:py-12 md:active:brightness-100"
-                    onClick={() => setSelected(project)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setSelected(project);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="absolute inset-0 origin-bottom translate-y-full bg-[#0A0A0A] transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:translate-y-0" />
-
-                    <div className="relative z-10 flex flex-col items-start justify-between gap-4 transition-colors duration-300 group-hover:text-[#EBE8E1] md:flex-row md:items-center md:gap-10 lg:gap-12">
-                      <div className="flex min-w-0 flex-1 items-center gap-6 sm:gap-8 md:w-2/3 md:gap-12 lg:gap-16">
-                        <span className="hidden text-sm font-mono opacity-30 transition-opacity group-hover:opacity-100 md:block">
-                          {project.id}
-                        </span>
-
-                        <div className="relative hidden h-16 w-16 shrink-0 origin-center overflow-hidden rounded-full border border-white/20 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100 md:block md:h-24 md:w-24 md:scale-0">
-                          <PortfolioImage
-                            src={project.image}
-                            alt={title ?? ""}
-                            fill
-                            sizes="128px"
-                            className="h-full w-full"
-                          />
-                        </div>
-
-                        <div className="relative min-w-0 flex-1">
-                          <h3
-                            className={`relative text-2xl font-black sm:text-4xl md:text-6xl lg:text-7xl ${lang === "fa" ? "leading-[1.12] sm:leading-[1.1] md:leading-[1.08]" : "leading-none"} ${localeCase(lang)} ${trackHeading(lang)}`}
-                          >
-                            <span className="relative z-10">
-                              <ProjectTitleDisplay
-                                project={project}
-                                lang={lang}
-                              />
-                            </span>
-                            <div
-                              className={`absolute top-1/2 z-20 h-1 w-[110%] -translate-y-1/2 bg-[#ff2a2a] transition-transform duration-500 ease-out group-hover:scale-x-100 md:h-2 ${lang === "fa" ? "right-[-5%] origin-right" : "left-[-5%] origin-left"} scale-x-0`}
-                            />
-                          </h3>
-                          <p
-                            className={`mt-2 max-w-3xl font-mono text-[9px] leading-relaxed opacity-45 sm:text-[10px] ${localeCase(lang)} ${trackMeta(lang)}`}
-                          >
-                            <span className="tabular-nums">{project.year}</span>
-                            <span className="mx-1.5 text-black/30">·</span>
-                            {role}
-                            <span className="mx-1.5 text-black/30">·</span>
-                            {context}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex w-full items-center justify-between gap-3 md:w-1/3 md:max-w-md md:gap-4 lg:max-w-lg">
-                        <p
-                          className={`min-w-0 flex-1 break-words text-end rtl:text-start font-mono text-[10px] opacity-50 group-hover:opacity-100 md:text-xs ${localeCase(lang)} ${trackMeta(lang)}`}
-                        >
-                          {category}
-                        </p>
-                        <div
-                          className={`flex h-11 min-h-[44px] w-11 min-w-[44px] shrink-0 items-center justify-center rounded-full border border-current transition-all duration-500 group-hover:rotate-0 group-hover:border-[#ff2a2a] group-hover:bg-[#ff2a2a] md:h-10 md:min-h-0 md:w-10 md:min-w-0 ${lang === "fa" ? "rotate-45" : "-rotate-45"}`}
-                        >
-                          <svg
-                            viewBox="0 0 24 24"
-                            className={`h-4 w-4 fill-none stroke-current stroke-2 ${lang === "fa" ? "rotate-180" : ""}`}
-                          >
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                            <polyline points="12 5 19 12 12 19" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <WorksScroll lang={lang} />
 
         <section
           id="nfts"
