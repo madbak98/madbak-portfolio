@@ -1,6 +1,5 @@
-/** About / Operator column portrait. Swap for e.g. `/about-operator.jpg` when self-hosting. */
-export const ABOUT_OPERATOR_IMAGE_SRC =
-  "https://github.com/madbak98/My-image/blob/main/IMG_3080.JPG?raw=true";
+/** About / Operator column portrait. */
+export const ABOUT_OPERATOR_IMAGE_SRC = "/about-operator.png";
 
 export const TRANSLATIONS = {
   en: {
