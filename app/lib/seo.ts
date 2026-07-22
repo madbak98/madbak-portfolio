@@ -28,7 +28,7 @@ export const HOME_SEO: Record<LangKey, PageSeoCopy> = {
   en: {
     title: "Madbak — Creative Frontend Developer & Web Designer",
     description:
-      "Portfolio of Madbak, a creative frontend developer and web designer creating interactive websites, digital experiences, visual identities, and motion-led web projects.",
+      "Portfolio of Madbak, a creative frontend developer and web designer creating interactive websites, digital experiences, and motion-led projects.",
     keywords: [
       "frontend developer",
       "creative frontend developer",
