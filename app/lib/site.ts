@@ -1,11 +1,13 @@
 import { ABOUT_OPERATOR_IMAGE_SRC, SOCIAL_LINKS } from "./portfolio-data";
 
 /**
- * Preferred production origin (apex, non-www).
- * Env overrides are accepted only when they resolve to madbak.art;
- * www / localhost / Vercel preview hosts are never emitted in metadata.
+ * Current production origin (www).
+ * Apex madbak.art is not attached to this Vercel project yet — do not emit it.
+ * Env overrides are accepted only when they resolve to madbak.art (www or apex);
+ * they are always normalized to www. Localhost / Vercel preview hosts are ignored.
+ * No application-level hostname redirects.
  */
-const PREFERRED_ORIGIN = "https://madbak.art" as const;
+const PREFERRED_ORIGIN = "https://www.madbak.art" as const;
 
 function resolveSiteUrl(): typeof PREFERRED_ORIGIN {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
