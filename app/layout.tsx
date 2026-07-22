@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
 import { Bevan, Geist, Geist_Mono, Vazirmatn } from "next/font/google";
+import { SiteCursor } from "./components/SiteCursor";
+import {
+  absoluteUrl,
+  DEFAULT_OG_IMAGE_HEIGHT,
+  DEFAULT_OG_IMAGE_PATH,
+  DEFAULT_OG_IMAGE_WIDTH,
+  SITE_NAME,
+  SITE_URL,
+} from "./lib/site";
+import { HOME_SEO } from "./lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,10 +42,66 @@ const vazirmatn = Vazirmatn({
   preload: true,
 });
 
+const home = HOME_SEO.en;
+
 export const metadata: Metadata = {
-  title: "Madbak",
-  description:
-    "Visual designer and creative developer — web, motion, and digital craft. Istanbul / global.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: home.title,
+    template: "%s — Madbak",
+  },
+  description: home.description,
+  applicationName: SITE_NAME,
+  authors: [{ name: "Babak Ravanbakhsh", url: SITE_URL }],
+  creator: "Babak Ravanbakhsh",
+  publisher: SITE_NAME,
+  keywords: home.keywords,
+  category: "portfolio",
+  alternates: {
+    canonical: absoluteUrl("/"),
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: ["fa_IR", "tr_TR"],
+    url: absoluteUrl("/"),
+    siteName: SITE_NAME,
+    title: home.title,
+    description: home.description,
+    images: [
+      {
+        url: absoluteUrl(DEFAULT_OG_IMAGE_PATH),
+        width: DEFAULT_OG_IMAGE_WIDTH,
+        height: DEFAULT_OG_IMAGE_HEIGHT,
+        alt: "Madbak portfolio — creative frontend developer and web designer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: home.title,
+    description: home.description,
+    images: [absoluteUrl(DEFAULT_OG_IMAGE_PATH)],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? {
+          "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION,
+        }
+      : undefined,
+  },
 };
 
 export default function RootLayout({
@@ -48,7 +114,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${bevan.variable} ${vazirmatn.variable} h-full antialiased`}
     >
-      <body className="min-h-full overflow-x-hidden">{children}</body>
+      <body className="min-h-full overflow-x-hidden">
+        {children}
+        <SiteCursor />
+      </body>
     </html>
   );
 }

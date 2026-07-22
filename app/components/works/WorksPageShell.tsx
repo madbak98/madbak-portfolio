@@ -3,20 +3,28 @@
 import { useCallback, useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
-import { TRANSLATIONS, type LangKey } from "../../lib/portfolio-data";
+import { TRANSLATIONS } from "../../lib/portfolio-data";
 import type { WorkCategory } from "../../lib/works-categories";
+import { usePreferredLang } from "../../lib/locale-preference";
+import { documentTitleForPath } from "../../lib/seo";
 import { htmlLangAttr, rootLocaleClasses } from "../../lib/locale-ui";
 import { MobileNavOverlay, SiteNav } from "../SiteNav";
 import { WorksCategoryPage } from "./WorksCategoryPage";
 
 export function WorksPageShell({ category }: { category: WorkCategory }) {
-  const [lang, setLang] = useState<LangKey>("en");
+  const [lang, setLang] = usePreferredLang();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [worksMenuOpen, setWorksMenuOpen] = useState(false);
   const [worksAccordionOpen, setWorksAccordionOpen] = useState(true);
   const [navScrolled, setNavScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const reduceMotion = Boolean(prefersReducedMotion);
+
+  useEffect(() => {
+    document.title = documentTitleForPath(category.href, lang);
+    document.documentElement.lang = htmlLangAttr(lang);
+    document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
+  }, [category.href, lang]);
 
   const t = (key: keyof (typeof TRANSLATIONS)["en"]) =>
     TRANSLATIONS[lang][key] ?? String(key);

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { WORK_CATEGORIES, type WorkCategorySlug } from "../../lib/works-categories";
 import type { LangKey } from "../../lib/portfolio-data";
+import { localizeDigits } from "../../lib/locale-preference";
 import { localeCase, trackMeta } from "../../lib/locale-ui";
 
 export function WorksMegaMenuPanel({
@@ -12,20 +13,24 @@ export function WorksMegaMenuPanel({
   lang,
   activeSlug,
   onNavigate,
+  ariaLabel,
 }: {
   id: string;
   open: boolean;
   lang: LangKey;
   activeSlug?: WorkCategorySlug | null;
   onNavigate?: () => void;
+  ariaLabel: string;
 }) {
+  const isFa = lang === "fa";
+
   return (
     <div
       id={id}
       hidden={!open}
       className="absolute inset-x-0 top-full z-[105] border-b border-white/10 bg-[#0A0A0A]"
       role="region"
-      aria-label="Works categories"
+      aria-label={ariaLabel}
     >
       {open ? (
         <div className="mx-auto grid max-w-[1400px] grid-cols-1 divide-y divide-white/10 px-4 sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:px-6 lg:grid-cols-4 lg:px-10">
@@ -42,24 +47,32 @@ export function WorksMegaMenuPanel({
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#ff2a2a]">
-                    {category.index}
+                  <p
+                    className={`font-mono text-[9px] text-[#ff2a2a] ${
+                      isFa ? "tracking-[0]" : "uppercase tracking-[0.28em]"
+                    }`}
+                  >
+                    {localizeDigits(category.index, lang)}
                   </p>
                   <span
-                    className="font-mono text-[11px] text-white/30 transition-transform duration-500 group-hover:translate-x-1 group-hover:text-white/70"
+                    className="font-mono text-[11px] text-white/30 transition-transform duration-500 group-hover:translate-x-1 group-hover:text-white/70 rtl:group-hover:-translate-x-1"
                     aria-hidden
                   >
-                    →
+                    {isFa ? "←" : "→"}
                   </span>
                 </div>
                 <div>
                   <p
-                    className={`text-[clamp(0.95rem,1.4vw,1.15rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-[#EBE8E1] transition-transform duration-500 group-hover:translate-x-1 ${localeCase(lang)}`}
+                    className={`text-[clamp(0.95rem,1.4vw,1.15rem)] font-black leading-[0.95] text-[#EBE8E1] transition-transform duration-500 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 ${
+                      isFa ? "tracking-[0]" : "uppercase tracking-[-0.05em]"
+                    } ${localeCase(lang)}`}
                   >
                     {category.menuLabel[lang]}
                   </p>
                   <p
-                    className={`mt-2 font-mono text-[9px] uppercase leading-relaxed text-white/38 ${trackMeta(lang)}`}
+                    className={`mt-2 font-mono text-[9px] leading-relaxed text-white/38 ${trackMeta(lang)} ${
+                      isFa ? "" : "uppercase"
+                    }`}
                   >
                     {category.menuDescriptor[lang]}
                   </p>
@@ -104,7 +117,9 @@ export function WorksMobileCategoryList({
                 : "text-[#EBE8E1]/85 hover:bg-white/[0.06]"
             } ${localeCase(lang)}`}
           >
-            <span className="text-white/35">{category.index}</span>
+            <span className="text-white/35">
+              {localizeDigits(category.index, lang)}
+            </span>
             <span>{category.menuLabel[lang]}</span>
           </Link>
         );

@@ -303,6 +303,7 @@ export function SiteNav({
           lang={lang}
           activeSlug={activeSlug}
           onNavigate={() => setWorksMenuOpen(false)}
+          ariaLabel={t("nav_works_categories_aria")}
         />
       </div>
     </header>

@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "ipfs.foundation.app", pathname: "/**" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.madbak.art" }],
+        destination: "https://madbak.art/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

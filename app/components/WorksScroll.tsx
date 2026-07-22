@@ -17,6 +17,7 @@ import { WEB_PROJECTS } from "../lib/works-categories";
 import { PortfolioImage } from "./PortfolioImage";
 import { ProjectMarquee } from "./ProjectMarquee";
 import { localeCase, trackHeading, trackMeta } from "../lib/locale-ui";
+import Link from "next/link";
 
 type Project = (typeof PROJECTS)[number];
 type GenreVariant = "character" | "influencer" | "fashion" | "poster";
@@ -25,6 +26,7 @@ const GENRES: {
   id: string;
   number: string;
   variant: GenreVariant;
+  href: string;
   projectIds: readonly string[];
   title: Record<LangKey, string>;
   description: Record<LangKey, string>;
@@ -33,6 +35,7 @@ const GENRES: {
     id: "character",
     number: "01",
     variant: "character",
+    href: "/works/character-design",
     projectIds: ["01"],
     title: { en: "CHARACTER DESIGN", fa: "طراحی کاراکتر", tr: "KARAKTER TASARIMI" },
     description: {
@@ -45,6 +48,7 @@ const GENRES: {
     id: "influencer",
     number: "02",
     variant: "influencer",
+    href: "/works/ai-influencer",
     projectIds: ["02"],
     title: { en: "AI INFLUENCER", fa: "اینفلوئنسر هوش مصنوعی", tr: "YZ INFLUENCER" },
     description: {
@@ -162,11 +166,14 @@ function ChapterProject({
     const isYoungMi = variant === "character";
 
     const gallery = (
-      <div className={`relative h-[48svh] overflow-hidden sm:h-[56svh]`}>
-        <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
+      <div className="relative h-[48svh] overflow-hidden sm:h-[56svh]" dir="ltr">
+        <motion.div
+          className="absolute inset-y-0 left-0 flex w-max items-center gap-4 sm:gap-6"
+          style={{ x: railX }}
+        >
           {[...images, ...images].map((src, i) => (
             <div key={`${src}-${i}`} className="relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] sm:h-[82%]">
-              <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill sizes="25rem" className="object-cover" priority={i === 0} />
+              <PortfolioImage src={src} alt={`${title} character design artwork by Madbak`} fill sizes="25rem" className="object-cover" priority={i === 0} />
             </div>
           ))}
         </motion.div>
@@ -236,20 +243,34 @@ function ChapterProject({
           {isPinkArmy ? (
             <ProjectMarquee
               text="PINK ARMY"
-              accessibleLabel="Pink Army"
+              accessibleLabel="PINK ARMY"
               stripBackground="rgba(180, 0, 95, 0.28)"
               textColor="#ff9bd5"
               dividerColor="rgba(0, 0, 0, 0.2)"
+              lang={lang}
             />
           ) : null}
 
           {isYoungMi ? (
             <ProjectMarquee
-              text="CHARACTER DESIGN"
-              accessibleLabel="Character Design"
+              text={
+                lang === "fa"
+                  ? "طراحی کاراکتر"
+                  : lang === "tr"
+                    ? "KARAKTER TASARIMI"
+                    : "CHARACTER DESIGN"
+              }
+              accessibleLabel={
+                lang === "fa"
+                  ? "طراحی کاراکتر"
+                  : lang === "tr"
+                    ? "KARAKTER TASARIMI"
+                    : "Character Design"
+              }
               stripBackground="rgba(22, 125, 0, 0.38)"
               textColor="#d9ffcc"
               dividerColor="rgba(0, 0, 0, 0.42)"
+              lang={lang}
             />
           ) : null}
 
@@ -277,8 +298,8 @@ function ChapterProject({
               </h3>
               <p className={`mt-7 max-w-sm text-sm leading-relaxed text-[#6E6A63] sm:text-base ${localeCase(lang)}`}>{description}</p>
             </div>
-            <motion.div className="relative order-1 h-[54svh] min-h-[22rem] overflow-hidden bg-[#12141A] md:order-2 md:h-[62svh]" style={{ clipPath: reveal, y: reduce ? 0 : y }}>
-              <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 p-5 md:gap-6 md:p-8" style={{ x: fashionRailX }}>
+            <motion.div className="relative order-1 h-[54svh] min-h-[22rem] overflow-hidden bg-[#12141A] md:order-2 md:h-[62svh]" style={{ clipPath: reveal, y: reduce ? 0 : y }} dir="ltr">
+              <motion.div className="absolute inset-y-0 left-0 flex w-max items-center gap-4 p-5 md:gap-6 md:p-8" style={{ x: fashionRailX }}>
                 {images.map((src, i) => (
                   <div key={`${src}-${i}`} className="relative h-[78%] w-[min(68vw,34rem)] shrink-0 overflow-hidden border border-white/15 bg-[#1B1B1B] md:h-[84%]">
                     <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill priority={i === 0} sizes="34rem" className="object-contain" />
@@ -306,7 +327,7 @@ function ChapterProject({
             </h3>
             <p className={`mt-7 max-w-sm text-sm leading-relaxed text-white/70 sm:text-base ${localeCase(lang)}`}>{description}</p>
           </div>
-          <div className="relative flex min-h-[54svh] items-center justify-center py-8 sm:min-h-[70svh]">
+          <div className="relative flex min-h-[54svh] items-center justify-center py-8 sm:min-h-[70svh]" dir="ltr">
             {images.map((src, i) => (
               <motion.div
                 key={`${src}-${i}`}
@@ -411,6 +432,21 @@ function GenreSection({
           >
             {genre.description[lang]}
           </p>
+          <Link
+            href={genre.href}
+            className={`mt-8 inline-flex min-h-[44px] items-center font-mono text-[10px] transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40 ${
+              lang === "fa" ? "tracking-[0]" : "uppercase tracking-[0.22em]"
+            } ${
+              genre.id === "influencer" || genre.id === "character"
+                ? "text-black/75"
+                : "text-[#A9BDC6]"
+            }`}
+          >
+            {lang === "fa" ? "باز کردن آرشیو" : lang === "tr" ? "Arşivi aç" : "Open archive"}
+            <span aria-hidden className="ms-2">
+              {lang === "fa" ? "←" : "→"}
+            </span>
+          </Link>
         </div>
       </header>
 
@@ -632,6 +668,19 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
             {lang === "fa" ? "هر کارت برای یک وب‌سایت است؛ با اضافه‌شدن پروژه‌های جدید، همین گرید کامل‌تر می‌شود." : "Each card belongs to one website. New projects can be added to the same living grid."}
           </p>
         </header>
+        <div className="mb-10">
+          <Link
+            href="/works/websites"
+            className={`inline-flex min-h-[44px] items-center font-mono text-[10px] text-[#1C1A17]/70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1C1A17]/35 ${
+              lang === "fa" ? "tracking-[0]" : "uppercase tracking-[0.22em]"
+            }`}
+          >
+            {lang === "fa" ? "باز کردن آرشیو وب‌سایت‌ها" : lang === "tr" ? "Web arşivini aç" : "Open websites archive"}
+            <span aria-hidden className="ms-2">
+              {lang === "fa" ? "←" : "→"}
+            </span>
+          </Link>
+        </div>
 
         <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-6 sm:gap-6 lg:grid-cols-12 lg:gap-7">
           {WEB_PROJECTS.map((project, index) => {
@@ -690,14 +739,36 @@ function NFTSection({ lang }: { lang: LangKey }) {
         <div className="relative z-10 mx-auto w-full max-w-[1400px]">
           <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-black/55">
             <span>03 / 03</span>
-            <span>{NFT_ITEMS.length} {lang === "fa" ? "اثر" : "editions"}</span>
+            <span>
+              {NFT_ITEMS.length}{" "}
+              {lang === "fa" ? "اثر" : lang === "tr" ? "edisyon" : "editions"}
+            </span>
           </div>
           <motion.h2 className={`mt-6 max-w-[11ch] text-[clamp(3.75rem,12vw,12rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`} style={{ y: headingY }}>
-            {lang === "fa" ? "کالکشن NFT" : "NFT COLLECTION"}
+            {lang === "fa"
+              ? "مجموعه NFT"
+              : lang === "tr"
+                ? "NFT KOLEKSİYONU"
+                : "NFT COLLECTION"}
           </motion.h2>
           <p className={`mt-7 max-w-md text-sm leading-relaxed text-black/70 sm:text-base ${localeCase(lang)}`}>
-            {lang === "fa" ? "تمام نسخه‌ها در یک فید متحرک؛ هر اثر به صفحه‌ی اصلی خودش لینک شده است." : "Every edition in one moving feed, with each piece linked to its original mint page."}
+            {lang === "fa"
+              ? "تمام نسخه‌ها در یک فید متحرک؛ هر اثر به صفحه‌ی اصلی خودش لینک شده است."
+              : lang === "tr"
+                ? "Her edisyon tek bir hareketli akışta; her parça kendi mint sayfasına bağlı."
+                : "Every edition in one moving feed, with each piece linked to its original mint page."}
           </p>
+          <Link
+            href="/works/nft-collection"
+            className={`mt-8 inline-flex min-h-[44px] items-center font-mono text-[10px] text-black/75 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40 ${
+              lang === "fa" ? "tracking-[0]" : "uppercase tracking-[0.22em]"
+            }`}
+          >
+            {lang === "fa" ? "باز کردن آرشیو NFT" : lang === "tr" ? "NFT arşivini aç" : "Open NFT archive"}
+            <span aria-hidden className="ms-2">
+              {lang === "fa" ? "←" : "→"}
+            </span>
+          </Link>
         </div>
       </header>
 
@@ -708,9 +779,9 @@ function NFTSection({ lang }: { lang: LangKey }) {
             <span>{NFT_ITEMS.length} frames</span>
           </div>
 
-          <div className="relative my-10 overflow-hidden">
+          <div className="relative my-10 overflow-hidden" dir="ltr">
             <div className="relative h-[48svh] overflow-hidden sm:h-[56svh]">
-              <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
+              <motion.div className="absolute inset-y-0 left-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
                 {[...NFT_ITEMS, ...NFT_ITEMS].map((nft, i) => (
                   <a
                     key={`${nft.id}-${i}`}
@@ -720,7 +791,7 @@ function NFTSection({ lang }: { lang: LangKey }) {
                     className="group relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] outline-none focus-visible:ring-2 focus-visible:ring-black/40 sm:h-[82%]"
                     aria-label={`${nft.langs[lang]?.title ?? "NFT"} — ${nft.langs[lang]?.cat ?? "1/1"}`}
                   >
-                    <PortfolioImage src={nft.image} alt={nft.langs[lang]?.title ?? "NFT"} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" priority={i === 0} />
+                    <PortfolioImage src={nft.image} alt={`${nft.langs[lang]?.title ?? "NFT"} — Foundation 1/1 edition by Madbak`} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" priority={i === 0} />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12 font-mono text-[9px] uppercase tracking-[0.18em] text-white/75">
                       {nft.langs[lang]?.title}
                     </div>
@@ -729,28 +800,52 @@ function NFTSection({ lang }: { lang: LangKey }) {
               </motion.div>
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#00CCFF] via-transparent to-[#00CCFF]" />
               <motion.h3
-                className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] text-white mix-blend-difference"
+                className={`pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black leading-[0.78] text-white mix-blend-difference ${
+                  lang === "fa" ? "tracking-[0]" : "uppercase tracking-[-0.1em]"
+                } ${localeCase(lang)}`}
                 style={{ y: headingY }}
               >
-                {lang === "fa" ? "دارایی‌ها" : "ON-CHAIN"}
+                {lang === "fa" ? "آن‌چین" : "ON-CHAIN"}
               </motion.h3>
             </div>
           </div>
 
           <ProjectMarquee
-            text="NFT COLLECTION"
-            accessibleLabel="NFT Collection"
+            text={
+              lang === "fa"
+                ? "مجموعه NFT"
+                : lang === "tr"
+                  ? "NFT KOLEKSİYONU"
+                  : "NFT COLLECTION"
+            }
+            accessibleLabel={
+              lang === "fa"
+                ? "مجموعه NFT"
+                : lang === "tr"
+                  ? "NFT KOLEKSİYONU"
+                  : "NFT Collection"
+            }
             stripBackground="rgba(0, 105, 135, 0.34)"
             textColor="#c9f7ff"
             dividerColor="rgba(0, 0, 0, 0.42)"
+            lang={lang}
           />
 
           <div className="mt-8 flex flex-col gap-4 pt-0 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
             <p className={`max-w-md text-sm leading-relaxed text-black/70 sm:text-base ${localeCase(lang)}`}>
-              {lang === "fa" ? "مجموعه‌ای از آثار دیجیتال مستقل، هرکدام با صفحه‌ی اختصاصی برای مشاهده و مینت." : "A collection of independent digital pieces, each with its own page for viewing and minting."}
+              {lang === "fa"
+                ? "مجموعه‌ای از آثار دیجیتال مستقل، هرکدام با صفحه‌ی اختصاصی برای مشاهده و مینت."
+                : lang === "tr"
+                  ? "Her biri görüntüleme ve mint için kendi sayfasına sahip bağımsız dijital parçalar koleksiyonu."
+                  : "A collection of independent digital pieces, each with its own page for viewing and minting."}
             </p>
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/75">
-              {NFT_ITEMS.length} / {NFT_ITEMS.length} · verified editions
+              {NFT_ITEMS.length} / {NFT_ITEMS.length} ·{" "}
+              {lang === "fa"
+                ? "نسخه‌های تاییدشده"
+                : lang === "tr"
+                  ? "doğrulanmış edisyonlar"
+                  : "verified editions"}
             </span>
           </div>
         </div>

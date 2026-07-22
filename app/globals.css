@@ -45,20 +45,27 @@ body {
   background-color: #ebe8e1;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
-  cursor: none;
+  cursor: auto;
+}
+
+/* Custom cursor is root-mounted; hide native only while it is active */
+html[data-custom-cursor] body,
+html[data-custom-cursor] body * {
+  cursor: none !important;
 }
 
 /* Next/Image + some browsers use zoom-in on <img>; force no system cursor where the custom dot is used */
 @media (min-width: 768px) {
-  [data-cursor-no-difference],
-  [data-cursor-no-difference] * {
+  html[data-custom-cursor] [data-cursor-no-difference],
+  html[data-custom-cursor] [data-cursor-no-difference] * {
     cursor: none !important;
   }
 }
 
-@media (max-width: 1023px) {
-  body {
-    cursor: auto;
+@media (hover: none), (pointer: coarse) {
+  html[data-custom-cursor] body,
+  html[data-custom-cursor] body * {
+    cursor: auto !important;
   }
 }
 

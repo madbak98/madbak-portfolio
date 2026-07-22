@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "../../components/seo/JsonLd";
 import { WorksPageShell } from "../../components/works/WorksPageShell";
+import {
+  buildCategoryMetadata,
+  buildCollectionPageJsonLd,
+} from "../../lib/seo";
 import {
   WORK_CATEGORY_SLUGS,
   getWorkCategory,
+  type WorkCategorySlug,
 } from "../../lib/works-categories";
 
 type PageProps = {
@@ -19,17 +25,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const category = getWorkCategory(slug);
   if (!category) {
-    return { title: "Works — MADBAK" };
+    return { title: "Not found" };
   }
 
-  return {
-    title: category.metaTitle,
-    description: category.metaDescription,
-    openGraph: {
-      title: category.metaTitle,
-      description: category.metaDescription,
-    },
-  };
+  return buildCategoryMetadata(category.slug, "en");
 }
 
 export default async function WorkCategoryRoute({ params }: PageProps) {
@@ -37,5 +36,15 @@ export default async function WorkCategoryRoute({ params }: PageProps) {
   const category = getWorkCategory(slug);
   if (!category) notFound();
 
-  return <WorksPageShell category={category} />;
+  return (
+    <>
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          slug: category.slug as WorkCategorySlug,
+          lang: "en",
+        })}
+      />
+      <WorksPageShell category={category} />
+    </>
+  );
 }
