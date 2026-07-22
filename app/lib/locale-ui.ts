@@ -53,7 +53,7 @@ export function trackKickerEm(lang: LangKey, enEm: string): string {
 export function heroSubTracking(lang: LangKey): string {
   return lang === "fa"
     ? "tracking-[0]"
-    : "tracking-[0.22em] sm:tracking-[0.3em] md:tracking-[0.55em]";
+    : "tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.28em]";
 }
 
 /** Turkish long words + FA paragraph rhythm */

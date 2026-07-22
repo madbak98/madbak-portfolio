@@ -877,7 +877,7 @@ export default function HomePage() {
                 }}
               >
                 <span
-                  className={`inline-block max-w-[min(100%,42rem)] rounded-full border border-[#ff2a2a]/40 bg-[#0A0A0A]/90 px-3 py-1.5 text-[10px] font-light text-[#ff2a2a] shadow-[0_0_24px_rgba(255,42,42,0.18)] backdrop-blur-sm sm:px-4 sm:py-2 sm:text-xs md:px-6 md:py-2.5 md:text-xl ${localeCase(lang)} ${heroSubTracking(lang)}`}
+                  className={`inline-block max-w-[min(100%,42rem)] rounded-full border border-[#ff2a2a]/40 bg-[#0A0A0A]/90 px-3 py-1 text-center text-[10px] font-normal leading-snug text-[#ff2a2a] shadow-[0_0_24px_rgba(255,42,42,0.18)] backdrop-blur-sm sm:whitespace-nowrap sm:px-4 sm:py-1.5 sm:text-xs md:px-6 md:py-2 md:text-xl ${localeCase(lang)} ${heroSubTracking(lang)}`}
                 >
                   {t("hero_dev")}
                 </span>

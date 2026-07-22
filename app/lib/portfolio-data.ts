@@ -59,7 +59,7 @@ export const TRANSLATIONS = {
     works_year_label: "Year",
     works_status_label: "Status",
     works_in_development: "In Development",
-    hero_dev: "Creative Frontend Developer & Web Designer",
+    hero_dev: "FRONTEND DEVELOPER • WEB DESIGNER",
     hero_scroll: "Scroll to explore",
     work_title: "Selected Works",
     about_op: "Operator",
