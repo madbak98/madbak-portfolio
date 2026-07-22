@@ -663,6 +663,8 @@ export default function Page() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selected, setSelected] = useState<Project | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [worksMenuOpen, setWorksMenuOpen] = useState(false);
+  const [worksAccordionOpen, setWorksAccordionOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const reduceMotion = Boolean(prefersReducedMotion);
@@ -670,6 +672,7 @@ export default function Page() {
   const navigateToHash = useCallback(
     (hash: string) => {
       const behavior: ScrollBehavior = reduceMotion ? "auto" : "smooth";
+      setWorksMenuOpen(false);
       if (hash === "hero") {
         window.scrollTo({ top: 0, behavior });
         setMobileNavOpen(false);
@@ -827,6 +830,8 @@ export default function Page() {
           setMobileNavOpen={setMobileNavOpen}
           scrolled={navScrolled}
           onNavigate={navigateToHash}
+          worksMenuOpen={worksMenuOpen}
+          setWorksMenuOpen={setWorksMenuOpen}
         />
         <MobileNavOverlay
           lang={lang}
@@ -836,6 +841,8 @@ export default function Page() {
           setLang={setLang}
           prefersReducedMotion={reduceMotion}
           onNavigate={navigateToHash}
+          worksAccordionOpen={worksAccordionOpen}
+          setWorksAccordionOpen={setWorksAccordionOpen}
         />
 
         <section

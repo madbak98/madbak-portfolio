@@ -14,12 +14,14 @@
   --color-cream: var(--cream);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-bevan: var(--font-bevan-family), Georgia, "Times New Roman", serif;
   /* Persian stack (Vazirmatn variable from layout); use font-persian in FA contexts */
   --font-persian: var(--font-fa), Tahoma, "Segoe UI", sans-serif;
 
   --animate-scroll-line: scroll-line 2s ease-in-out infinite;
   --animate-portfolio-fade-in: portfolio-fade-in 0.5s ease-out forwards;
   --animate-portfolio-slide-up: portfolio-slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-project-marquee-ltr: project-marquee-ltr 26s linear infinite;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -86,6 +88,49 @@ body {
   }
   100% {
     transform: translateY(100%);
+  }
+}
+
+@keyframes project-marquee-ltr {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.project-marquee-track {
+  display: flex;
+  width: max-content;
+  flex-shrink: 0;
+  will-change: transform;
+  animation: project-marquee-ltr 26s linear infinite;
+}
+
+.project-marquee-group {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.project-marquee-static {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-marquee-viewport {
+    display: none !important;
+  }
+
+  .project-marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .project-marquee-static {
+    display: flex;
   }
 }
 

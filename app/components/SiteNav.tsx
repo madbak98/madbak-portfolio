@@ -1,9 +1,20 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
+import { useEffect, useId, useRef } from "react";
 
 import { TRANSLATIONS, type LangKey } from "../lib/portfolio-data";
+import {
+  WORK_CATEGORIES,
+  type WorkCategorySlug,
+} from "../lib/works-categories";
 import { LanguageFlag } from "./LanguageFlagIcons";
+import {
+  WorksMegaMenuPanel,
+  WorksMobileCategoryList,
+} from "./works/WorksCategoryMenu";
 import {
   LANGUAGE_DISPLAY,
   brandUppercase,
@@ -14,12 +25,13 @@ import {
 
 type TFn = (key: keyof (typeof TRANSLATIONS)["en"]) => string;
 
-const NAV_LINK_KEYS = ["nav_works", "nav_about", "nav_contact"] as const;
-const NAV_HASH: Record<(typeof NAV_LINK_KEYS)[number], string> = {
-  nav_works: "works",
-  nav_about: "about",
-  nav_contact: "contact",
-};
+function worksSlugFromPath(pathname: string | null): WorkCategorySlug | null {
+  if (!pathname?.startsWith("/works/")) return null;
+  const slug = pathname.replace("/works/", "").split("/")[0];
+  return WORK_CATEGORIES.some((category) => category.slug === slug)
+    ? (slug as WorkCategorySlug)
+    : null;
+}
 
 export function SiteNav({
   lang,
@@ -29,6 +41,9 @@ export function SiteNav({
   setMobileNavOpen,
   scrolled,
   onNavigate,
+  worksMenuOpen,
+  setWorksMenuOpen,
+  homeLinks = true,
 }: {
   lang: LangKey;
   setLang: (code: LangKey) => void;
@@ -37,7 +52,40 @@ export function SiteNav({
   setMobileNavOpen: (open: boolean) => void;
   scrolled: boolean;
   onNavigate: (hash: string) => void;
+  worksMenuOpen: boolean;
+  setWorksMenuOpen: (open: boolean) => void;
+  homeLinks?: boolean;
 }) {
+  const pathname = usePathname();
+  const activeSlug = worksSlugFromPath(pathname);
+  const worksActive = Boolean(activeSlug) || worksMenuOpen;
+  const menuId = useId();
+  const menuShellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!worksMenuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setWorksMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [worksMenuOpen, setWorksMenuOpen]);
+
+  useEffect(() => {
+    if (!worksMenuOpen) return;
+    const onPointer = (event: MouseEvent) => {
+      if (!menuShellRef.current?.contains(event.target as Node)) {
+        setWorksMenuOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", onPointer);
+    return () => window.removeEventListener("mousedown", onPointer);
+  }, [worksMenuOpen, setWorksMenuOpen]);
+
+  useEffect(() => {
+    setWorksMenuOpen(false);
+  }, [pathname, setWorksMenuOpen]);
+
   const linkClass = `group relative font-mono text-[10px] uppercase ${lang === "fa" ? "tracking-[0]" : "tracking-[0.18em]"} text-[#EBE8E1]/75 transition-colors duration-200 hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${localeCase(lang)} ${trackMeta(lang)}`;
 
   const linkUnderline = (
@@ -47,35 +95,60 @@ export function SiteNav({
     />
   );
 
+  const aboutHref = homeLinks ? "#about" : "/#about";
+  const contactHref = homeLinks ? "#contact" : "/#contact";
+  const logoHref = homeLinks ? "#hero" : "/";
+
   return (
     <header
+      ref={menuShellRef}
       className={`fixed top-0 start-0 z-[100] w-full border-b transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300 ${
-        scrolled
+        scrolled || worksMenuOpen
           ? "border-white/12 bg-[#0A0A0A]/88 shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-xl"
           : "border-white/[0.08] bg-[#0A0A0A]/40 backdrop-blur-md"
       }`}
     >
       <div className="mx-auto flex h-14 max-w-[100vw] items-center justify-between gap-3 px-4 sm:h-[3.75rem] sm:gap-4 sm:px-6 md:px-10">
         <div className="flex min-w-0 items-center gap-3">
-          <a
-            href="#hero"
-            onClick={(e) => {
-              e.preventDefault();
-              onNavigate("hero");
-            }}
-            className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)}`}
-            aria-label={t("nav_logo_aria")}
-          >
-            <span
-              className="block h-2 w-2 shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110"
-              aria-hidden
-            />
-            <span
-              className={`fa-wordmark-latin font-sans text-lg font-black leading-none sm:text-xl ${lang === "fa" ? "tracking-[0]" : "tracking-tight"}`}
+          {homeLinks ? (
+            <a
+              href={logoHref}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("hero");
+                setWorksMenuOpen(false);
+              }}
+              className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)}`}
+              aria-label={t("nav_logo_aria")}
             >
-              MADBAK
-            </span>
-          </a>
+              <span
+                className="block h-2 w-2 shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110"
+                aria-hidden
+              />
+              <span
+                className={`fa-wordmark-latin font-sans text-lg font-black leading-none sm:text-xl ${lang === "fa" ? "tracking-[0]" : "tracking-tight"}`}
+              >
+                MADBAK
+              </span>
+            </a>
+          ) : (
+            <Link
+              href="/"
+              className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)}`}
+              aria-label={t("nav_logo_aria")}
+              onClick={() => setWorksMenuOpen(false)}
+            >
+              <span
+                className="block h-2 w-2 shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110"
+                aria-hidden
+              />
+              <span
+                className={`fa-wordmark-latin font-sans text-lg font-black leading-none sm:text-xl ${lang === "fa" ? "tracking-[0]" : "tracking-tight"}`}
+              >
+                MADBAK
+              </span>
+            </Link>
+          )}
         </div>
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-4 sm:gap-6 md:gap-8">
@@ -83,20 +156,64 @@ export function SiteNav({
             className="hidden items-center gap-6 md:gap-7 lg:flex"
             aria-label={t("nav_primary_aria")}
           >
-            {NAV_LINK_KEYS.map((key) => (
+            <button
+              type="button"
+              className={`${linkClass} ${worksActive ? "text-[#ff2a2a]" : ""}`}
+              aria-expanded={worksMenuOpen}
+              aria-controls={menuId}
+              onClick={() => setWorksMenuOpen(!worksMenuOpen)}
+            >
+              {t("nav_works")}
+              {linkUnderline}
+            </button>
+
+            {homeLinks ? (
               <a
-                key={key}
-                href={`#${NAV_HASH[key]}`}
+                href={aboutHref}
                 onClick={(e) => {
                   e.preventDefault();
-                  onNavigate(NAV_HASH[key]);
+                  setWorksMenuOpen(false);
+                  onNavigate("about");
                 }}
                 className={linkClass}
               >
-                {t(key)}
+                {t("nav_about")}
                 {linkUnderline}
               </a>
-            ))}
+            ) : (
+              <Link
+                href={aboutHref}
+                className={linkClass}
+                onClick={() => setWorksMenuOpen(false)}
+              >
+                {t("nav_about")}
+                {linkUnderline}
+              </Link>
+            )}
+
+            {homeLinks ? (
+              <a
+                href={contactHref}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setWorksMenuOpen(false);
+                  onNavigate("contact");
+                }}
+                className={linkClass}
+              >
+                {t("nav_contact")}
+                {linkUnderline}
+              </a>
+            ) : (
+              <Link
+                href={contactHref}
+                className={linkClass}
+                onClick={() => setWorksMenuOpen(false)}
+              >
+                {t("nav_contact")}
+                {linkUnderline}
+              </Link>
+            )}
           </nav>
 
           <div
@@ -142,7 +259,10 @@ export function SiteNav({
             type="button"
             aria-expanded={mobileNavOpen}
             aria-controls="mobile-nav"
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            onClick={() => {
+              setWorksMenuOpen(false);
+              setMobileNavOpen(!mobileNavOpen);
+            }}
             className="flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-full border border-white/18 bg-black/35 text-[#EBE8E1] backdrop-blur-sm transition-[transform,colors] duration-200 hover:border-white/25 hover:bg-black/50 active:scale-90 lg:hidden"
           >
             {mobileNavOpen ? (
@@ -175,6 +295,16 @@ export function SiteNav({
           </button>
         </div>
       </div>
+
+      <div className="hidden lg:block">
+        <WorksMegaMenuPanel
+          id={menuId}
+          open={worksMenuOpen}
+          lang={lang}
+          activeSlug={activeSlug}
+          onNavigate={() => setWorksMenuOpen(false)}
+        />
+      </div>
     </header>
   );
 }
@@ -188,6 +318,9 @@ export function MobileNavOverlay({
   setLang,
   prefersReducedMotion,
   onNavigate,
+  homeLinks = true,
+  worksAccordionOpen,
+  setWorksAccordionOpen,
 }: {
   lang: LangKey;
   t: TFn;
@@ -196,7 +329,14 @@ export function MobileNavOverlay({
   setLang: (code: LangKey) => void;
   prefersReducedMotion: boolean;
   onNavigate: (hash: string) => void;
+  homeLinks?: boolean;
+  worksAccordionOpen: boolean;
+  setWorksAccordionOpen: (open: boolean) => void;
 }) {
+  const pathname = usePathname();
+  const activeSlug = worksSlugFromPath(pathname);
+  const worksPanelId = useId();
+
   return (
     <div
       id="mobile-nav"
@@ -219,7 +359,7 @@ export function MobileNavOverlay({
         aria-label={t("nav_close_menu")}
       />
       <motion.div
-        className="absolute end-0 top-0 flex h-full w-[min(100%,20rem)] flex-col bg-[#0A0A0A] p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] text-[#EBE8E1] shadow-2xl sm:w-80"
+        className="absolute end-0 top-0 flex h-full w-[min(100%,20rem)] flex-col overflow-y-auto overscroll-contain bg-[#0A0A0A] p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] text-[#EBE8E1] shadow-2xl sm:w-80"
         initial={false}
         animate={
           mobileNavOpen
@@ -240,49 +380,123 @@ export function MobileNavOverlay({
           <p className="mb-3 font-mono text-[9px] text-white/35">
             {t("nav_section_label")}
           </p>
-          {NAV_LINK_KEYS.map((key, i) => (
+
+          <button
+            type="button"
+            aria-expanded={worksAccordionOpen}
+            aria-controls={worksPanelId}
+            className={`flex min-h-[48px] w-full items-center justify-between rounded-xl px-3 py-2.5 text-start font-mono text-[13px] font-semibold transition-colors hover:bg-white/[0.06] ${
+              activeSlug || worksAccordionOpen ? "text-[#ff2a2a]" : "text-[#EBE8E1]"
+            } ${localeCase(lang)}`}
+            onClick={() => setWorksAccordionOpen(!worksAccordionOpen)}
+          >
+            <span>{t("nav_works")}</span>
+            <span className="font-mono text-[11px] text-white/40" aria-hidden>
+              {worksAccordionOpen ? "−" : "+"}
+            </span>
+          </button>
+          <div id={worksPanelId} hidden={!worksAccordionOpen} className="pb-2">
+            {worksAccordionOpen ? (
+              <WorksMobileCategoryList
+                lang={lang}
+                activeSlug={activeSlug}
+                onNavigate={() => setMobileNavOpen(false)}
+              />
+            ) : null}
+          </div>
+
+          {homeLinks ? (
             <motion.a
-              key={key}
-              href={`#${NAV_HASH[key]}`}
+              href="#about"
               initial={false}
               animate={
                 mobileNavOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }
               }
               transition={{
                 delay:
-                  mobileNavOpen && !prefersReducedMotion ? 0.04 + i * 0.05 : 0,
+                  mobileNavOpen && !prefersReducedMotion ? 0.08 : 0,
                 duration: prefersReducedMotion ? 0.2 : 0.28,
                 ease: [0.18, 1, 0.32, 1],
               }}
               className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold text-[#EBE8E1] transition-colors hover:bg-white/[0.06] active:scale-[0.99] ${localeCase(lang)}`}
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate(NAV_HASH[key]);
+                onNavigate("about");
               }}
             >
-              {t(key)}
+              {t("nav_about")}
             </motion.a>
-          ))}
-          <motion.a
-            href="#hero"
-            initial={false}
-            animate={
-              mobileNavOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }
-            }
-            transition={{
-              delay:
-                mobileNavOpen && !prefersReducedMotion ? 0.2 : 0,
-              duration: prefersReducedMotion ? 0.2 : 0.28,
-              ease: [0.18, 1, 0.32, 1],
-            }}
-            className={`mt-1 flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[12px] text-white/55 transition-colors hover:bg-white/[0.06] ${localeCase(lang)}`}
-            onClick={(e) => {
-              e.preventDefault();
-              onNavigate("hero");
-            }}
-          >
-            {t("nav_home")}
-          </motion.a>
+          ) : (
+            <Link
+              href="/#about"
+              className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold text-[#EBE8E1] transition-colors hover:bg-white/[0.06] ${localeCase(lang)}`}
+              onClick={() => setMobileNavOpen(false)}
+            >
+              {t("nav_about")}
+            </Link>
+          )}
+
+          {homeLinks ? (
+            <motion.a
+              href="#contact"
+              initial={false}
+              animate={
+                mobileNavOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }
+              }
+              transition={{
+                delay:
+                  mobileNavOpen && !prefersReducedMotion ? 0.12 : 0,
+                duration: prefersReducedMotion ? 0.2 : 0.28,
+                ease: [0.18, 1, 0.32, 1],
+              }}
+              className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold text-[#EBE8E1] transition-colors hover:bg-white/[0.06] active:scale-[0.99] ${localeCase(lang)}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("contact");
+              }}
+            >
+              {t("nav_contact")}
+            </motion.a>
+          ) : (
+            <Link
+              href="/#contact"
+              className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold text-[#EBE8E1] transition-colors hover:bg-white/[0.06] ${localeCase(lang)}`}
+              onClick={() => setMobileNavOpen(false)}
+            >
+              {t("nav_contact")}
+            </Link>
+          )}
+
+          {homeLinks ? (
+            <motion.a
+              href="#hero"
+              initial={false}
+              animate={
+                mobileNavOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }
+              }
+              transition={{
+                delay:
+                  mobileNavOpen && !prefersReducedMotion ? 0.16 : 0,
+                duration: prefersReducedMotion ? 0.2 : 0.28,
+                ease: [0.18, 1, 0.32, 1],
+              }}
+              className={`mt-1 flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[12px] text-white/55 transition-colors hover:bg-white/[0.06] ${localeCase(lang)}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("hero");
+              }}
+            >
+              {t("nav_home")}
+            </motion.a>
+          ) : (
+            <Link
+              href="/"
+              className={`mt-1 flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[12px] text-white/55 transition-colors hover:bg-white/[0.06] ${localeCase(lang)}`}
+              onClick={() => setMobileNavOpen(false)}
+            >
+              {t("nav_home")}
+            </Link>
+          )}
         </nav>
 
         <p
@@ -348,23 +562,33 @@ export function MobileNavOverlay({
             </motion.button>
           ))}
         </div>
-        <motion.a
-          href="#contact"
-          initial={false}
-          animate={mobileNavOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{
-            delay: mobileNavOpen && !prefersReducedMotion ? 0.22 : 0,
-            duration: prefersReducedMotion ? 0.2 : 0.3,
-            ease: [0.18, 1, 0.32, 1],
-          }}
-          className={`mt-6 flex min-h-[48px] items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-center font-mono text-xs transition-[transform,colors] duration-200 hover:border-[#ff2a2a] hover:text-[#ff2a2a] active:scale-[0.99] ${localeCase(lang)} ${trackMeta(lang)}`}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate("contact");
-          }}
-        >
-          {t("foot_init")}
-        </motion.a>
+        {homeLinks ? (
+          <motion.a
+            href="#contact"
+            initial={false}
+            animate={mobileNavOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+            transition={{
+              delay: mobileNavOpen && !prefersReducedMotion ? 0.22 : 0,
+              duration: prefersReducedMotion ? 0.2 : 0.3,
+              ease: [0.18, 1, 0.32, 1],
+            }}
+            className={`mt-6 flex min-h-[48px] items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-center font-mono text-xs transition-[transform,colors] duration-200 hover:border-[#ff2a2a] hover:text-[#ff2a2a] active:scale-[0.99] ${localeCase(lang)} ${trackMeta(lang)}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("contact");
+            }}
+          >
+            {t("foot_init")}
+          </motion.a>
+        ) : (
+          <Link
+            href="/#contact"
+            className={`mt-6 flex min-h-[48px] items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-center font-mono text-xs transition-colors hover:border-[#ff2a2a] hover:text-[#ff2a2a] ${localeCase(lang)} ${trackMeta(lang)}`}
+            onClick={() => setMobileNavOpen(false)}
+          >
+            {t("foot_init")}
+          </Link>
+        )}
       </motion.div>
     </div>
   );

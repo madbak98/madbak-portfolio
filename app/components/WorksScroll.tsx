@@ -13,7 +13,9 @@ import {
 } from "motion/react";
 
 import { NFT_ITEMS, PROJECTS, type LangKey } from "../lib/portfolio-data";
+import { WEB_PROJECTS } from "../lib/works-categories";
 import { PortfolioImage } from "./PortfolioImage";
+import { ProjectMarquee } from "./ProjectMarquee";
 import { localeCase, trackHeading, trackMeta } from "../lib/locale-ui";
 
 type Project = (typeof PROJECTS)[number];
@@ -53,68 +55,14 @@ const GENRES: {
   },
 ];
 
-const WEB_PROJECTS = [
-  {
-    title: "SIGMAA.PRO",
-    href: "https://sigmaa.pro",
-    images: [
-      "/projects/sigmaa/home.png",
-      "/projects/sigmaa/regions.png",
-      "/projects/sigmaa/system.png",
-      "/projects/sigmaa/insights.png",
-    ],
-    label: {
-      en: "Website in development",
-      fa: "نمونه وب‌سایت در حال ساخت",
-      tr: "Geliştirme aşamasındaki web sitesi",
-    },
-    description: {
-      en: "A future web direction — calm, tactile, and built for immersive storytelling.",
-      fa: "یک مسیر وب‌محور برای آینده — آرام، لمسی و ساخته‌شده برای روایت غوطه‌ور.",
-      tr: "Gelecekteki web yönü — sakin, dokunsal ve sürükleyici anlatı için tasarlandı.",
-    },
-  },
-  {
-    title: "ART GALLERY",
-    href: "https://muse-24-art-gallery.vercel.app/",
-    featured: true as const,
-    year: "2026",
-    images: [
-      "/projects/art-gallery/art-gallery-home.png",
-      "/projects/art-gallery/art-gallery-selected-works.png",
-      "/projects/art-gallery/art-gallery-exhibition.png",
-      "/projects/art-gallery/art-gallery-about.png",
-      "/projects/art-gallery/art-gallery-visit.png",
-    ],
-    imageAlts: [
-      "Art Gallery homepage with editorial typography and featured abstract artwork",
-      "Art Gallery selected works section",
-      "Art Gallery full-screen exhibition page",
-      "Art Gallery about section",
-      "Art Gallery visit and location section",
-    ],
-    label: {
-      en: "Art Gallery / Cultural Website",
-      fa: "گالری هنری / وب‌سایت فرهنگی",
-      tr: "Sanat Galerisi / Kültürel Web Sitesi",
-    },
-    liveLabel: {
-      en: "Live Website",
-      fa: "وب‌سایت زنده",
-      tr: "Canlı Site",
-    },
-    description: {
-      en: "An editorial cultural website for MUSE / 24 — quiet typography, living archive, and present-tense looking.",
-      fa: "وب‌سایت فرهنگی ادیتوریال برای MUSE / 24 — تایپوگرافی آرام، آرشیو زنده و نگاه در زمان حال.",
-      tr: "MUSE / 24 için editoryal bir kültürel site — sakin tipografi, yaşayan arşiv ve şimdiki zamana bakış.",
-    },
-  },
-];
-
 const WEB_CARD_SLOTS = [
   "col-span-2 sm:col-span-3 lg:col-span-6",
   "col-span-2 sm:col-span-3 lg:col-span-6",
 ] as const;
+
+/** Shared slideshow timing for SIGMAA.PRO + ART GALLERY cards */
+const WEB_CARD_AUTOPLAY_MS = 3700;
+const WEB_CARD_CROSSFADE_S = 0.55;
 
 const SIGMA_META_CATEGORY: Record<LangKey, string> = {
   en: "Web3 Growth Platform",
@@ -210,32 +158,102 @@ function ChapterProject({
   const images = project.images?.length ? project.images : [project.image];
 
   if (variant === "influencer" || variant === "character") {
+    const isPinkArmy = variant === "influencer";
+    const isYoungMi = variant === "character";
+
+    const gallery = (
+      <div className={`relative h-[48svh] overflow-hidden sm:h-[56svh]`}>
+        <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
+          {[...images, ...images].map((src, i) => (
+            <div key={`${src}-${i}`} className="relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] sm:h-[82%]">
+              <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill sizes="25rem" className="object-cover" priority={i === 0} />
+            </div>
+          ))}
+        </motion.div>
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-r via-transparent ${
+            isPinkArmy
+              ? "from-[#ff00cc] to-[#ff00cc]"
+              : isYoungMi
+                ? "from-[#33FF00] to-[#33FF00]"
+                : "from-[#10151b] to-[#10151b]"
+          }`}
+        />
+        <motion.h3
+          className={`pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] mix-blend-difference ${
+            isPinkArmy || isYoungMi ? "text-white" : "text-[#F4F0E8]"
+          }`}
+          style={{ y }}
+        >
+          <ProjectTitleDisplay project={project} lang={lang} />
+        </motion.h3>
+      </div>
+    );
+
+    const descriptionBlock = (
+      <div className="mt-8 flex flex-col gap-4 pt-0 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
+        <p
+          className={`max-w-md text-sm leading-relaxed sm:text-base ${localeCase(lang)} ${
+            isPinkArmy || isYoungMi ? "text-black/70" : "text-white/55"
+          }`}
+        >
+          {description}
+        </p>
+        <span
+          className={`font-mono text-[9px] uppercase tracking-[0.2em] ${
+            isPinkArmy || isYoungMi ? "text-black/75" : "text-[#C45C4A]"
+          }`}
+        >
+          {variant === "character" ? "01 / 01 · character study" : "01 / 01 · moving identity"}
+        </span>
+      </div>
+    );
+
     return (
-      <article ref={ref} className="relative min-h-[86svh] overflow-hidden border-t border-white/10 bg-[#10151b] px-5 py-8 text-[#F4F0E8] sm:px-8 lg:px-12" dir={lang === "fa" ? "rtl" : "ltr"}>
+      <article
+        ref={ref}
+        className={`relative min-h-[86svh] overflow-hidden border-t px-5 py-8 sm:px-8 lg:px-12 ${
+          isPinkArmy
+            ? "border-black/15 bg-[#ff00cc] text-[#0A0A0A]"
+            : isYoungMi
+              ? "border-black/15 bg-[#33FF00] text-[#0A0A0A]"
+              : "border-white/10 bg-[#10151b] text-[#F4F0E8]"
+        }`}
+        dir={lang === "fa" ? "rtl" : "ltr"}
+      >
         <div className="mx-auto flex min-h-[78svh] max-w-[1400px] flex-col justify-between">
-          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-[#A9BDC6]">
+          <div
+            className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] ${
+              isPinkArmy || isYoungMi ? "text-black/55" : "text-[#A9BDC6]"
+            }`}
+          >
             <span>{category}</span>
             <span>{project.year}</span>
           </div>
-          <div className="relative my-10 h-[48svh] overflow-hidden border-y border-[#A9BDC6]/25 sm:h-[56svh]">
-            <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
-              {[...images, ...images].map((src, i) => (
-                <div key={`${src}-${i}`} className="relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] sm:h-[82%]">
-                  <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill sizes="25rem" className="object-cover" priority={i === 0} />
-                </div>
-              ))}
-            </motion.div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#10151b] via-transparent to-[#10151b]" />
-            <motion.h3 className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] text-[#F4F0E8] mix-blend-difference" style={{ y }}>
-              <ProjectTitleDisplay project={project} lang={lang} />
-            </motion.h3>
-          </div>
-          <div className="flex flex-col gap-4 border-t border-white/15 pt-5 sm:flex-row sm:items-end sm:justify-between">
-            <p className={`max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>{description}</p>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C45C4A]">
-              {variant === "character" ? "01 / 01 · character study" : "01 / 01 · moving identity"}
-            </span>
-          </div>
+
+          <div className="relative my-10 overflow-hidden">{gallery}</div>
+
+          {isPinkArmy ? (
+            <ProjectMarquee
+              text="PINK ARMY"
+              accessibleLabel="Pink Army"
+              stripBackground="rgba(180, 0, 95, 0.28)"
+              textColor="#ff9bd5"
+              dividerColor="rgba(0, 0, 0, 0.2)"
+            />
+          ) : null}
+
+          {isYoungMi ? (
+            <ProjectMarquee
+              text="CHARACTER DESIGN"
+              accessibleLabel="Character Design"
+              stripBackground="rgba(22, 125, 0, 0.38)"
+              textColor="#d9ffcc"
+              dividerColor="rgba(0, 0, 0, 0.42)"
+            />
+          ) : null}
+
+          {descriptionBlock}
         </div>
       </article>
     );
@@ -350,19 +368,49 @@ function GenreSection({
 
   return (
     <section id={genre.id} ref={ref} className="relative scroll-mt-24 overflow-hidden" dir={lang === "fa" ? "rtl" : "ltr"}>
-      <header className="relative flex min-h-[46svh] items-end overflow-hidden bg-[#080808] px-5 pb-10 pt-20 text-[#F4F0E8] sm:min-h-[52svh] sm:px-8 sm:pb-14 lg:px-12">
-        <motion.div className="pointer-events-none absolute -right-[2.8rem] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(10rem,30vw,32rem)] font-black uppercase leading-none tracking-[-0.13em] text-white/[0.05]" style={{ y: headingY }} aria-hidden>
+      <header
+        className={`relative flex min-h-[46svh] items-end overflow-hidden px-5 pb-10 pt-20 sm:min-h-[52svh] sm:px-8 sm:pb-14 lg:px-12 ${
+          genre.id === "influencer"
+            ? "bg-[#ff00cc] text-[#0A0A0A]"
+            : genre.id === "character"
+              ? "bg-[#33FF00] text-[#0A0A0A]"
+              : "bg-[#080808] text-[#F4F0E8]"
+        }`}
+      >
+        <motion.div
+          className={`pointer-events-none absolute -right-[2.8rem] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(10rem,30vw,32rem)] font-black uppercase leading-none tracking-[-0.13em] ${
+            genre.id === "influencer" || genre.id === "character"
+              ? "text-black/[0.08]"
+              : "text-white/[0.05]"
+          }`}
+          style={{ y: headingY }}
+          aria-hidden
+        >
           {genre.number}
         </motion.div>
         <div className="relative z-10 mx-auto w-full max-w-[1400px]">
-          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-[#A9BDC6]">
+          <div
+            className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] ${
+              genre.id === "influencer" || genre.id === "character"
+                ? "text-black/55"
+                : "text-[#A9BDC6]"
+            }`}
+          >
             <span>{genre.number} / {String(GENRES.length).padStart(2, "0")}</span>
             <span>{projects.length} {lang === "fa" ? "اثر" : "editions"}</span>
           </div>
           <motion.h2 className={`mt-6 max-w-[11ch] text-[clamp(3.75rem,12vw,12rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`} style={{ y: headingY }}>
             {genre.title[lang]}
           </motion.h2>
-          <p className={`mt-7 max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>{genre.description[lang]}</p>
+          <p
+            className={`mt-7 max-w-md text-sm leading-relaxed sm:text-base ${localeCase(lang)} ${
+              genre.id === "influencer" || genre.id === "character"
+                ? "text-black/70"
+                : "text-white/55"
+            }`}
+          >
+            {genre.description[lang]}
+          </p>
         </div>
       </header>
 
@@ -418,7 +466,7 @@ function EditorialWebCard({
     if (isPointerFine && isHovering) return;
     const timer = window.setInterval(() => {
       setActiveImage((current) => (current + 1) % images.length);
-    }, 4800);
+    }, WEB_CARD_AUTOPLAY_MS);
     return () => window.clearInterval(timer);
   }, [images.length, isHovering, isPointerFine, reduce]);
 
@@ -487,7 +535,7 @@ function EditorialWebCard({
               initial={reduce ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={reduce ? undefined : { opacity: 0 }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: WEB_CARD_CROSSFADE_S, ease: [0.22, 1, 0.36, 1] }}
             >
               <Image
                 src={images[activeImage]}
@@ -631,58 +679,79 @@ function NFTSection({ lang }: { lang: LangKey }) {
 
   return (
     <section id="nfts" ref={ref} className="relative scroll-mt-24 overflow-hidden" dir={lang === "fa" ? "rtl" : "ltr"}>
-      <header className="relative flex min-h-[46svh] items-end overflow-hidden bg-[#080808] px-5 pb-10 pt-20 text-[#F4F0E8] sm:min-h-[52svh] sm:px-8 sm:pb-14 lg:px-12">
-        <motion.div className="pointer-events-none absolute -right-[2.8rem] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(10rem,30vw,32rem)] font-black leading-none tracking-[-0.13em] text-white/[0.05]" style={{ y: headingY }} aria-hidden>
+      <header className="relative flex min-h-[46svh] items-end overflow-hidden bg-[#00CCFF] px-5 pb-10 pt-20 text-[#050505] sm:min-h-[52svh] sm:px-8 sm:pb-14 lg:px-12">
+        <motion.div
+          className="pointer-events-none absolute -right-[2.8rem] top-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(10rem,30vw,32rem)] font-black leading-none tracking-[-0.13em] text-black/[0.08]"
+          style={{ y: headingY }}
+          aria-hidden
+        >
           03
         </motion.div>
         <div className="relative z-10 mx-auto w-full max-w-[1400px]">
-          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-[#A9BDC6]">
+          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-black/55">
             <span>03 / 03</span>
             <span>{NFT_ITEMS.length} {lang === "fa" ? "اثر" : "editions"}</span>
           </div>
           <motion.h2 className={`mt-6 max-w-[11ch] text-[clamp(3.75rem,12vw,12rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`} style={{ y: headingY }}>
             {lang === "fa" ? "کالکشن NFT" : "NFT COLLECTION"}
           </motion.h2>
-          <p className={`mt-7 max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
+          <p className={`mt-7 max-w-md text-sm leading-relaxed text-black/70 sm:text-base ${localeCase(lang)}`}>
             {lang === "fa" ? "تمام نسخه‌ها در یک فید متحرک؛ هر اثر به صفحه‌ی اصلی خودش لینک شده است." : "Every edition in one moving feed, with each piece linked to its original mint page."}
           </p>
         </div>
       </header>
 
-      <article className="relative min-h-[86svh] overflow-hidden border-t border-white/10 bg-[#10151b] px-5 py-8 text-[#F4F0E8] sm:px-8 lg:px-12">
+      <article className="relative min-h-[86svh] overflow-hidden border-t border-black/15 bg-[#00CCFF] px-5 py-8 text-[#050505] sm:px-8 lg:px-12">
         <div className="mx-auto flex min-h-[78svh] max-w-[1400px] flex-col justify-between">
-          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-[#A9BDC6]">
+          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-black/55">
             <span>Foundation / 1 of 1</span>
             <span>{NFT_ITEMS.length} frames</span>
           </div>
-          <div className="relative my-10 h-[48svh] overflow-hidden border-y border-[#A9BDC6]/25 sm:h-[56svh]">
-            <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
-              {[...NFT_ITEMS, ...NFT_ITEMS].map((nft, i) => (
-                <a
-                  key={`${nft.id}-${i}`}
-                  href={nft.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] outline-none focus-visible:ring-2 focus-visible:ring-[#A9BDC6] sm:h-[82%]"
-                  aria-label={`${nft.langs[lang]?.title ?? "NFT"} — ${nft.langs[lang]?.cat ?? "1/1"}`}
-                >
-                  <PortfolioImage src={nft.image} alt={nft.langs[lang]?.title ?? "NFT"} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" priority={i === 0} />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12 font-mono text-[9px] uppercase tracking-[0.18em] text-white/75">
-                    {nft.langs[lang]?.title}
-                  </div>
-                </a>
-              ))}
-            </motion.div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#10151b] via-transparent to-[#10151b]" />
-            <motion.h3 className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] text-[#F4F0E8] mix-blend-difference" style={{ y: headingY }}>
-              {lang === "fa" ? "دارایی‌ها" : "ON-CHAIN"}
-            </motion.h3>
+
+          <div className="relative my-10 overflow-hidden">
+            <div className="relative h-[48svh] overflow-hidden sm:h-[56svh]">
+              <motion.div className="absolute inset-y-0 flex w-max items-center gap-4 sm:gap-6" style={{ x: railX }}>
+                {[...NFT_ITEMS, ...NFT_ITEMS].map((nft, i) => (
+                  <a
+                    key={`${nft.id}-${i}`}
+                    href={nft.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] outline-none focus-visible:ring-2 focus-visible:ring-black/40 sm:h-[82%]"
+                    aria-label={`${nft.langs[lang]?.title ?? "NFT"} — ${nft.langs[lang]?.cat ?? "1/1"}`}
+                  >
+                    <PortfolioImage src={nft.image} alt={nft.langs[lang]?.title ?? "NFT"} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" priority={i === 0} />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12 font-mono text-[9px] uppercase tracking-[0.18em] text-white/75">
+                      {nft.langs[lang]?.title}
+                    </div>
+                  </a>
+                ))}
+              </motion.div>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#00CCFF] via-transparent to-[#00CCFF]" />
+              <motion.h3
+                className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[clamp(3rem,11vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.1em] text-white mix-blend-difference"
+                style={{ y: headingY }}
+              >
+                {lang === "fa" ? "دارایی‌ها" : "ON-CHAIN"}
+              </motion.h3>
+            </div>
           </div>
-          <div className="flex flex-col gap-4 border-t border-white/15 pt-5 sm:flex-row sm:items-end sm:justify-between">
-            <p className={`max-w-md text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
+
+          <ProjectMarquee
+            text="NFT COLLECTION"
+            accessibleLabel="NFT Collection"
+            stripBackground="rgba(0, 105, 135, 0.34)"
+            textColor="#c9f7ff"
+            dividerColor="rgba(0, 0, 0, 0.42)"
+          />
+
+          <div className="mt-8 flex flex-col gap-4 pt-0 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
+            <p className={`max-w-md text-sm leading-relaxed text-black/70 sm:text-base ${localeCase(lang)}`}>
               {lang === "fa" ? "مجموعه‌ای از آثار دیجیتال مستقل، هرکدام با صفحه‌ی اختصاصی برای مشاهده و مینت." : "A collection of independent digital pieces, each with its own page for viewing and minting."}
             </p>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C45C4A]">{NFT_ITEMS.length} / {NFT_ITEMS.length} · verified editions</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/75">
+              {NFT_ITEMS.length} / {NFT_ITEMS.length} · verified editions
+            </span>
           </div>
         </div>
       </article>

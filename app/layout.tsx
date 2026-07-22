@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Vazirmatn } from "next/font/google";
+import { Bevan, Geist, Geist_Mono, Vazirmatn } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -10,6 +10,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin", "latin-ext"],
+});
+
+const bevan = Bevan({
+  variable: "--font-bevan-family",
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+  display: "swap",
 });
 
 /**
@@ -26,7 +33,7 @@ const vazirmatn = Vazirmatn({
 });
 
 export const metadata: Metadata = {
-  title: "MADBAK — Creative Archive",
+  title: "Madbak",
   description:
     "Visual designer and creative developer — web, motion, and digital craft. Istanbul / global.",
 };
@@ -39,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bevan.variable} ${vazirmatn.variable} h-full antialiased`}
     >
       <body className="min-h-full overflow-x-hidden">{children}</body>
     </html>
