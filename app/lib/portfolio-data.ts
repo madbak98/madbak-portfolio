@@ -65,16 +65,16 @@ export const TRANSLATIONS = {
     about_op: "Operator",
     about_h1_1: "DESIGNED",
     about_h1_2: "PRESENCE",
-    about_intro_before: "I’M BABAK — creating as ",
+    about_intro_before: "I’M BABAK, WORKING UNDER THE NAME ",
     about_intro_after: ".",
     about_p2:
-      "Madbak is the creative practice of Babak Ravanbakhsh, a frontend developer and multidisciplinary designer creating interactive websites, digital identities, and motion-led web experiences. His work combines creative direction, UI/UX design, visual systems, Next.js, React, TypeScript, and modern frontend engineering.",
+      "I’m a frontend developer and mostly build interactive, complex websites, using React and Next.js for development and GSAP and Three.js for animation.",
     about_p3:
-      "Projects span website design and development, character systems, AI-assisted digital personas, and on-chain visual editions — always with an emphasis on craft, interaction, and clear visual language.",
+      "My work covers full website builds for businesses and various projects, including a few Web3 ones, and lately I’ve been working on AI-assisted automation to speed up my workflow.",
     about_p4:
-      "A background in graphic design informs interfaces that are not only functional, but thoughtfully composed and ready for production.",
+      "My background in design still shows up in my work too, including a few more visual pieces like character design and some on-chain work, which are more of a creative outlet.",
     about_p5:
-      "Based in Istanbul and working globally, Madbak is open to select freelance collaborations across frontend development, web design, and creative digital experiences.",
+      "Based in Istanbul, working freelance with clients around the world. If you’ve got a frontend development project in mind, I’d love to hear about it.",
     about_operator_image_alt:
       "Portrait of Babak Ravanbakhsh, creative frontend developer known as Madbak",
     stat_role: "Role",
