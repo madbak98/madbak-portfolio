@@ -1170,6 +1170,9 @@ export default function HomePage() {
               <Link href="/works/nft-collection" className="transition-opacity hover:opacity-100 hover:text-white">
                 {lang === "fa" ? "مجموعه NFT" : lang === "tr" ? "NFT Koleksiyonu" : "NFT Collection"}
               </Link>
+              <Link href="/services" className="transition-opacity hover:opacity-100 hover:text-white">
+                {t("nav_services")}
+              </Link>
               <Link href="/#about" className="transition-opacity hover:opacity-100 hover:text-white">
                 {t("nav_about")}
               </Link>

@@ -59,6 +59,7 @@ export function SiteNav({
   const pathname = usePathname();
   const activeSlug = worksSlugFromPath(pathname);
   const worksActive = Boolean(activeSlug) || worksMenuOpen;
+  const servicesActive = pathname === "/services";
   const menuId = useId();
   const menuShellRef = useRef<HTMLDivElement>(null);
 
@@ -214,6 +215,15 @@ export function SiteNav({
                 {linkUnderline}
               </Link>
             )}
+
+            <Link
+              href="/services"
+              className={`${linkClass} ${servicesActive ? "text-[#ff2a2a]" : ""}`}
+              onClick={() => setWorksMenuOpen(false)}
+            >
+              {t("nav_services")}
+              {linkUnderline}
+            </Link>
           </nav>
 
           <div
@@ -467,6 +477,14 @@ export function MobileNavOverlay({
               {t("nav_contact")}
             </Link>
           )}
+
+          <Link
+            href="/services"
+            className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold transition-colors hover:bg-white/[0.06] ${pathname === "/services" ? "text-[#ff2a2a]" : "text-[#EBE8E1]"} ${localeCase(lang)}`}
+            onClick={() => setMobileNavOpen(false)}
+          >
+            {t("nav_services")}
+          </Link>
 
           {homeLinks ? (
             <motion.a

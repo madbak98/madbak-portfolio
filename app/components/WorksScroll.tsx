@@ -462,6 +462,7 @@ function EditorialWebCard({
   href,
   images,
   imageAlts,
+  description,
   meta,
   slotClass,
   frameTone = "warm",
@@ -470,6 +471,7 @@ function EditorialWebCard({
   href: string;
   images: readonly string[];
   imageAlts?: readonly string[];
+  description: string;
   meta: readonly string[];
   slotClass: string;
   frameTone?: "warm" | "dark";
@@ -633,6 +635,9 @@ function EditorialWebCard({
             <h3 className="mt-2 text-[clamp(1.75rem,4.2vw,3.5rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-[#1C1A17]">
               {title}
             </h3>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-[#6E6A63] sm:text-base">
+              {description}
+            </p>
           </div>
 
           <span
@@ -707,6 +712,7 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
                 href={project.href}
                 images={project.images}
                 imageAlts={"imageAlts" in project ? project.imageAlts : undefined}
+                description={project.description[lang]}
                 meta={meta}
                 slotClass={slotClass}
                 frameTone={isFeatured ? "warm" : "dark"}
