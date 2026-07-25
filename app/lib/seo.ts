@@ -377,6 +377,7 @@ export const SITEMAP_ROUTES: {
   priority: number;
 }[] = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
+  { path: "/blog", changeFrequency: "weekly", priority: 0.8 },
   { path: "/works/websites", changeFrequency: "monthly", priority: 0.9 },
   {
     path: "/works/character-design",

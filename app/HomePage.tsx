@@ -47,6 +47,7 @@ import {
   nftLinkTrack,
 } from "./lib/locale-ui";
 import { ContactSection } from "./components/ContactSection";
+import { FooterCrowd } from "./components/FooterCrowd";
 import { MiniGame } from "./components/MiniGame";
 import { WorksScroll } from "./components/WorksScroll";
 
@@ -1145,8 +1146,9 @@ export default function HomePage() {
 
         <ContactSection t={t} lang={lang} />
 
-        <footer className="border-t border-white/10 bg-[#0A0A0A] px-4 py-10 text-[#EBE8E1] sm:px-6 sm:py-12">
-          <div className="mx-auto flex max-w-[1400px] flex-col gap-8 sm:gap-10">
+        <footer className="relative isolate overflow-hidden border-t border-white/10 bg-[#0A0A0A] px-4 py-10 text-[#EBE8E1] sm:px-6 sm:py-12">
+          <FooterCrowd reduceMotion={reduceMotion} />
+          <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col gap-8 sm:gap-10">
             <p
               className={`max-w-2xl text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)} ${bodyProse(lang)}`}
             >
@@ -1173,6 +1175,9 @@ export default function HomePage() {
               <Link href="/services" className="transition-opacity hover:opacity-100 hover:text-white">
                 {t("nav_services")}
               </Link>
+              <Link href="/blog" className="transition-opacity hover:opacity-100 hover:text-white">
+                {t("nav_blog")}
+              </Link>
               <Link href="/#about" className="transition-opacity hover:opacity-100 hover:text-white">
                 {t("nav_about")}
               </Link>
@@ -1180,11 +1185,16 @@ export default function HomePage() {
                 {t("nav_contact")}
               </Link>
             </nav>
-            <p
-              className={`text-center font-mono text-[10px] text-white/40 sm:text-start ${brandUppercase()} ${trackMeta(lang)}`}
-            >
-              © 2026 MADBAK IND.
-            </p>
+            <div className="flex flex-col gap-2">
+              <p
+                className={`text-center font-mono text-[10px] text-white/40 sm:text-start ${brandUppercase()} ${trackMeta(lang)}`}
+              >
+                © 2026 MADBAK IND.
+              </p>
+              <p className="text-center font-mono text-[8px] uppercase tracking-[0.16em] text-white/25 sm:text-start">
+                Crowd study by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://skiper-ui.com/v1/skiper39" target="_blank" rel="noreferrer">Skiper UI</a> · characters by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://www.openpeeps.com/" target="_blank" rel="noreferrer">Open Peeps</a>
+              </p>
+            </div>
           </div>
         </footer>
       </main>
