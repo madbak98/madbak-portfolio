@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 
-import { getAllBlogPosts } from "./lib/blog";
 import { languageAlternates, SITEMAP_ROUTES } from "./lib/seo";
 import { absoluteUrl, CONTENT_UPDATED_AT } from "./lib/site";
 
@@ -25,12 +24,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  const blogRoutes = getAllBlogPosts().map((post) => ({
-    url: absoluteUrl(`/blog/${post.slug}`),
-    lastModified: new Date(`${post.date}T00:00:00Z`),
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
-
-  return [...coreRoutes, ...blogRoutes];
+  return coreRoutes;
 }

@@ -1175,8 +1175,8 @@ export default function HomePage() {
               <Link href="/services" className="transition-opacity hover:opacity-100 hover:text-white">
                 {t("nav_services")}
               </Link>
-              <Link href="/blog" className="transition-opacity hover:opacity-100 hover:text-white">
-                {t("nav_blog")}
+              <Link href="/lab" className="transition-opacity hover:opacity-100 hover:text-white">
+                {t("nav_lab")}
               </Link>
               <Link href="/#about" className="transition-opacity hover:opacity-100 hover:text-white">
                 {t("nav_about")}

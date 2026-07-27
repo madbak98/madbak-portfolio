@@ -18,6 +18,9 @@ import { PortfolioImage } from "./PortfolioImage";
 import { ProjectMarquee } from "./ProjectMarquee";
 import { localeCase, trackHeading, trackMeta } from "../lib/locale-ui";
 import Link from "next/link";
+import { REACT_BITS_FREE_ITEMS, type ReactBitsFreeItem } from "../lib/react-bits-free";
+import { ReactBitsLivePreview } from "../lab/components/ReactBitsLivePreview";
+import { MadlabDexterModel } from "../lab/components/MadlabDexterModel";
 
 type Project = (typeof PROJECTS)[number];
 type GenreVariant = "character" | "influencer" | "fashion" | "poster";
@@ -32,21 +35,8 @@ const GENRES: {
   description: Record<LangKey, string>;
 }[] = [
   {
-    id: "character",
-    number: "01",
-    variant: "character",
-    href: "/works/character-design",
-    projectIds: ["01"],
-    title: { en: "CHARACTER DESIGN", fa: "طراحی کاراکتر", tr: "KARAKTER TASARIMI" },
-    description: {
-      en: "One character study, presented as a focused visual identity.",
-      fa: "یک مطالعه‌ی کاراکتر، به‌عنوان یک هویت بصری متمرکز.",
-      tr: "Tek bir karakter çalışması, odaklanmış bir görsel kimlik olarak sunuluyor.",
-    },
-  },
-  {
     id: "influencer",
-    number: "02",
+    number: "01",
     variant: "influencer",
     href: "/works/ai-influencer",
     projectIds: ["02"],
@@ -72,6 +62,26 @@ const SIGMA_META_CATEGORY: Record<LangKey, string> = {
   en: "Web3 Growth Platform",
   fa: "پلتفرم رشد وب۳",
   tr: "Web3 Büyüme Platformu",
+};
+
+const MADLAB_HOME_ITEMS = ["Strands", "Logo Loop", "Folder"] as const;
+
+const MADLAB_HOME_SUMMARIES: Record<(typeof MADLAB_HOME_ITEMS)[number], Record<LangKey, string>> = {
+  Strands: {
+    en: "A flowing visual study built from layered strands, glow, and controlled motion.",
+    fa: "یک مطالعه‌ی بصری روان با رشته‌های لایه‌ای، درخشش و حرکت کنترل‌شده.",
+    tr: "Katmanlı çizgiler, ışıma ve kontrollü hareketten oluşan akışkan bir görsel çalışma.",
+  },
+  "Logo Loop": {
+    en: "A continuous brand loop built for movement, repetition, and visual balance.",
+    fa: "یک لوپ پیوسته برای حرکت، تکرار و تعادل بصری برندها.",
+    tr: "Hareket, tekrar ve görsel denge için sürekli bir marka döngüsü.",
+  },
+  Folder: {
+    en: "A tactile folder interaction for organizing small collections of content.",
+    fa: "یک تعامل پوشه‌ای برای مرتب‌کردن مجموعه‌های کوچک محتوا.",
+    tr: "Küçük içerik koleksiyonlarını düzenleyen dokunsal bir klasör etkileşimi.",
+  },
 };
 
 const ART_GALLERY_META_TITLE: Record<LangKey, string> = {
@@ -725,6 +735,105 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
   );
 }
 
+function MadlabHomeSection({ lang }: { lang: LangKey }) {
+  const previewItems = MADLAB_HOME_ITEMS.map((title) =>
+    REACT_BITS_FREE_ITEMS.find((item) => item.title === title),
+  ).filter((item): item is ReactBitsFreeItem => Boolean(item));
+
+  return (
+    <section
+      id="madlab"
+      className="relative scroll-mt-24 overflow-hidden border-t border-white/10 bg-[#0A0A0A] px-5 py-20 text-[#EBE8E1] sm:px-8 sm:py-28 lg:px-12"
+      dir={lang === "fa" ? "rtl" : "ltr"}
+    >
+      <div className="mx-auto max-w-[1400px]">
+        <header className="mb-12 grid gap-8 border-t border-white/15 pt-5 sm:mb-16 sm:grid-cols-[minmax(0,1fr)_10rem_minmax(16rem,0.72fr)] sm:items-end sm:gap-8">
+          <div>
+            <p className={`font-mono text-[10px] uppercase tracking-[0.3em] text-[#FF2A2A] ${localeCase(lang)} ${trackMeta(lang)}`}>
+              MADLAB / EXPERIMENTAL DEVELOPMENT
+            </p>
+            <h2 className={`mt-5 max-w-[9ch] text-[clamp(4rem,13vw,12rem)] font-black uppercase leading-[0.72] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`}>
+              MADLAB
+            </h2>
+          </div>
+          <MadlabDexterModel modelPath="/potion.glb" label="MADLAB potion" compact />
+          <div className="max-w-md">
+            <p className={`text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
+              {lang === "fa"
+                ? "آزمایشگاه شخصی من برای ساخت کامپوننت‌ها، تعامل‌ها و تجربه‌های بصری از صفر."
+                : lang === "tr"
+                  ? "Bileşenleri, etkileşimleri ve görsel deneyleri sıfırdan kurduğum kişisel laboratuvar."
+                  : "A personal lab for building components, interactions, and visual experiments from scratch."}
+            </p>
+            <Link
+              href="/lab"
+              className="group mt-8 block w-fit border-y border-white/12 py-4 transition-colors hover:border-[#FF2A2A]/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF2A2A] focus-visible:ring-offset-4 focus-visible:ring-offset-[#0A0A0A]"
+              aria-label="Get MADLAB source code for free"
+            >
+              <span className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-[#FF2A2A]">
+                <span>Free source</span>
+                <span className="text-white/25">/</span>
+                <span className="text-white/35 transition-colors group-hover:text-white/65">No gatekeeping</span>
+              </span>
+              <span className="mt-2 flex items-center gap-3 text-[clamp(1.15rem,2.4vw,1.75rem)] font-black uppercase leading-none tracking-[-0.07em] text-[#EBE8E1]">
+                <span>Take the code. Make it yours</span>
+                <span aria-hidden className="relative mt-0.5 h-5 w-9 shrink-0 overflow-hidden rounded-r-full bg-[#FF2A2A] transition-transform duration-300 group-hover:translate-x-1">
+                  <span className="absolute -right-2 top-0 h-5 w-5 rounded-full bg-[#0A0A0A]" />
+                </span>
+                <span className="text-[#FF2A2A]">!</span>
+              </span>
+            </Link>
+          </div>
+        </header>
+
+        <div className="grid gap-8 md:grid-cols-3 md:gap-6 lg:gap-8">
+          {previewItems.map((item, index) => (
+            <article key={item.slug} className="group min-w-0">
+              <Link
+                href={`/lab/${item.slug}`}
+                className="block overflow-hidden border border-white/15 bg-[#101010] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF2A2A]"
+                aria-label={`Open MADLAB experiment: ${item.title}`}
+              >
+                <div className="relative">
+                  <ReactBitsLivePreview item={item} />
+                  <span className="absolute left-3 top-3 font-mono text-[9px] uppercase tracking-[0.18em] text-white/40">
+                    {String(index + 1).padStart(2, "0")} / PREVIEW
+                  </span>
+                </div>
+              </Link>
+              <div className="mt-5 flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#FF2A2A]">{item.category}</p>
+                  <h3 className="mt-2 text-2xl font-black tracking-[-0.07em] transition-colors group-hover:text-[#FF2A2A] sm:text-3xl">
+                    {item.title}
+                  </h3>
+                  <p className={`mt-3 max-w-sm text-sm leading-relaxed text-white/45 ${localeCase(lang)}`}>
+                    {MADLAB_HOME_SUMMARIES[item.title as (typeof MADLAB_HOME_ITEMS)[number]][lang]}
+                  </p>
+                </div>
+                <span className="mt-1 font-mono text-sm text-white/30 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-[#FF2A2A]" aria-hidden>
+                  ↗
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-12 sm:mt-16">
+          <ProjectMarquee
+            text="MADLAB"
+            accessibleLabel="MADLAB experimental development lab"
+            stripBackground="#111111"
+            textColor="#EBE8E1"
+            dividerColor="rgba(255, 255, 255, 0.14)"
+            lang={lang}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function NFTSection({ lang }: { lang: LangKey }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -883,6 +992,8 @@ export function WorksScroll({
       </header>
 
       <WebProjectsSection lang={lang} />
+
+      <MadlabHomeSection lang={lang} />
 
       {GENRES.map((genre) => {
         const projects = genre.projectIds

@@ -59,7 +59,7 @@ export function SiteNav({
   const pathname = usePathname();
   const activeSlug = worksSlugFromPath(pathname);
   const worksActive = Boolean(activeSlug) || worksMenuOpen;
-  const blogActive = pathname === "/blog" || pathname?.startsWith("/blog/");
+  const labActive = pathname === "/lab" || pathname?.startsWith("/lab/");
   const servicesActive = pathname === "/services";
   const menuId = useId();
   const menuShellRef = useRef<HTMLDivElement>(null);
@@ -218,11 +218,11 @@ export function SiteNav({
             )}
 
             <Link
-              href="/blog"
-              className={`${linkClass} ${blogActive ? "text-[#ff2a2a]" : ""}`}
+              href="/lab"
+              className={`${linkClass} ${labActive ? "text-[#ff2a2a]" : ""}`}
               onClick={() => setWorksMenuOpen(false)}
             >
-              {t("nav_blog")}
+              {t("nav_lab")}
               {linkUnderline}
             </Link>
 
@@ -356,7 +356,7 @@ export function MobileNavOverlay({
 }) {
   const pathname = usePathname();
   const activeSlug = worksSlugFromPath(pathname);
-  const blogActive = pathname === "/blog" || pathname?.startsWith("/blog/");
+  const labActive = pathname === "/lab" || pathname?.startsWith("/lab/");
   const worksPanelId = useId();
 
   return (
@@ -490,11 +490,11 @@ export function MobileNavOverlay({
           )}
 
           <Link
-            href="/blog"
-            className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold transition-colors hover:bg-white/[0.06] ${blogActive ? "text-[#ff2a2a]" : "text-[#EBE8E1]"} ${localeCase(lang)}`}
+            href="/lab"
+            className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold transition-colors hover:bg-white/[0.06] ${labActive ? "text-[#ff2a2a]" : "text-[#EBE8E1]"} ${localeCase(lang)}`}
             onClick={() => setMobileNavOpen(false)}
           >
-            {t("nav_blog")}
+            {t("nav_lab")}
           </Link>
 
           <Link
