@@ -225,7 +225,7 @@ export function MadlabDexterModel({
 
   return (
     <div
-      className={`relative overflow-hidden ${compact ? "aspect-square w-full max-w-[10rem]" : "border border-[#ff2a2a]/35 bg-[#0a0a0a] shadow-[0_0_70px_rgba(255,42,42,0.08)] aspect-[3/4] min-h-[19rem] lg:min-h-0"}`}
+      className={`relative overflow-hidden ${compact ? "aspect-square w-full max-w-[10rem]" : "border border-[#ff2a2a]/35 bg-[#0a0a0a] shadow-[0_0_70px_rgba(255,42,42,0.08)] aspect-[3/4] min-h-[14rem] sm:min-h-[19rem] lg:min-h-0"}`}
       style={{ cursor: isModelHovered ? "pointer" : "default" }}
     >
       {!compact && <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(255,42,42,0.14),transparent_52%)]" />}

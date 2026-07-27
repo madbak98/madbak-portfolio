@@ -59,12 +59,12 @@ export function MadlabHero() {
               <span>{madlabText(lang, "liveDisplay")}</span>
               <span aria-hidden>01—05</span>
             </div>
-            <div className="grid w-full gap-8 lg:grid-cols-[minmax(12rem,0.28fr)_minmax(0,1fr)] lg:items-center">
+            <div className="grid w-full min-w-0 grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-3 sm:gap-5 lg:grid-cols-[minmax(12rem,0.28fr)_minmax(0,1fr)] lg:items-center lg:gap-8">
               <MadlabDexterModel />
               <div
                 role="img"
                 aria-label="MADLAB — MADBAK Experimental Development Lab"
-                className="w-full"
+                className="min-w-0 w-full"
               >
                 <div aria-hidden="true">
                   <TextFlippingBoard
