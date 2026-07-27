@@ -15,14 +15,12 @@ export async function GET(_request: Request, { params }: RouteContext) {
     return Response.json({ error: "MADLAB item not found." }, { status: 404 });
   }
 
-  const localSourcePath = item.sourcePath.replace(/^src\/ts-tailwind\//, "app/lab/react-bits/");
-
   try {
-    const code = await readFile(path.join(/* turbopackIgnore: true */ process.cwd(), localSourcePath), "utf8");
+    const code = await readFile(path.join(/* turbopackIgnore: true */ process.cwd(), item.localSourcePath), "utf8");
     return Response.json({
       title: item.title,
       variant: "TS + Tailwind",
-      sourcePath: localSourcePath,
+      sourcePath: item.sourcePath,
       code,
     });
   } catch {

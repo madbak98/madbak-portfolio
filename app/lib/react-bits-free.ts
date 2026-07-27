@@ -6,6 +6,7 @@ export type ReactBitsFreeItem = {
   category: ReactBitsFreeCategory;
   sourceName: string;
   sourcePath: string;
+  localSourcePath: string;
   featured?: boolean;
 };
 
@@ -29,6 +30,7 @@ const items = (category: ReactBitsFreeCategory, titles: string[]): ReactBitsFree
       category,
       sourceName,
       sourcePath: `src/ts-tailwind/${sourceCategory}/${sourceName}/${sourceName}.tsx`,
+      localSourcePath: `app/lab/react-bits/${sourceCategory}/${sourceName}/${sourceName}.tsx`,
       featured: ["Cursor Grid", "Specular Button", "Lightfall", "Ferrofluid", "Magic Bento", "Shiny Text"].includes(title),
     };
   });
