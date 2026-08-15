@@ -20,7 +20,6 @@ import { localeCase, trackHeading, trackMeta } from "../lib/locale-ui";
 import Link from "next/link";
 import { REACT_BITS_FREE_ITEMS, type ReactBitsFreeItem } from "../lib/react-bits-free";
 import { ReactBitsLivePreview } from "../lab/components/ReactBitsLivePreview";
-import { MadlabDexterModel } from "../lab/components/MadlabDexterModel";
 
 type Project = (typeof PROJECTS)[number];
 type GenreVariant = "character" | "influencer" | "fashion" | "poster";
@@ -747,7 +746,7 @@ function MadlabHomeSection({ lang }: { lang: LangKey }) {
       dir={lang === "fa" ? "rtl" : "ltr"}
     >
       <div className="mx-auto max-w-[1400px]">
-        <header className="mb-12 grid gap-8 border-t border-white/15 pt-5 sm:mb-16 sm:grid-cols-[minmax(0,1fr)_10rem_minmax(16rem,0.72fr)] sm:items-end sm:gap-8">
+        <header className="mb-12 grid gap-8 border-t border-white/15 pt-5 sm:mb-16 sm:grid-cols-[minmax(0,1fr)_minmax(16rem,0.72fr)] sm:items-end sm:gap-8">
           <div>
             <p className={`font-mono text-[10px] uppercase tracking-[0.3em] text-[#FF2A2A] ${localeCase(lang)} ${trackMeta(lang)}`}>
               MADLAB / EXPERIMENTAL DEVELOPMENT
@@ -756,7 +755,6 @@ function MadlabHomeSection({ lang }: { lang: LangKey }) {
               MADLAB
             </h2>
           </div>
-          <MadlabDexterModel modelPath="/potion.glb" label="MADLAB potion" compact />
           <div className="max-w-md">
             <p className={`text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
               {lang === "fa"
