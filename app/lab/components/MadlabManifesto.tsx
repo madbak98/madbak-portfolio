@@ -25,7 +25,7 @@ export function MadlabManifesto() {
           <Link href="/works/nft-collection" className="transition-colors hover:text-[#ebe8e1]">NFT Collection</Link>
           <Link href="/services" className="transition-colors hover:text-[#ebe8e1]">Services</Link>
           <Link href="/lab" className="text-[#ebe8e1] transition-colors hover:text-[#ff2a2a]">MADLAB</Link>
-          <Link href="/#about" className="transition-colors hover:text-[#ebe8e1]">About</Link>
+          <Link href="/about" className="transition-colors hover:text-[#ebe8e1]">About</Link>
           <Link href="/#contact" className="transition-colors hover:text-[#ebe8e1]">Contact</Link>
         </nav>
 

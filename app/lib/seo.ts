@@ -379,6 +379,7 @@ export const SITEMAP_ROUTES: {
   { path: "/", changeFrequency: "weekly", priority: 1 },
   { path: "/lab", changeFrequency: "weekly", priority: 0.95 },
   { path: "/services", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/about", changeFrequency: "monthly", priority: 0.85 },
   { path: "/works/websites", changeFrequency: "monthly", priority: 0.9 },
   {
     path: "/works/character-design",

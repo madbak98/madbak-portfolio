@@ -61,6 +61,7 @@ export function SiteNav({
   const worksActive = Boolean(activeSlug) || worksMenuOpen;
   const labActive = pathname === "/lab" || pathname?.startsWith("/lab/");
   const servicesActive = pathname === "/services";
+  const aboutActive = pathname === "/about";
   const menuId = useId();
   const menuShellRef = useRef<HTMLDivElement>(null);
 
@@ -97,7 +98,7 @@ export function SiteNav({
     />
   );
 
-  const aboutHref = homeLinks ? "#about" : "/#about";
+  const aboutHref = "/about";
   const contactHref = homeLinks ? "#contact" : "/#contact";
   const logoHref = homeLinks ? "#hero" : "/";
 
@@ -169,29 +170,14 @@ export function SiteNav({
               {linkUnderline}
             </button>
 
-            {homeLinks ? (
-              <a
-                href={aboutHref}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setWorksMenuOpen(false);
-                  onNavigate("about");
-                }}
-                className={linkClass}
-              >
-                {t("nav_about")}
-                {linkUnderline}
-              </a>
-            ) : (
-              <Link
-                href={aboutHref}
-                className={linkClass}
-                onClick={() => setWorksMenuOpen(false)}
-              >
-                {t("nav_about")}
-                {linkUnderline}
-              </Link>
-            )}
+            <Link
+              href={aboutHref}
+              className={`${linkClass} ${aboutActive ? "text-[#ff2a2a]" : ""}`}
+              onClick={() => setWorksMenuOpen(false)}
+            >
+              {t("nav_about")}
+              {linkUnderline}
+            </Link>
 
             {homeLinks ? (
               <a
@@ -427,36 +413,15 @@ export function MobileNavOverlay({
             ) : null}
           </div>
 
-          {homeLinks ? (
-            <motion.a
-              href="#about"
-              initial={false}
-              animate={
-                mobileNavOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }
-              }
-              transition={{
-                delay:
-                  mobileNavOpen && !prefersReducedMotion ? 0.08 : 0,
-                duration: prefersReducedMotion ? 0.2 : 0.28,
-                ease: [0.18, 1, 0.32, 1],
-              }}
-              className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold text-[#EBE8E1] transition-colors hover:bg-white/[0.06] active:scale-[0.99] ${localeCase(lang)}`}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("about");
-              }}
-            >
-              {t("nav_about")}
-            </motion.a>
-          ) : (
-            <Link
-              href="/#about"
-              className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold text-[#EBE8E1] transition-colors hover:bg-white/[0.06] ${localeCase(lang)}`}
-              onClick={() => setMobileNavOpen(false)}
-            >
-              {t("nav_about")}
-            </Link>
-          )}
+          <Link
+            href="/about"
+            className={`flex min-h-[48px] items-center rounded-xl px-3 py-2.5 font-mono text-[13px] font-semibold transition-colors hover:bg-white/[0.06] active:scale-[0.99] ${
+              pathname === "/about" ? "text-[#ff2a2a]" : "text-[#EBE8E1]"
+            } ${localeCase(lang)}`}
+            onClick={() => setMobileNavOpen(false)}
+          >
+            {t("nav_about")}
+          </Link>
 
           {homeLinks ? (
             <motion.a
