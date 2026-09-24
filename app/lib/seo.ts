@@ -26,32 +26,30 @@ export type PageSeoCopy = {
 /** Full document titles including brand — used for absolute metadata + client updates. */
 export const HOME_SEO: Record<LangKey, PageSeoCopy> = {
   en: {
-    title: "Madbak — Creative Frontend Developer & Web Designer",
+    title: "MADBAK — Creative Developer & Web Designer",
     description:
-      "Portfolio of Madbak, a creative frontend developer and web designer creating interactive websites, digital experiences, and motion-led projects.",
+      "Babak Ravanbakhsh is a creative developer and web designer based in Istanbul, building interactive websites, digital experiences and creative technology projects.",
     keywords: [
+      "creative developer",
       "frontend developer",
-      "creative frontend developer",
       "web designer",
-      "website developer",
-      "frontend portfolio",
       "interactive websites",
       "Next.js developer",
-      "UI UX designer",
       "digital experiences",
-      "Madbak",
+      "MADBAK",
       "Babak Ravanbakhsh",
+      "Istanbul",
     ],
   },
   fa: {
-    title: "مدبک — توسعه‌دهنده فرانت‌اند و طراح وب خلاق",
+    title: "مدبک — توسعه‌دهنده خلاق و طراح وب",
     description:
-      "پورتفولیوی مدبک؛ توسعه‌دهنده فرانت‌اند و طراح وب با تمرکز بر وب‌سایت‌های تعاملی، تجربه‌های دیجیتال، هویت بصری و موشن.",
+      "بابک روان‌بخش، توسعه‌دهنده خلاق و طراح وب مستقر در استانبول؛ ساخت وب‌سایت‌های تعاملی، تجربه‌های دیجیتال و پروژه‌های فناوری خلاق.",
   },
   tr: {
-    title: "Madbak — Yaratıcı Frontend Geliştirici ve Web Tasarımcısı",
+    title: "MADBAK — Yaratıcı Geliştirici ve Web Tasarımcısı",
     description:
-      "Etkileşimli web siteleri, dijital deneyimler, görsel kimlikler ve hareket odaklı projeler geliştiren Madbak’ın frontend geliştirme ve web tasarım portfolyosu.",
+      "Babak Ravanbakhsh, İstanbul merkezli yaratıcı geliştirici ve web tasarımcısı; etkileşimli web siteleri, dijital deneyimler ve yaratıcı teknoloji projeleri üretir.",
   },
 };
 
@@ -65,68 +63,68 @@ export const CATEGORY_SEO: Record<
 > = {
   websites: {
     en: {
-      title: "Web Design & Frontend Development Projects",
+      title: "Web Design Projects",
       description:
         "Selected websites and interactive digital products designed and developed by Madbak using modern frontend technologies, motion, visual identity, and creative direction.",
     },
     fa: {
-      title: "پروژه‌های طراحی وب و توسعه فرانت‌اند",
+      title: "پروژه‌های طراحی وب",
       description:
         "مجموعه‌ای از پروژه‌های طراحی وب‌سایت و توسعه فرانت‌اند مدبک با تمرکز بر تجربه تعاملی، موشن، هویت بصری و فناوری‌های مدرن وب.",
     },
     tr: {
-      title: "Web Tasarım ve Frontend Geliştirme Projeleri",
+      title: "Web Tasarım Projeleri",
       description:
         "Madbak tarafından modern frontend teknolojileri, hareket tasarımı, görsel kimlik ve yaratıcı yön ile geliştirilen seçili web projeleri.",
     },
   },
   "character-design": {
     en: {
-      title: "Character Design & Visual Development",
+      title: "Character Design Projects",
       description:
         "Character design and visual development by Madbak — exploration of styling, silhouettes, identity systems, and narrative illustration for digital characters.",
     },
     fa: {
-      title: "طراحی کاراکتر و توسعه بصری",
+      title: "پروژه‌های طراحی کاراکتر",
       description:
         "طراحی کاراکتر و توسعه بصری مدبک؛ کاوش استایل، سیلوئت، سیستم هویت و تصویرسازی روایی برای شخصیت‌های دیجیتال.",
     },
     tr: {
-      title: "Karakter Tasarımı ve Görsel Geliştirme",
+      title: "Karakter Tasarım Projeleri",
       description:
         "Madbak’ın karakter tasarımı ve görsel geliştirme çalışmaları — stil, siluet, kimlik sistemleri ve dijital karakterler için anlatısal illüstrasyon.",
     },
   },
   "ai-influencer": {
     en: {
-      title: "AI Influencer & Digital Persona Design",
+      title: "AI Influencer Projects",
       description:
         "Pink Army and related AI influencer work by Madbak — digital persona design, generative look development, and campaign imagery for synthetic talent.",
     },
     fa: {
-      title: "اینفلوئنسر هوش مصنوعی و طراحی پرسونای دیجیتال",
+      title: "پروژه‌های اینفلوئنسر هوش مصنوعی",
       description:
         "پروژه Pink Army و کارهای مرتبط اینفلوئنسر هوش مصنوعی مدبک؛ طراحی پرسونای دیجیتال، توسعه ظاهر مولد و تصویرسازی کمپین.",
     },
     tr: {
-      title: "YZ Influencer ve Dijital Persona Tasarımı",
+      title: "YZ Influencer Projeleri",
       description:
         "Madbak’ın Pink Army ve ilgili YZ influencer çalışmaları — dijital persona tasarımı, üretken görünüm geliştirme ve kampanya görselleri.",
     },
   },
   "nft-collection": {
     en: {
-      title: "NFT Art & Digital Collection",
+      title: "NFT Collection Projects",
       description:
         "Madbak’s NFT art collection on Foundation — independent 1/1 digital editions spanning character-led collectible artwork and experimental on-chain visuals.",
     },
     fa: {
-      title: "هنر NFT و مجموعه دیجیتال",
+      title: "پروژه‌های مجموعه NFT",
       description:
         "مجموعه هنر NFT مدبک در Foundation؛ نسخه‌های دیجیتال ۱/۱ مستقل با تمرکز بر آثار کلکسیونی کاراکترمحور و تصویرسازی آن‌چین.",
     },
     tr: {
-      title: "NFT Sanatı ve Dijital Koleksiyon",
+      title: "NFT Koleksiyon Projeleri",
       description:
         "Madbak’ın Foundation üzerindeki NFT sanat koleksiyonu — karakter odaklı koleksiyonluk eserler ve deneysel zincir üstü görsellerden oluşan 1/1 edisyonlar.",
     },
@@ -134,13 +132,49 @@ export const CATEGORY_SEO: Record<
 };
 
 const CATEGORY_OG_IMAGE: Record<WorkCategorySlug, string> = {
-  websites: "/projects/art-gallery/art-gallery-home.png",
+  websites: "/projects/sigmaa/home-hero.jpg",
   "character-design":
     "https://pbs.twimg.com/media/GdN7WSoXQAAgQO0?format=jpg&name=large",
   "ai-influencer":
     "https://github.com/madbak98/My-image/blob/main/6fe54cd9-9cce-492c-ba0c-e6438d486fff.png?raw=true",
   "nft-collection":
     "https://ipfs.foundation.app/ipfs/QmSawSnoD6YG6jP1ot8WhoZFcaS12tjE587y9QSJK2F1XD/nft.jpg",
+};
+
+export const ABOUT_SEO: Record<LangKey, PageSeoCopy> = {
+  en: {
+    title: "About — MADBAK",
+    description:
+      "About Babak Ravanbakhsh, a creative developer and frontend developer based in Istanbul, working across design, code, motion and interactive digital experiences.",
+  },
+  fa: {
+    title: "درباره — مدبک",
+    description:
+      "درباره بابک روان‌بخش؛ توسعه‌دهنده خلاق و فرانت‌اند مستقر در استانبول، فعال در طراحی، کد، موشن و تجربه‌های دیجیتال تعاملی.",
+  },
+  tr: {
+    title: "Hakkında — MADBAK",
+    description:
+      "İstanbul merkezli yaratıcı geliştirici ve frontend geliştiricisi Babak Ravanbakhsh hakkında — tasarım, kod, hareket ve etkileşimli dijital deneyimler.",
+  },
+};
+
+export const SERVICES_SEO: Record<LangKey, PageSeoCopy> = {
+  en: {
+    title: "Services — Web Design & Creative Development | MADBAK",
+    description:
+      "Web design, frontend development, motion, interaction, and creative direction packages by Babak Ravanbakhsh (MADBAK), based in Istanbul.",
+  },
+  fa: {
+    title: "خدمات — طراحی وب و توسعه خلاق | مدبک",
+    description:
+      "بسته‌های طراحی وب، توسعه فرانت‌اند، موشن، تعامل و کارگردانی خلاق توسط بابک روان‌بخش (مدبک)، مستقر در استانبول.",
+  },
+  tr: {
+    title: "Hizmetler — Web Tasarım ve Yaratıcı Geliştirme | MADBAK",
+    description:
+      "Babak Ravanbakhsh (MADBAK) tarafından sunulan web tasarım, frontend geliştirme, hareket, etkileşim ve yaratıcı yön paketleri — İstanbul.",
+  },
 };
 
 const OG_LOCALE: Record<LangKey, string> = {
@@ -168,8 +202,10 @@ function brandSuffix(lang: LangKey): string {
 export function withBrandTitle(segment: string, lang: LangKey): string {
   if (
     segment.includes("— Madbak") ||
+    segment.includes("— MADBAK") ||
     segment.includes("— مدبک") ||
     segment.startsWith("Madbak —") ||
+    segment.startsWith("MADBAK —") ||
     segment.startsWith("مدبک —")
   ) {
     return segment;
@@ -177,33 +213,40 @@ export function withBrandTitle(segment: string, lang: LangKey): string {
   return `${segment}${brandSuffix(lang)}`;
 }
 
+/**
+ * Locales are client-preferred (EN/FA/TR) with no distinct URL per language.
+ * Emitting identical hreflang URLs confuses crawlers — canonical only.
+ * When real locale paths exist, extend this to return languages + x-default.
+ */
 export function languageAlternates(path: string): Metadata["alternates"] {
-  // Locales are client-preferred (no distinct URL per language yet).
-  // Do not emit identical hreflang URLs — that confuses crawlers.
   return {
     canonical: absoluteUrl(path),
   };
 }
 
-export function buildHomeMetadata(lang: LangKey = "en"): Metadata {
-  const copy = HOME_SEO[lang];
-  const url = absoluteUrl("/");
-  const imageUrl = absoluteUrl(DEFAULT_OG_IMAGE_PATH);
-
+function sharedSocialMetadata({
+  title,
+  description,
+  url,
+  lang,
+  imagePath = DEFAULT_OG_IMAGE_PATH,
+  type = "website",
+}: {
+  title: string;
+  description: string;
+  url: string;
+  lang: LangKey;
+  imagePath?: string;
+  type?: "website" | "article";
+}): Pick<Metadata, "openGraph" | "twitter" | "robots"> {
+  const imageUrl = absoluteUrl(imagePath);
   return {
-    // Absolute prevents the root template from appending " — Madbak" again.
-    title: {
-      absolute: copy.title,
-    },
-    description: copy.description,
-    keywords: copy.keywords,
-    alternates: languageAlternates("/"),
     openGraph: {
-      type: "website",
+      type,
       url,
       siteName: SITE_NAME,
-      title: copy.title,
-      description: copy.description,
+      title,
+      description,
       locale: OG_LOCALE[lang],
       alternateLocale: (["en", "fa", "tr"] as LangKey[])
         .filter((code) => code !== lang)
@@ -213,17 +256,75 @@ export function buildHomeMetadata(lang: LangKey = "en"): Metadata {
           url: imageUrl,
           width: DEFAULT_OG_IMAGE_WIDTH,
           height: DEFAULT_OG_IMAGE_HEIGHT,
-          alt: "Madbak portfolio — creative frontend developer and web designer",
+          alt: title,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: copy.title,
-      description: copy.description,
+      title,
+      description,
       images: [imageUrl],
     },
     robots: INDEXABLE_ROBOTS,
+  };
+}
+
+export function buildHomeMetadata(lang: LangKey = "en"): Metadata {
+  const copy = HOME_SEO[lang];
+  const url = absoluteUrl("/");
+  const social = sharedSocialMetadata({
+    title: copy.title,
+    description: copy.description,
+    url,
+    lang,
+  });
+
+  return {
+    title: { absolute: copy.title },
+    description: copy.description,
+    keywords: copy.keywords,
+    alternates: languageAlternates("/"),
+    ...social,
+  };
+}
+
+export function buildAboutMetadata(lang: LangKey = "en"): Metadata {
+  const copy = ABOUT_SEO[lang];
+  const path = "/about";
+  const url = absoluteUrl(path);
+  const social = sharedSocialMetadata({
+    title: copy.title,
+    description: copy.description,
+    url,
+    lang,
+    imagePath: "/about-operator.png",
+  });
+
+  return {
+    title: { absolute: copy.title },
+    description: copy.description,
+    alternates: languageAlternates(path),
+    ...social,
+  };
+}
+
+export function buildServicesMetadata(lang: LangKey = "en"): Metadata {
+  const copy = SERVICES_SEO[lang];
+  const path = "/services";
+  const url = absoluteUrl(path);
+  const social = sharedSocialMetadata({
+    title: copy.title,
+    description: copy.description,
+    url,
+    lang,
+  });
+
+  return {
+    title: { absolute: copy.title },
+    description: copy.description,
+    alternates: languageAlternates(path),
+    ...social,
   };
 }
 
@@ -235,46 +336,27 @@ export function buildCategoryMetadata(
   const path = `/works/${slug}`;
   const url = absoluteUrl(path);
   const fullTitle = withBrandTitle(copy.title, lang);
-  const imageUrl = absoluteUrl(CATEGORY_OG_IMAGE[slug]);
+  const social = sharedSocialMetadata({
+    title: fullTitle,
+    description: copy.description,
+    url,
+    lang,
+    imagePath: CATEGORY_OG_IMAGE[slug],
+  });
 
   return {
-    // String title → root template renders `${title} — Madbak` for English SSR.
-    // Absolute used for FA/TR so the localized brand suffix is preserved.
     title: lang === "en" ? copy.title : { absolute: fullTitle },
     description: copy.description,
     keywords: copy.keywords,
     alternates: languageAlternates(path),
-    openGraph: {
-      type: "website",
-      url,
-      siteName: SITE_NAME,
-      title: fullTitle,
-      description: copy.description,
-      locale: OG_LOCALE[lang],
-      alternateLocale: (["en", "fa", "tr"] as LangKey[])
-        .filter((code) => code !== lang)
-        .map((code) => OG_LOCALE[code]),
-      images: [
-        {
-          url: imageUrl,
-          width: DEFAULT_OG_IMAGE_WIDTH,
-          height: DEFAULT_OG_IMAGE_HEIGHT,
-          alt: fullTitle,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: fullTitle,
-      description: copy.description,
-      images: [imageUrl],
-    },
-    robots: INDEXABLE_ROBOTS,
+    ...social,
   };
 }
 
 export function documentTitleForPath(path: string, lang: LangKey): string {
   if (path === "/" || path === "") return HOME_SEO[lang].title;
+  if (path === "/about") return ABOUT_SEO[lang].title;
+  if (path === "/services") return SERVICES_SEO[lang].title;
   const match = path.match(/^\/works\/([^/?#]+)/);
   if (match?.[1] && match[1] in CATEGORY_SEO) {
     return withBrandTitle(
@@ -292,9 +374,37 @@ export function buildWebsiteJsonLd() {
     "@id": `${SITE_URL}/#website`,
     url: `${SITE_URL}/`,
     name: SITE_NAME,
-    alternateName: "Madbak Portfolio",
+    alternateName: ["MADBAK", "Madbak Portfolio"],
     publisher: { "@id": `${SITE_URL}/#person` },
     inLanguage: ["en", "fa", "tr"],
+  };
+}
+
+export function buildPersonJsonLd() {
+  return {
+    "@type": "Person",
+    "@id": `${SITE_URL}/#person`,
+    name: PERSON_NAME,
+    alternateName: PERSON_ALTERNATE_NAME,
+    url: `${SITE_URL}/`,
+    jobTitle: ["Creative Developer", "Frontend Developer", "Web Designer"],
+    image: getProfileImageUrl(),
+    sameAs: getSameAsProfiles(),
+    knowsAbout: [
+      "Frontend Development",
+      "Web Design",
+      "Next.js",
+      "React",
+      "TypeScript",
+      "UI/UX Design",
+      "Creative Direction",
+      "Motion Design",
+      "Interactive Web Experiences",
+    ],
+    homeLocation: {
+      "@type": "Place",
+      name: "Istanbul, Türkiye",
+    },
   };
 }
 
@@ -307,35 +417,55 @@ export function buildProfilePageJsonLd() {
     url: `${SITE_URL}/`,
     name: copy.title,
     dateModified: CONTENT_UPDATED_AT.toISOString(),
-    mainEntity: {
-      "@type": "Person",
-      "@id": `${SITE_URL}/#person`,
-      name: PERSON_NAME,
-      alternateName: PERSON_ALTERNATE_NAME,
-      url: `${SITE_URL}/`,
-      jobTitle: [
-        "Frontend Developer",
-        "Web Designer",
-        "Creative Developer",
-      ],
-      image: getProfileImageUrl(),
-      sameAs: getSameAsProfiles(),
-      knowsAbout: [
-        "Frontend Development",
-        "Web Design",
-        "Next.js",
-        "React",
-        "TypeScript",
-        "UI/UX Design",
-        "Creative Direction",
-        "Motion Design",
-        "Interactive Web Experiences",
-      ],
-      homeLocation: {
-        "@type": "Place",
-        name: "Istanbul",
-      },
-    },
+    mainEntity: buildPersonJsonLd(),
+  };
+}
+
+export function buildAboutPageJsonLd(lang: LangKey = "en") {
+  const copy = ABOUT_SEO[lang];
+  const url = absoluteUrl("/about");
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "@id": `${url}#about`,
+    url,
+    name: copy.title,
+    description: copy.description,
+    inLanguage: lang,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    about: { "@id": `${SITE_URL}/#person` },
+    mainEntity: { "@id": `${SITE_URL}/#person` },
+  };
+}
+
+export function buildServicesPageJsonLd(lang: LangKey = "en") {
+  const copy = SERVICES_SEO[lang];
+  const url = absoluteUrl("/services");
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name: copy.title,
+    description: copy.description,
+    inLanguage: lang,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    about: { "@id": `${SITE_URL}/#person` },
+  };
+}
+
+export function buildBreadcrumbJsonLd(
+  items: { name: string; path: string }[],
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
   };
 }
 
@@ -349,17 +479,23 @@ export function buildCollectionPageJsonLd({
   const copy = CATEGORY_SEO[slug][lang];
   const path = `/works/${slug}`;
   const fullTitle = withBrandTitle(copy.title, lang);
-  return {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "@id": `${absoluteUrl(path)}#collection`,
-    url: absoluteUrl(path),
-    name: fullTitle,
-    description: copy.description,
-    isPartOf: { "@id": `${SITE_URL}/#website` },
-    about: { "@id": `${SITE_URL}/#person` },
-    inLanguage: lang,
-  };
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": `${absoluteUrl(path)}#collection`,
+      url: absoluteUrl(path),
+      name: fullTitle,
+      description: copy.description,
+      isPartOf: { "@id": `${SITE_URL}/#website` },
+      about: { "@id": `${SITE_URL}/#person` },
+      inLanguage: lang,
+    },
+    buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: fullTitle, path },
+    ]),
+  ];
 }
 
 export function homeJsonLdGraph() {

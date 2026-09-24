@@ -608,6 +608,17 @@ export default function ServicesPage() {
             <p className="max-w-2xl text-[clamp(1.7rem,4vw,4rem)] font-black leading-[0.95] tracking-[-0.06em]">{lang === "fa" ? "هر پروژه از یک گفت‌وگوی خوب شروع می‌شود." : lang === "tr" ? "Her proje iyi bir konuşmayla başlar." : "Every project starts with a good conversation."}</p>
             <Link href={SOCIAL_LINKS.telegram} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[48px] w-fit items-center rounded-full bg-[#ff2a2a] px-6 font-mono text-[10px] text-[#0A0A0A] transition-transform hover:scale-[1.03]">{copy.cta}<span className="ms-3" aria-hidden>→</span></Link>
           </div>
+          <nav
+            aria-label={lang === "fa" ? "نمونه‌کارها" : lang === "tr" ? "Portföy" : "Selected work"}
+            className="mx-auto mt-12 flex max-w-[1400px] flex-wrap gap-x-5 gap-y-3 border-t border-white/12 pt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-white/40"
+          >
+            <Link href="/works/websites" className="transition-colors hover:text-[#ebe8e1]">Websites</Link>
+            <Link href="/works/ai-influencer" className="transition-colors hover:text-[#ebe8e1]">AI Influencer</Link>
+            <Link href="/works/nft-collection" className="transition-colors hover:text-[#ebe8e1]">NFT Collection</Link>
+            <Link href="/works/character-design" className="transition-colors hover:text-[#ebe8e1]">Character Design</Link>
+            <Link href="/lab" className="transition-colors hover:text-[#ff2a2a]">MADLAB</Link>
+            <Link href="/#contact" className="transition-colors hover:text-[#ebe8e1]">Contact</Link>
+          </nav>
         </section>
       </main>
     </div>

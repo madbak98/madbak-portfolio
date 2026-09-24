@@ -247,9 +247,11 @@ export default async function MadlabEntryPage({ params }: MadlabEntryPageProps) 
   const item = getReactBitsFreeItem(slug);
   if (!entry && !item) notFound();
 
+  const jsonLd = entry ? buildMadlabJsonLd(entry) : null;
+
   return (
     <MadlabShell>
-      <JsonLd data={buildMadlabJsonLd(entry ?? catalogEntry(item!))} />
+      {jsonLd ? <JsonLd data={jsonLd} /> : null}
       {entry ? (
         <div className="mx-auto max-w-[1800px] lg:grid lg:grid-cols-[250px_minmax(0,1fr)]">
           <MadlabLibrarySidebar />

@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 
 import { SITEMAP_ROUTES } from "./lib/seo";
 import { MADLAB_ENTRIES } from "./lib/madlab";
-import { REACT_BITS_FREE_ITEMS } from "./lib/react-bits-free";
 import { absoluteUrl, CONTENT_UPDATED_AT } from "./lib/site";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
@@ -23,6 +22,11 @@ function entry(
   };
 }
 
+/**
+ * Sitemap = indexable URLs only.
+ * Catalog demos (/lab/catalog-*) and templated tutorials (/lab/tutorials/*)
+ * are public + noindex and intentionally omitted.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
   const core = SITEMAP_ROUTES.map((route) =>
     entry(route.path, {
@@ -39,23 +43,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const catalogItems = REACT_BITS_FREE_ITEMS.map((item) =>
-    entry(`/lab/${item.slug}`, {
-      changeFrequency: "monthly",
-      priority: item.featured ? 0.8 : 0.7,
-    }),
-  );
-
-  const tutorials = REACT_BITS_FREE_ITEMS.map((item) => {
-    const tutorialSlug = item.slug.replace(/^catalog-/, "");
-    return entry(`/lab/tutorials/${tutorialSlug}`, {
-      changeFrequency: "monthly",
-      priority: 0.65,
-    });
-  });
-
   const byUrl = new Map<string, SitemapEntry>();
-  for (const item of [...core, ...madlabExperiments, ...catalogItems, ...tutorials]) {
+  for (const item of [...core, ...madlabExperiments]) {
     byUrl.set(item.url, item);
   }
 

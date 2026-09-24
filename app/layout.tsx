@@ -73,7 +73,7 @@ export const metadata: Metadata = {
         url: absoluteUrl(DEFAULT_OG_IMAGE_PATH),
         width: DEFAULT_OG_IMAGE_WIDTH,
         height: DEFAULT_OG_IMAGE_HEIGHT,
-        alt: "Madbak portfolio — creative frontend developer and web designer",
+        alt: "MADBAK — creative developer and web designer",
       },
     ],
   },

@@ -91,9 +91,17 @@ export function MadlabHero() {
             <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-white/45 sm:text-xs">
               {madlabText(lang, "heroSubcopy")}
             </p>
+            <div className="mt-6 flex flex-wrap gap-x-5 gap-y-3 font-mono text-[9px] uppercase tracking-[0.16em] text-white/40">
+              <a href="#featured-experiments" className="transition-colors hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]">
+                Written experiments
+              </a>
+              <a href="#archive" className="transition-colors hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]">
+                Component archive
+              </a>
+            </div>
           </div>
           <a
-            href="#archive"
+            href="#featured-experiments"
             className="group flex w-fit items-center gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a] focus-visible:ring-offset-4 focus-visible:ring-offset-[#0A0A0A]"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 transition-transform duration-300 group-hover:translate-y-1">↓</span>

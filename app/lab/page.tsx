@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { JsonLd } from "../components/seo/JsonLd";
 import { MadlabShell } from "./MadlabShell";
 import { MadlabComponentGallery } from "./components/MadlabComponentGallery";
+import { MadlabFeaturedExperiments } from "./components/MadlabFeaturedExperiments";
 import { MadlabHero } from "./components/MadlabHero";
 import { MadlabLibrarySidebar } from "./components/MadlabLibrarySidebar";
 import { MadlabManifesto } from "./components/MadlabManifesto";
@@ -11,24 +12,45 @@ import {
   getMadlabEntries,
   type MadlabCategory,
 } from "../lib/madlab";
-import { absoluteUrl } from "../lib/site";
+import { absoluteUrl, DEFAULT_OG_IMAGE_PATH, SITE_NAME } from "../lib/site";
+
+const LAB_TITLE = "MADLAB — Creative Development Experiments | MADBAK";
+const LAB_DESCRIPTION =
+  "MADLAB is MADBAK’s creative development lab: interactive React, Next.js, GSAP, Three.js and WebGL experiments with working previews and implementation notes.";
 
 export const metadata: Metadata = {
-  title: "MADLAB — Interactive Components & Creative Development Experiments",
-  description: "Explore interactive React, Next.js, GSAP, Three.js and WebGL components built and explained by MADBAK.",
+  title: { absolute: LAB_TITLE },
+  description: LAB_DESCRIPTION,
   alternates: { canonical: absoluteUrl("/lab") },
   openGraph: {
     type: "website",
     url: absoluteUrl("/lab"),
-    title: "MADLAB — Interactive Components & Creative Development Experiments",
-    description: "Explore interactive React, Next.js, GSAP, Three.js and WebGL components built and explained by MADBAK.",
-    images: [{ url: absoluteUrl("/og-default.png"), alt: "MADLAB — MADBAK Experimental Development Lab" }],
+    siteName: SITE_NAME,
+    title: LAB_TITLE,
+    description: LAB_DESCRIPTION,
+    images: [
+      {
+        url: absoluteUrl(DEFAULT_OG_IMAGE_PATH),
+        alt: "MADLAB — MADBAK Experimental Development Lab",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MADLAB — Interactive Components & Creative Development Experiments",
-    description: "Explore interactive React, Next.js, GSAP, Three.js and WebGL components built and explained by MADBAK.",
-    images: [absoluteUrl("/og-default.png")],
+    title: LAB_TITLE,
+    description: LAB_DESCRIPTION,
+    images: [absoluteUrl(DEFAULT_OG_IMAGE_PATH)],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -75,6 +97,7 @@ export default async function MadlabPage({ searchParams }: MadlabPageProps) {
         <div className="mx-auto max-w-[1800px] lg:grid lg:grid-cols-[250px_minmax(0,1fr)]">
           <MadlabLibrarySidebar />
           <div className="min-w-0">
+            <MadlabFeaturedExperiments />
             <MadlabComponentGallery />
             <MadlabManifesto />
           </div>

@@ -87,9 +87,14 @@ export default function MadlabTutorialClient({ item }: { item: ReactBitsFreeItem
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#ff2a2a]">{tx("tutorialSource")}</p>
               <h2 className="mt-3 text-3xl font-black tracking-[-0.06em]">{tx("readyToAdapt")}</h2>
             </div>
-            <Link href={`/lab/${item.slug}#implementation-code`} className="border border-[#ff2a2a] px-4 py-3 font-mono text-[9px] uppercase tracking-[0.16em] text-[#ff2a2a] transition-colors hover:bg-[#ff2a2a] hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]">
-              {tx("openLocalSource")}
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/lab" className="border border-white/20 px-4 py-3 font-mono text-[9px] uppercase tracking-[0.16em] text-white/55 transition-colors hover:border-[#ff2a2a] hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]">
+                MADLAB
+              </Link>
+              <Link href={`/lab/${item.slug}#implementation-code`} className="border border-[#ff2a2a] px-4 py-3 font-mono text-[9px] uppercase tracking-[0.16em] text-[#ff2a2a] transition-colors hover:bg-[#ff2a2a] hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]">
+                {tx("openLocalSource")}
+              </Link>
+            </div>
           </div>
         </section>
       </main>

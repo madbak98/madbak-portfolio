@@ -1,25 +1,16 @@
 import type { Metadata } from "next";
 
+import { JsonLd } from "../components/seo/JsonLd";
+import { buildServicesMetadata, buildServicesPageJsonLd } from "../lib/seo";
 import ServicesPage from "./ServicesPage";
 
-export const metadata: Metadata = {
-  title: {
-    absolute: "Services — MADBAK",
-  },
-  description:
-    "Web design, frontend development, motion, interaction, and creative direction by Madbak.",
-  alternates: {
-    canonical: "/services",
-  },
-  openGraph: {
-    title: "Services — MADBAK",
-    description:
-      "Web design, frontend development, motion, interaction, and creative direction by Madbak.",
-    url: "/services",
-    type: "website",
-  },
-};
+export const metadata: Metadata = buildServicesMetadata("en");
 
 export default function Page() {
-  return <ServicesPage />;
+  return (
+    <>
+      <JsonLd data={buildServicesPageJsonLd("en")} />
+      <ServicesPage />
+    </>
+  );
 }
