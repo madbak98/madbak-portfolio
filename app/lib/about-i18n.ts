@@ -238,7 +238,11 @@ export const ABOUT_COPY = {
   skillDesign: { en: "DESIGN", fa: "طراحی", tr: "TASARIM" },
   skillTools: { en: "TOOLS / WORKFLOW", fa: "ابزار / ورک‌فلو", tr: "ARAÇLAR / İŞ AKIŞI" },
   education: { en: "EDUCATION", fa: "تحصیلات", tr: "EĞİTİM" },
-  eduDegree: { en: "Graphic Design", fa: "طراحی گرافیک", tr: "Grafik Tasarım" },
+  eduDegree: {
+    en: "Graphic Design · Software Development",
+    fa: "طراحی گرافیک · توسعه نرم‌افزار",
+    tr: "Grafik Tasarım · Yazılım Geliştirme",
+  },
   eduSchool: {
     en: "Nişantaşı University · Istanbul",
     fa: "دانشگاه نیشانتاشی · استانبول",
