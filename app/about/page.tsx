@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import AboutPage from "./AboutPage";
 
 export const metadata: Metadata = {
-  title: "About — MADBAK",
+  title: {
+    absolute: "About — MADBAK",
+  },
   description:
     "Babak Ravanbakhsh — Creative Developer and Frontend Developer based in Istanbul, working across design, code, motion and interactive digital experiences.",
   openGraph: {

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "motion/react";
-import { Mail } from "lucide-react";
 import { useRef, type ComponentType, type SVGProps } from "react";
 
 import {
@@ -20,6 +19,24 @@ import {
   contactSocialLabel,
   localeCase,
 } from "../lib/locale-ui";
+
+function MailIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  );
+}
 
 /** Filled glyphs — same visual system (currentColor, 24×24 viewBox) as original X / Instagram contact icons. */
 function ContactXIcon(props: SVGProps<SVGSVGElement>) {
@@ -221,10 +238,10 @@ export function ContactSection({
           viewport={{ once: true }}
           className={`group mb-12 flex w-fit max-w-full min-h-[48px] items-center gap-3 sm:mb-16 sm:gap-4 ${lang === "fa" ? "flex-row-reverse" : ""}`}
         >
-          <Mail
-            size={24}
+          <MailIcon
+            width={24}
+            height={24}
             className="shrink-0 text-[#0A0A0A]"
-            aria-hidden
           />
           <span
             className={`transition-colors duration-300 group-hover:text-black/80 ${lang !== "fa" ? "font-sans" : ""}`}

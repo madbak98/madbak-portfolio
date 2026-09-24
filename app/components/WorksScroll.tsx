@@ -182,7 +182,7 @@ function ChapterProject({
         >
           {[...images, ...images].map((src, i) => (
             <div key={`${src}-${i}`} className="relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] sm:h-[82%]">
-              <PortfolioImage src={src} alt={`${title} character design artwork by Madbak`} fill sizes="25rem" className="object-cover" priority={i === 0} />
+              <PortfolioImage src={src} alt={`${title} character design artwork by Madbak`} fill sizes="25rem" className="object-cover" />
             </div>
           ))}
         </motion.div>
@@ -311,7 +311,7 @@ function ChapterProject({
               <motion.div className="absolute inset-y-0 left-0 flex w-max items-center gap-4 p-5 md:gap-6 md:p-8" style={{ x: fashionRailX }}>
                 {images.map((src, i) => (
                   <div key={`${src}-${i}`} className="relative h-[78%] w-[min(68vw,34rem)] shrink-0 overflow-hidden border border-white/15 bg-[#1B1B1B] md:h-[84%]">
-                    <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill priority={i === 0} sizes="34rem" className="object-contain" />
+                    <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill sizes="34rem" className="object-contain" />
                   </div>
                 ))}
               </motion.div>
@@ -349,7 +349,7 @@ function ChapterProject({
                   zIndex: images.length - i,
                 }}
               >
-                <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill sizes="24rem" className="object-cover" priority={i === 0} />
+                <PortfolioImage src={src} alt={`${title} ${i + 1}`} fill sizes="24rem" className="object-cover" />
               </motion.div>
             ))}
           </div>
@@ -371,7 +371,7 @@ function ChapterProject({
         </div>
         <div className="relative order-1 flex min-h-[54svh] items-center justify-center md:order-2 md:min-h-[70svh]">
           <motion.div className="absolute h-[54svh] w-[min(70vw,27rem)] overflow-hidden border border-[#1C1A17]/20 bg-[#12141A] shadow-[18px_20px_0_rgba(169,189,198,0.28)] sm:h-[66svh]" style={{ y, scale, rotate }}>
-            <PortfolioImage src={project.image} alt={title} fill priority={index === 0} sizes="(max-width: 768px) 70vw, 30rem" className="object-contain" />
+            <PortfolioImage src={project.image} alt={title} fill sizes="(max-width: 768px) 70vw, 30rem" className="object-contain" />
           </motion.div>
           <motion.p className="pointer-events-none absolute -bottom-2 start-1/2 -translate-x-1/2 whitespace-nowrap text-[clamp(4rem,15vw,13rem)] font-black uppercase leading-none tracking-[-0.12em] text-[#1C1A17]/[0.07]" style={{ y: reduce ? 0 : y }} aria-hidden>
             {String(index + 1).padStart(2, "0")}
@@ -589,9 +589,8 @@ function EditorialWebCard({
                 alt={imageAlts?.[activeImage] ?? `${title} preview ${activeImage + 1}`}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 42rem"
-                priority={activeImage === 0}
                 quality={92}
-                className="object-contain object-center p-2 sm:p-2.5"
+                className="object-cover object-center"
                 draggable={false}
               />
             </motion.div>
@@ -904,7 +903,7 @@ function NFTSection({ lang }: { lang: LangKey }) {
                     className="group relative h-[72%] w-[34vw] min-w-[12rem] max-w-[25rem] overflow-hidden bg-[#1b232b] outline-none focus-visible:ring-2 focus-visible:ring-black/40 sm:h-[82%]"
                     aria-label={`${nft.langs[lang]?.title ?? "NFT"} — ${nft.langs[lang]?.cat ?? "1/1"}`}
                   >
-                    <PortfolioImage src={nft.image} alt={`${nft.langs[lang]?.title ?? "NFT"} — Foundation 1/1 edition by Madbak`} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" priority={i === 0} />
+                    <PortfolioImage src={nft.image} alt={`${nft.langs[lang]?.title ?? "NFT"} — Foundation 1/1 edition by Madbak`} fill sizes="25rem" className="object-cover transition duration-700 group-hover:scale-[1.04]" />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12 font-mono text-[9px] uppercase tracking-[0.18em] text-white/75">
                       {nft.langs[lang]?.title}
                     </div>

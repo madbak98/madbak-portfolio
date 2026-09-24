@@ -1,33 +1,44 @@
 "use client";
 
-import { createContext, useContext, useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
+import dynamic from "next/dynamic";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
 
-import AnimatedContent from "../react-bits/Animations/AnimatedContent/AnimatedContent";
-import Antigravity from "../react-bits/Animations/Antigravity/Antigravity";
-import BlobCursor from "../react-bits/Animations/BlobCursor/BlobCursor";
-import ClickSpark from "../react-bits/Animations/ClickSpark/ClickSpark";
-import Crosshair from "../react-bits/Animations/Crosshair/Crosshair";
-import Cubes from "../react-bits/Animations/Cubes/Cubes";
-import CursorGrid from "../react-bits/Animations/CursorGrid/CursorGrid";
-import ElectricBorder from "../react-bits/Animations/ElectricBorder/ElectricBorder";
-import LogoLoop from "../react-bits/Animations/LogoLoop/LogoLoop";
-import MagicRings from "../react-bits/Animations/MagicRings/MagicRings";
-import Magnet from "../react-bits/Animations/Magnet/Magnet";
-import Strands from "../react-bits/Animations/Strands/Strands";
-import LetterGlitch from "../react-bits/Backgrounds/LetterGlitch/LetterGlitch";
-import ShapeGrid from "../react-bits/Backgrounds/ShapeGrid/ShapeGrid";
-import Waves from "../react-bits/Backgrounds/Waves/Waves";
-import AnimatedList from "../react-bits/Components/AnimatedList/AnimatedList";
-import Counter from "../react-bits/Components/Counter/Counter";
-import Folder from "../react-bits/Components/Folder/Folder";
-import SpotlightCard from "../react-bits/Components/SpotlightCard/SpotlightCard";
-import BlurText from "../react-bits/TextAnimations/BlurText/BlurText";
-import CircularText from "../react-bits/TextAnimations/CircularText/CircularText";
-import CountUp from "../react-bits/TextAnimations/CountUp/CountUp";
-import GradientText from "../react-bits/TextAnimations/GradientText/GradientText";
-import ShinyText from "../react-bits/TextAnimations/ShinyText/ShinyText";
-import TrueFocus from "../react-bits/TextAnimations/TrueFocus/TrueFocus";
 import type { ReactBitsFreeItem } from "../../lib/react-bits-free";
+
+const AnimatedContent = dynamic(() => import("../react-bits/Animations/AnimatedContent/AnimatedContent"), { ssr: false });
+const Antigravity = dynamic(() => import("../react-bits/Animations/Antigravity/Antigravity"), { ssr: false });
+const BlobCursor = dynamic(() => import("../react-bits/Animations/BlobCursor/BlobCursor"), { ssr: false });
+const ClickSpark = dynamic(() => import("../react-bits/Animations/ClickSpark/ClickSpark"), { ssr: false });
+const Crosshair = dynamic(() => import("../react-bits/Animations/Crosshair/Crosshair"), { ssr: false });
+const Cubes = dynamic(() => import("../react-bits/Animations/Cubes/Cubes"), { ssr: false });
+const CursorGrid = dynamic(() => import("../react-bits/Animations/CursorGrid/CursorGrid"), { ssr: false });
+const ElectricBorder = dynamic(() => import("../react-bits/Animations/ElectricBorder/ElectricBorder"), { ssr: false });
+const LogoLoop = dynamic(() => import("../react-bits/Animations/LogoLoop/LogoLoop"), { ssr: false });
+const MagicRings = dynamic(() => import("../react-bits/Animations/MagicRings/MagicRings"), { ssr: false });
+const Magnet = dynamic(() => import("../react-bits/Animations/Magnet/Magnet"), { ssr: false });
+const Strands = dynamic(() => import("../react-bits/Animations/Strands/Strands"), { ssr: false });
+const LetterGlitch = dynamic(() => import("../react-bits/Backgrounds/LetterGlitch/LetterGlitch"), { ssr: false });
+const ShapeGrid = dynamic(() => import("../react-bits/Backgrounds/ShapeGrid/ShapeGrid"), { ssr: false });
+const Waves = dynamic(() => import("../react-bits/Backgrounds/Waves/Waves"), { ssr: false });
+const AnimatedList = dynamic(() => import("../react-bits/Components/AnimatedList/AnimatedList"), { ssr: false });
+const Counter = dynamic(() => import("../react-bits/Components/Counter/Counter"), { ssr: false });
+const Folder = dynamic(() => import("../react-bits/Components/Folder/Folder"), { ssr: false });
+const SpotlightCard = dynamic(() => import("../react-bits/Components/SpotlightCard/SpotlightCard"), { ssr: false });
+const BlurText = dynamic(() => import("../react-bits/TextAnimations/BlurText/BlurText"), { ssr: false });
+const CircularText = dynamic(() => import("../react-bits/TextAnimations/CircularText/CircularText"), { ssr: false });
+const CountUp = dynamic(() => import("../react-bits/TextAnimations/CountUp/CountUp"), { ssr: false });
+const GradientText = dynamic(() => import("../react-bits/TextAnimations/GradientText/GradientText"), { ssr: false });
+const ShinyText = dynamic(() => import("../react-bits/TextAnimations/ShinyText/ShinyText"), { ssr: false });
+const TrueFocus = dynamic(() => import("../react-bits/TextAnimations/TrueFocus/TrueFocus"), { ssr: false });
 
 export type MadlabPalette = {
   primary: string;
@@ -260,20 +271,73 @@ function PreviewContent({
   }
 }
 
+type PreviewProps = {
+  item: ReactBitsFreeItem;
+  palette?: MadlabPalette;
+  size?: "card" | "detail";
+  previewProps?: { speed?: number; count?: number; ringCount?: number; glow?: number; text?: string; duration?: number; delay?: number; animateBy?: "words" | "letters"; blur?: boolean };
+  /** When true (gallery cards), mount the demo only after it enters the viewport. */
+  deferUntilVisible?: boolean;
+};
+
+function LivePreviewInner({
+  item,
+  palette = DEFAULT_PALETTE,
+  size = "card",
+  previewProps,
+}: Omit<PreviewProps, "deferUntilVisible">) {
+  return (
+    <PreviewContext.Provider value={{ size, palette }}>
+      <PreviewContent item={item} palette={palette} previewProps={previewProps} />
+    </PreviewContext.Provider>
+  );
+}
+
 export function ReactBitsLivePreview({
   item,
   palette = DEFAULT_PALETTE,
   size = "card",
   previewProps,
-}: {
-  item: ReactBitsFreeItem;
-  palette?: MadlabPalette;
-  size?: "card" | "detail";
-  previewProps?: { speed?: number; count?: number; ringCount?: number; glow?: number; text?: string; duration?: number; delay?: number; animateBy?: "words" | "letters"; blur?: boolean };
-}) {
+  deferUntilVisible = false,
+}: PreviewProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(!deferUntilVisible);
+
+  useEffect(() => {
+    if (!deferUntilVisible || visible) return;
+    const node = rootRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "160px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [deferUntilVisible, visible]);
+
+  if (!deferUntilVisible) {
+    return (
+      <LivePreviewInner item={item} palette={palette} size={size} previewProps={previewProps} />
+    );
+  }
+
   return (
-    <PreviewContext.Provider value={{ size, palette }}>
-      <PreviewContent item={item} palette={palette} previewProps={previewProps} />
-    </PreviewContext.Provider>
+    <div ref={rootRef} className={size === "detail" ? "min-h-[24rem]" : "min-h-[10.5rem]"}>
+      {visible ? (
+        <LivePreviewInner item={item} palette={palette} size={size} previewProps={previewProps} />
+      ) : (
+        <div
+          className={`w-full bg-[#0d0d0d] ${size === "detail" ? "min-h-[24rem] h-[min(34rem,58vw)]" : "h-[10.5rem]"}`}
+          aria-hidden
+        />
+      )}
+    </div>
   );
 }

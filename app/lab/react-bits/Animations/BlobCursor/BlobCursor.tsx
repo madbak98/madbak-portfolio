@@ -80,7 +80,12 @@ export default function BlobCursor({
   useEffect(() => {
     const onResize = () => updateOffset();
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      blobsRef.current.forEach((el) => {
+        if (el) gsap.killTweensOf(el);
+      });
+    };
   }, [updateOffset]);
 
   return (

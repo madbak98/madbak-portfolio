@@ -16,7 +16,7 @@ function CatalogCard({ item, lang }: { item: ReactBitsFreeItem; lang: "en" | "fa
     <article id={item.slug} className="group min-w-0 scroll-mt-32">
       <div className="relative">
         <Link href={`/lab/${item.slug}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]">
-          <ReactBitsLivePreview item={item} />
+          <ReactBitsLivePreview item={item} deferUntilVisible />
         </Link>
         <ReactBitsCodeViewer item={item} />
       </div>

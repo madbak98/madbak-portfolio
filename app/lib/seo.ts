@@ -178,15 +178,10 @@ export function withBrandTitle(segment: string, lang: LangKey): string {
 }
 
 export function languageAlternates(path: string): Metadata["alternates"] {
-  const url = absoluteUrl(path);
+  // Locales are client-preferred (no distinct URL per language yet).
+  // Do not emit identical hreflang URLs — that confuses crawlers.
   return {
-    canonical: url,
-    languages: {
-      en: url,
-      fa: url,
-      tr: url,
-      "x-default": url,
-    },
+    canonical: absoluteUrl(path),
   };
 }
 

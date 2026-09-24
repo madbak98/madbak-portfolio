@@ -120,7 +120,7 @@ export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
         poster={posterSrc}
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
       />
       <div className="about-page-video__tint" />
     </div>

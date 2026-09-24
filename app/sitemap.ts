@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { languageAlternates, SITEMAP_ROUTES } from "./lib/seo";
+import { SITEMAP_ROUTES } from "./lib/seo";
 import { MADLAB_ENTRIES } from "./lib/madlab";
 import { REACT_BITS_FREE_ITEMS } from "./lib/react-bits-free";
 import { absoluteUrl, CONTENT_UPDATED_AT } from "./lib/site";
@@ -15,22 +15,11 @@ function entry(
     lastModified?: Date | string;
   },
 ): SitemapEntry {
-  const alternates = languageAlternates(path)?.languages;
   return {
     url: absoluteUrl(path),
     lastModified: options.lastModified ?? CONTENT_UPDATED_AT,
     changeFrequency: options.changeFrequency,
     priority: options.priority,
-    alternates: alternates
-      ? {
-          languages: Object.fromEntries(
-            Object.entries(alternates).map(([lang, href]) => [
-              lang,
-              typeof href === "string" ? href : absoluteUrl(path),
-            ]),
-          ),
-        }
-      : undefined,
   };
 }
 
