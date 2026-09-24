@@ -8,8 +8,11 @@ type PageScrollVideoProps = {
 };
 
 /**
- * Fixed full-page background video scrubbed only by document scroll.
- * No mouse/touch timeline control.
+ * Fixed full-page background video scrubbed by document scroll.
+ *
+ * The media is fetched once into a blob URL so reverse seeks stay reliable —
+ * progressive HTTP range seeks often drop readyState and glitch when scrolling
+ * back up after reaching the page bottom.
  */
 export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -18,17 +21,21 @@ export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
     const video = videoRef.current;
     if (!video) return;
 
-    let frame = 0;
     let duration = 0;
     let targetTime = 0;
-    let lastSeekAt = 0;
-    const scrubEase = 0.35;
-    const seekInterval = 1000 / 30;
+    let seeking = false;
+    let rafId = 0;
+    let destroyed = false;
+    let objectUrl: string | null = null;
+    let abort: AbortController | null = null;
 
     const reducedMotion = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const range = () => Math.max(duration - 0.05, 0);
+    const usableDuration = () => {
+      if (!Number.isFinite(duration) || duration <= 0) return 0;
+      return Math.max(duration - 0.08, 0);
+    };
 
     const readScrollTarget = () => {
       if (reducedMotion()) return;
@@ -37,41 +44,46 @@ export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
         1,
       );
       const progress = Math.min(1, Math.max(0, window.scrollY / scrollRange));
-      const r = range();
-      if (r > 0) targetTime = progress * r;
+      const range = usableDuration();
+      if (range > 0) targetTime = progress * range;
     };
 
-    const tick = (now: number) => {
-      frame = 0;
-      if (duration <= 0 || reducedMotion()) return;
+    const applySeek = () => {
+      if (destroyed || seeking || reducedMotion()) return;
+      if (video.readyState < HTMLMediaElement.HAVE_METADATA) return;
 
-      const difference = targetTime - video.currentTime;
-      const nextTime =
-        Math.abs(difference) < 0.01
-          ? targetTime
-          : video.currentTime + difference * scrubEase;
+      const range = usableDuration();
+      if (range <= 0) return;
 
-      if (
-        Math.abs(nextTime - video.currentTime) > 0.002 &&
-        video.readyState >= HTMLMediaElement.HAVE_METADATA &&
-        now - lastSeekAt >= seekInterval
-      ) {
-        try {
-          video.currentTime = nextTime;
-        } catch {
-          /* ignore */
-        }
-        lastSeekAt = now;
+      const next = Math.min(range, Math.max(0.001, targetTime));
+      if (Math.abs(next - video.currentTime) < 0.035) return;
+
+      seeking = true;
+      try {
+        video.currentTime = next;
+      } catch {
+        seeking = false;
       }
+    };
 
-      if (Math.abs(targetTime - video.currentTime) > 0.01) {
-        frame = window.requestAnimationFrame(tick);
-      }
+    const onSeeked = () => {
+      seeking = false;
+      if (Math.abs(targetTime - video.currentTime) >= 0.035) applySeek();
+    };
+
+    const onSeeking = () => {
+      seeking = true;
+    };
+
+    const tick = () => {
+      rafId = 0;
+      readScrollTarget();
+      applySeek();
     };
 
     const sync = () => {
       readScrollTarget();
-      if (!frame) frame = window.requestAnimationFrame(tick);
+      if (!rafId) rafId = window.requestAnimationFrame(tick);
     };
 
     const unlock = async () => {
@@ -85,28 +97,67 @@ export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
     };
 
     const onMeta = () => {
-      duration = Number.isFinite(video.duration) ? video.duration : 0;
-      void unlock().then(sync);
+      const next = video.duration;
+      duration = Number.isFinite(next) ? next : 0;
+      void unlock().then(() => {
+        if (!destroyed) sync();
+      });
     };
 
-    video.pause();
-    video.addEventListener("loadedmetadata", onMeta);
-    video.addEventListener("loadeddata", onMeta);
-    video.addEventListener("durationchange", onMeta);
-    video.addEventListener("canplay", onMeta);
+    const bindMedia = () => {
+      video.pause();
+      video.addEventListener("loadedmetadata", onMeta);
+      video.addEventListener("loadeddata", onMeta);
+      video.addEventListener("durationchange", onMeta);
+      video.addEventListener("seeked", onSeeked);
+      video.addEventListener("seeking", onSeeking);
+      if (video.readyState >= 1) onMeta();
+    };
+
+    const loadBlob = async () => {
+      abort = new AbortController();
+      try {
+        const response = await fetch(videoSrc, {
+          signal: abort.signal,
+          cache: "force-cache",
+        });
+        if (!response.ok) throw new Error(`video fetch ${response.status}`);
+        const blob = await response.blob();
+        if (destroyed) return;
+        objectUrl = URL.createObjectURL(blob);
+        video.src = objectUrl;
+        video.load();
+        bindMedia();
+      } catch (error) {
+        if (destroyed || (error instanceof DOMException && error.name === "AbortError")) {
+          return;
+        }
+        // Fallback: progressive URL if blob fetch fails.
+        video.src = videoSrc;
+        video.load();
+        bindMedia();
+      }
+    };
+
     window.addEventListener("scroll", sync, { passive: true });
     window.addEventListener("resize", sync);
-    if (video.readyState >= 1) onMeta();
+    void loadBlob();
     sync();
 
     return () => {
+      destroyed = true;
+      abort?.abort();
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("loadeddata", onMeta);
       video.removeEventListener("durationchange", onMeta);
-      video.removeEventListener("canplay", onMeta);
+      video.removeEventListener("seeked", onSeeked);
+      video.removeEventListener("seeking", onSeeking);
       window.removeEventListener("scroll", sync);
       window.removeEventListener("resize", sync);
-      if (frame) window.cancelAnimationFrame(frame);
+      if (rafId) window.cancelAnimationFrame(rafId);
+      video.removeAttribute("src");
+      video.load();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [videoSrc]);
 
@@ -116,11 +167,10 @@ export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
         ref={videoRef}
         key={videoSrc}
         className="about-page-video__media"
-        src={videoSrc}
         poster={posterSrc}
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
       />
       <div className="about-page-video__tint" />
     </div>
