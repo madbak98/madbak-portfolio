@@ -40,7 +40,7 @@ export function FloatingPetComputer({
               width={980}
               height={980}
               sizes="160px"
-              priority
+              loading="lazy"
               draggable={false}
               className="floating-pet-computer__chassis"
             />

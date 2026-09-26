@@ -83,7 +83,7 @@ export function HomeAboutPetSection() {
   // Mount 3D only after Pet has committed — never share Suspense/load with Pet
   useEffect(() => {
     if (!active || consoleMount) return;
-    const t = window.setTimeout(() => setConsoleMount(true), 32);
+    const t = window.setTimeout(() => setConsoleMount(true), 900);
     return () => window.clearTimeout(t);
   }, [active, consoleMount]);
 

@@ -352,7 +352,8 @@ export function MadbakPet({
                         ? "(max-width: 1023px) min(70vw, 280px), 240px"
                         : "112px"
                     }
-                    priority={key === "idle"}
+                    priority={mode === "full" && key === "idle"}
+                    loading={mode === "full" && key === "idle" ? "eager" : "lazy"}
                     draggable={false}
                     aria-hidden={key !== visibleKey}
                     className={

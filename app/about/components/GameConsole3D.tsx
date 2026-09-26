@@ -62,7 +62,8 @@ function acquireConsoleVideo(playlist: readonly string[]) {
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
-    video.preload = "auto";
+    // metadata only — avoid pulling full 5MB+ on mount
+    video.preload = "metadata";
 
     const texture = new VideoTexture(video);
     texture.colorSpace = SRGBColorSpace;
@@ -70,22 +71,36 @@ function acquireConsoleVideo(playlist: readonly string[]) {
     texture.magFilter = LinearFilter;
     texture.generateMipmaps = false;
 
-    // Warm next clip once — cleaned on release
-    let warmer: HTMLVideoElement | null = null;
-    if (playlist[1]) {
-      warmer = document.createElement("video");
-      warmer.preload = "auto";
-      warmer.muted = true;
-      warmer.playsInline = true;
-      warmer.src = playlist[1];
-      warmer.load();
-    }
-
-    entry = { video, texture, users: 0, index: 0, warmer };
+    // Second clip warmer is created lazily near end of current clip
+    entry = { video, texture, users: 0, index: 0, warmer: null };
     videoCache.set(key, entry);
   }
   entry.users += 1;
   return entry;
+}
+
+function warmNextConsoleClip(
+  entry: {
+    warmer: HTMLVideoElement | null;
+  },
+  playlist: readonly string[],
+  currentIndex: number,
+) {
+  const nextSrc = playlist[(currentIndex + 1) % playlist.length];
+  if (!nextSrc || playlist.length < 2) return;
+  if (entry.warmer) {
+    if (entry.warmer.getAttribute("src") === nextSrc) return;
+    entry.warmer.pause();
+    entry.warmer.removeAttribute("src");
+    entry.warmer.load();
+  }
+  const warmer = document.createElement("video");
+  warmer.preload = "auto";
+  warmer.muted = true;
+  warmer.playsInline = true;
+  warmer.src = nextSrc;
+  warmer.load();
+  entry.warmer = warmer;
 }
 
 function releaseConsoleVideo(key: string) {
@@ -267,6 +282,7 @@ function useConsoleVideo(playlist: readonly string[]) {
       const current = video.getAttribute("src") || video.currentSrc || "";
       if (!current.endsWith(nextSrc)) {
         video.src = nextSrc;
+        video.preload = "auto";
         const onReady = () => {
           void video.play().catch(() => {});
         };
@@ -281,11 +297,20 @@ function useConsoleVideo(playlist: readonly string[]) {
       playAt((entry.index + 1) % playlist.length);
     };
 
+    // Warm next clip only when current is nearly finished (~2s left)
+    const onTimeUpdate = () => {
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+      if (video.duration - video.currentTime > 2.5) return;
+      warmNextConsoleClip(entry, playlist, entry.index);
+    };
+
     video.loop = false;
     video.addEventListener("ended", onEnded);
+    video.addEventListener("timeupdate", onTimeUpdate);
 
     const tryPlay = () => {
       if (document.hidden) return;
+      video.preload = "auto";
       void video.play().catch(() => {});
     };
     if (video.readyState >= 2) tryPlay();
@@ -301,6 +326,7 @@ function useConsoleVideo(playlist: readonly string[]) {
 
     return () => {
       video.removeEventListener("ended", onEnded);
+      video.removeEventListener("timeupdate", onTimeUpdate);
       document.removeEventListener("visibilitychange", onVisibility);
       releaseConsoleVideo(key);
     };
