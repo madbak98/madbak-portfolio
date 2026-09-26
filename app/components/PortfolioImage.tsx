@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 
 type PortfolioImageProps = {
@@ -25,6 +28,18 @@ export function PortfolioImage({
   width = 1200,
   height = 800,
 }: PortfolioImageProps) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return (
+      <div
+        className={`bg-[#141414] ${fill ? "absolute inset-0" : ""} ${className}`}
+        style={fill ? undefined : { width, height }}
+        role="img"
+        aria-label={alt}
+      />
+    );
+  }
+
   if (fill) {
     return (
       <Image
@@ -36,6 +51,7 @@ export function PortfolioImage({
         priority={priority}
         loading={priority ? "eager" : "lazy"}
         draggable={false}
+        onError={() => setFailed(true)}
       />
     );
   }
@@ -51,6 +67,7 @@ export function PortfolioImage({
       priority={priority}
       loading={priority ? "eager" : "lazy"}
       draggable={false}
+      onError={() => setFailed(true)}
     />
   );
 }

@@ -65,34 +65,30 @@ const FooterCrowd = dynamic(
    3. UI COMPONENTS
 ========================================== */
 
+const HERO_SCENE_TIMEOUT_MS = 2800;
+
 const LoadingScreen = ({
   onComplete,
   lang,
+  progress,
 }: {
   onComplete: () => void;
   lang: LangKey;
+  progress: number;
 }) => {
-  const [progress, setProgress] = useState(0);
   const [flicker, setFlicker] = useState(false);
+  const completedRef = useRef(false);
 
   useEffect(() => {
-    const start = performance.now();
-    const timer = setInterval(() => {
-      setProgress((p) => {
-        const next = Math.min(100, p + Math.floor(Math.random() * 16) + 10);
-        if (next >= 100) {
-          clearInterval(timer);
-          const elapsed = performance.now() - start;
-          const wait = Math.max(0, 220 - elapsed);
-          setTimeout(() => setFlicker(true), wait);
-          setTimeout(onComplete, wait + 380);
-          return 100;
-        }
-        return next;
-      });
-    }, 36);
-    return () => clearInterval(timer);
-  }, [onComplete]);
+    if (progress < 100 || completedRef.current) return;
+    completedRef.current = true;
+    const flickerTimer = window.setTimeout(() => setFlicker(true), 80);
+    const doneTimer = window.setTimeout(onComplete, 80 + 380);
+    return () => {
+      window.clearTimeout(flickerTimer);
+      window.clearTimeout(doneTimer);
+    };
+  }, [onComplete, progress]);
 
   return (
     <div
@@ -309,7 +305,13 @@ const Modal = ({
 export default function HomePage() {
   const [lang, setLang] = usePreferredLang();
   const [loading, setLoading] = useState(true);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [loaderProgress, setLoaderProgress] = useState(12);
+  const [sceneEnabled, setSceneEnabled] = useState(true);
+  const [sceneGeneration, setSceneGeneration] = useState(0);
+  const sceneRestoreCount = useRef(0);
+  const finishLoader = useCallback(() => {
+    setLoaderProgress(100);
+  }, []);
   const [selected, setSelected] = useState<Project | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [worksMenuOpen, setWorksMenuOpen] = useState(false);
@@ -317,6 +319,30 @@ export default function HomePage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const reduceMotion = Boolean(prefersReducedMotion);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(finishLoader, HERO_SCENE_TIMEOUT_MS);
+    return () => window.clearTimeout(timeout);
+  }, [finishLoader]);
+
+  const handleSceneBootstrapped = useCallback(() => {
+    setLoaderProgress((current) => (current >= 100 ? current : Math.max(current, 62)));
+  }, []);
+
+  const handleSceneUnavailable = useCallback(() => {
+    setSceneEnabled(false);
+    finishLoader();
+  }, [finishLoader]);
+
+  const handleSceneContextLost = useCallback(() => {
+    sceneRestoreCount.current += 1;
+    if (sceneRestoreCount.current > 1) {
+      setSceneEnabled(false);
+      finishLoader();
+      return;
+    }
+    setSceneGeneration((generation) => generation + 1);
+  }, [finishLoader]);
 
   useEffect(() => {
     document.title = documentTitleForPath("/", lang);
@@ -342,17 +368,16 @@ export default function HomePage() {
     [reduceMotion],
   );
 
-  useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 28);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   const t = (key: keyof (typeof TRANSLATIONS)["en"]) =>
     TRANSLATIONS[lang][key] ?? String(key);
 
-  const lastProgressRef = useRef(0);
+  const scrollProgressRef = useRef(0);
+  const miniGameRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
+  const [showMiniGame, setShowMiniGame] = useState(false);
+  const [showFooterCrowd, setShowFooterCrowd] = useState(false);
+  const wordmarkShiftRef = useRef<HTMLDivElement>(null);
+  const subtitleShiftRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (mobileNavOpen || selected) {
@@ -382,15 +407,52 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    const watch = (
+      element: Element | null,
+      reveal: () => void,
+    ) => {
+      if (!element) return () => {};
+      if (!("IntersectionObserver" in window)) {
+        reveal();
+        return () => {};
+      }
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry?.isIntersecting) return;
+          reveal();
+          observer.disconnect();
+        },
+        { rootMargin: "600px" },
+      );
+      observer.observe(element);
+      return () => observer.disconnect();
+    };
+
+    const stopMiniGame = watch(miniGameRef.current, () => setShowMiniGame(true));
+    const stopFooter = watch(footerRef.current, () => setShowFooterCrowd(true));
+    return () => {
+      stopMiniGame();
+      stopFooter();
+    };
+  }, []);
+
+  useEffect(() => {
     let currentScroll = window.scrollY;
     let targetScroll = window.scrollY;
-    let rafId: number;
+    let rafId = 0;
+    let navState = false;
 
     const handleScroll = () => {
       targetScroll = window.scrollY;
     };
 
+    let scrollLoop = false;
     const updateScroll = () => {
+      if (document.hidden) {
+        scrollLoop = false;
+        return;
+      }
+      scrollLoop = true;
       currentScroll += (targetScroll - currentScroll) * 0.1;
       const maxScroll =
         document.documentElement.scrollHeight - window.innerHeight;
@@ -399,23 +461,36 @@ export default function HomePage() {
           ? Math.max(0, Math.min(1, currentScroll / maxScroll))
           : 0;
 
-      const prev = lastProgressRef.current;
-      if (
-        Math.abs(progress - prev) > 0.003 ||
-        progress === 0 ||
-        progress === 1
-      ) {
-        lastProgressRef.current = progress;
-        setScrollProgress(progress);
+      scrollProgressRef.current = progress;
+      if (wordmarkShiftRef.current) {
+        wordmarkShiftRef.current.style.transform = `translate3d(0, ${progress * 200}px, 0)`;
+      }
+      if (subtitleShiftRef.current) {
+        subtitleShiftRef.current.style.transform = `translate3d(0, ${progress * 350}px, 0)`;
+      }
+
+      const scrolled = targetScroll > 28;
+      if (scrolled !== navState) {
+        navState = scrolled;
+        setNavScrolled(scrolled);
       }
       rafId = requestAnimationFrame(updateScroll);
     };
 
+    const onVisibility = () => {
+      if (!document.hidden && !scrollLoop) {
+        targetScroll = window.scrollY;
+        rafId = requestAnimationFrame(updateScroll);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
     rafId = requestAnimationFrame(updateScroll);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", onVisibility);
       cancelAnimationFrame(rafId);
     };
   }, []);
@@ -427,21 +502,30 @@ export default function HomePage() {
       dir={lang === "fa" ? "rtl" : "ltr"}
     >
       {loading && (
-        <LoadingScreen onComplete={() => setLoading(false)} lang={lang} />
+        <LoadingScreen
+          onComplete={() => setLoading(false)}
+          lang={lang}
+          progress={loaderProgress}
+        />
       )}
 
-      <div className="pointer-events-none fixed inset-0 z-[60] bg-noise opacity-[0.4] mix-blend-multiply" />
+      <div className="pointer-events-none fixed inset-0 z-[60] bg-noise opacity-[0.22] [contain:strict]" />
 
       <div
         className="pointer-events-none fixed inset-0 z-0 bg-[#030303]"
         aria-hidden
       />
 
-      {!loading && (
+      {sceneEnabled && (
         <ThreeScene
-          scrollProgress={scrollProgress}
-          introReady
+          key={sceneGeneration}
+          scrollProgressRef={scrollProgressRef}
+          introReady={!loading}
           reduceMotion={reduceMotion}
+          onBootstrapped={handleSceneBootstrapped}
+          onReady={finishLoader}
+          onUnavailable={handleSceneUnavailable}
+          onContextLost={handleSceneContextLost}
         />
       )}
 
@@ -474,13 +558,10 @@ export default function HomePage() {
           tabIndex={-1}
           className="pointer-events-none relative flex min-h-[min(92svh,40rem)] flex-col items-center justify-center overflow-x-hidden px-4 sm:min-h-[85vh] lg:h-[120vh] lg:min-h-0"
         >
-          <div className="absolute inset-0 flex w-full flex-col items-center justify-center mix-blend-difference text-[#EBE8E1]">
-            <div
-              className="relative z-10"
-              style={{ transform: `translateY(${scrollProgress * 200}px)` }}
-            >
+          <div className="absolute inset-0 flex w-full flex-col items-center justify-center text-[#EBE8E1]">
+            <div ref={wordmarkShiftRef} className="relative z-10">
               <motion.p
-                className={`fa-wordmark-latin max-w-[100%] text-center font-sans text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black select-none sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
+                className={`fa-wordmark-latin max-w-[100%] text-center font-sans text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black text-[#EBE8E1] select-none [text-shadow:0_2px_28px_rgba(0,0,0,0.72),0_0_2px_rgba(0,0,0,0.9)] sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
                 initial={
                   reduceMotion ? false : { opacity: 0, y: 56 }
                 }
@@ -503,8 +584,8 @@ export default function HomePage() {
             </div>
 
             <div
+              ref={subtitleShiftRef}
               className="relative z-10 mt-6 max-w-[95vw] text-center sm:mt-8 md:mt-12"
-              style={{ transform: `translateY(${scrollProgress * 350}px)` }}
             >
               <motion.h1
                 className="select-none mix-blend-normal"
@@ -536,7 +617,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="absolute bottom-20 flex -translate-x-1/2 flex-col items-center mix-blend-difference text-[#EBE8E1] start-1/2 sm:bottom-28 lg:bottom-32">
+          <div className="absolute bottom-20 flex -translate-x-1/2 flex-col items-center text-[#EBE8E1] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] start-1/2 sm:bottom-28 lg:bottom-32">
             <span
               className={`mb-4 font-mono text-[9px] opacity-50 ${localeCase(lang)} ${trackMeta(lang)}`}
             >
@@ -788,16 +869,22 @@ export default function HomePage() {
         </section>
         )}
 
-        <MiniGame
-          t={t}
-          lang={lang}
-          onNavigateToProjects={() => navigateToHash("works")}
-        />
+        <div ref={miniGameRef}>
+          {showMiniGame ? (
+            <MiniGame
+              t={t}
+              lang={lang}
+              onNavigateToProjects={() => navigateToHash("works")}
+            />
+          ) : (
+            <div className="min-h-[28rem]" aria-hidden />
+          )}
+        </div>
 
         <ContactSection t={t} lang={lang} />
 
-        <footer className="relative isolate overflow-hidden border-t border-white/10 bg-[#0A0A0A] px-4 py-10 text-[#EBE8E1] sm:px-6 sm:py-12">
-          <FooterCrowd reduceMotion={reduceMotion} />
+        <footer ref={footerRef} className="relative isolate overflow-hidden border-t border-white/10 bg-[#0A0A0A] px-4 py-10 text-[#EBE8E1] sm:px-6 sm:py-12">
+          {showFooterCrowd ? <FooterCrowd reduceMotion={reduceMotion} /> : null}
           <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col gap-8 sm:gap-10">
             <p
               className={`max-w-2xl text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)} ${bodyProse(lang)}`}

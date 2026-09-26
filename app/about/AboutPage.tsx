@@ -81,7 +81,7 @@ export default function AboutPage() {
     >
       <PageScrollVideo
         videoSrc="/about-hero.mp4"
-        posterSrc="/about-hero-poster.webp"
+        posterSrc="/about-hero-poster.png"
       />
 
       <SiteNav

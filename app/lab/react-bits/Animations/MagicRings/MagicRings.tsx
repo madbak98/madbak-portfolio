@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 const vertexShader = `
@@ -115,6 +115,7 @@ export default function MagicRings({
   const hoverAmountRef = useRef(0);
   const isHoveredRef = useRef(false);
   const burstRef = useRef(0);
+  const [unsupported, setUnsupported] = useState(false);
 
   propsRef.current = {
     color, colorTwo, speed, ringCount, attenuation, lineThickness,
@@ -131,11 +132,13 @@ export default function MagicRings({
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true });
     } catch {
+      setUnsupported(true);
       return;
     }
 
     if (!renderer.capabilities.isWebGL2) {
       renderer.dispose();
+      setUnsupported(true);
       return;
     }
 
@@ -257,6 +260,12 @@ export default function MagicRings({
       material.dispose();
     };
   }, []);
+
+  if (unsupported) {
+    return (
+      <div className="h-full w-full bg-[radial-gradient(circle,rgba(255,42,42,0.45),rgba(10,10,10,0.2)_42%,transparent_70%)]" />
+    );
+  }
 
   return <div ref={mountRef} className="w-full h-full" style={blur > 0 ? { filter: `blur(${blur}px)` } : undefined} />;
 }

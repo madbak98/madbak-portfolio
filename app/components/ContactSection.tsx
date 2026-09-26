@@ -20,25 +20,20 @@ import {
   localeCase,
 } from "../lib/locale-ui";
 
-function MailIcon(props: SVGProps<SVGSVGElement>) {
+/** Filled glyphs — same visual system (currentColor, 24×24 viewBox) as original X / Instagram contact icons. */
+function MailGlyph(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      fill="currentColor"
       aria-hidden="true"
       {...props}
     >
-      <rect width="20" height="16" x="2" y="4" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
     </svg>
   );
 }
 
-/** Filled glyphs — same visual system (currentColor, 24×24 viewBox) as original X / Instagram contact icons. */
 function ContactXIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -238,10 +233,9 @@ export function ContactSection({
           viewport={{ once: true }}
           className={`group mb-12 flex w-fit max-w-full min-h-[48px] items-center gap-3 sm:mb-16 sm:gap-4 ${lang === "fa" ? "flex-row-reverse" : ""}`}
         >
-          <MailIcon
-            width={24}
-            height={24}
-            className="shrink-0 text-[#0A0A0A]"
+          <MailGlyph
+            className="h-6 w-6 shrink-0 text-[#0A0A0A]"
+            aria-hidden
           />
           <span
             className={`transition-colors duration-300 group-hover:text-black/80 ${lang !== "fa" ? "font-sans" : ""}`}

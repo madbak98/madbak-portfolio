@@ -274,7 +274,6 @@ const Cubes: React.FC<CubesProps> = ({
 
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-      gsap.killTweensOf(el.querySelectorAll('.cube, .cube-face'));
     };
   }, [onPointerMove, resetAll, onClick, onTouchMove, onTouchStart, onTouchEnd]);
 

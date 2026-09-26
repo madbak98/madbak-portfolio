@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
@@ -10,16 +10,38 @@ import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 /* ==========================================
    2. 3D SCENE (Vanilla Three.js)
 ========================================== */
+function prefersConservativeGpu() {
+  const ua = navigator.userAgent;
+  const iOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const safari =
+    /safari/i.test(ua) && !/chrome|chromium|android|crios|fxios|edg\//i.test(ua);
+  return iOS || safari;
+}
+
 export function HomeThreeScene({
-  scrollProgress,
+  scrollProgressRef,
   introReady,
   reduceMotion,
+  onBootstrapped,
+  onReady,
+  onUnavailable,
+  onContextLost,
 }: {
-  scrollProgress: number;
+  scrollProgressRef: RefObject<number>;
   introReady: boolean;
   reduceMotion: boolean;
+  onBootstrapped?: () => void;
+  onReady?: () => void;
+  onUnavailable?: () => void;
+  onContextLost?: () => void;
 }) {
   const mountRef = useRef<HTMLDivElement>(null);
+  const callbacksRef = useRef({ onBootstrapped, onReady, onUnavailable, onContextLost });
+  useEffect(() => {
+    callbacksRef.current = { onBootstrapped, onReady, onUnavailable, onContextLost };
+  }, [onBootstrapped, onReady, onUnavailable, onContextLost]);
   const objectsRef = useRef<{
     camera?: THREE.PerspectiveCamera;
     star?: THREE.Mesh;
@@ -35,7 +57,7 @@ export function HomeThreeScene({
     introReady,
     reduceMotion,
     introProgress: reduceMotion ? 1 : 0,
-    scrollProgress,
+    scrollProgress: 0,
   });
 
   useEffect(() => {
@@ -49,7 +71,8 @@ export function HomeThreeScene({
     const w = window.innerWidth;
     const isMobile = w < 1024;
     const isPhone = w < 768;
-    const geoDetail = isPhone ? 8 : isMobile ? 12 : 28;
+    const conservativeGpu = prefersConservativeGpu();
+    const geoDetail = isPhone || conservativeGpu ? 6 : isMobile ? 8 : 12;
     const usePostFx = !isMobile && !reduceMotion;
 
     const camera = new THREE.PerspectiveCamera(
@@ -61,11 +84,24 @@ export function HomeThreeScene({
     camera.position.z = 7;
     objectsRef.current.camera = camera;
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
-      alpha: true,
-      powerPreference: "high-performance",
-    });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: !isMobile && !conservativeGpu,
+        alpha: true,
+        powerPreference: conservativeGpu ? "default" : "high-performance",
+        failIfMajorPerformanceCaveat: false,
+      });
+    } catch {
+      callbacksRef.current.onUnavailable?.();
+      return;
+    }
+    if (!renderer.getContext()) {
+      renderer.dispose();
+      callbacksRef.current.onUnavailable?.();
+      return;
+    }
+    callbacksRef.current.onBootstrapped?.();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(
       Math.min(window.devicePixelRatio, isPhone ? 1.25 : isMobile ? 1.5 : 2),
@@ -119,6 +155,28 @@ export function HomeThreeScene({
       anisotropyRotation: Math.PI * 0.22,
     });
 
+    const displaceUniforms = {
+      uTime: { value: 0 },
+      uDistort: { value: reduceMotion ? 0 : 0.15 },
+    };
+    chromeMaterial.customProgramCacheKey = () => "madbak-chrome-displace";
+    chromeMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = displaceUniforms.uTime;
+      shader.uniforms.uDistort = displaceUniforms.uDistort;
+      shader.vertexShader = shader.vertexShader
+        .replace(
+          "#include <common>",
+          "#include <common>\nuniform float uTime;\nuniform float uDistort;",
+        )
+        .replace(
+          "#include <begin_vertex>",
+          `
+          float madNoise = sin(uTime * 1.5 + position.x * 2.5) * cos(uTime * 1.5 + position.y * 2.5) * sin(uTime * 1.5 + position.z * 2.5);
+          vec3 transformed = normalize(position) * (1.8 + madNoise * uDistort);
+          `,
+        );
+    };
+
     const star = new THREE.Mesh(geometry, chromeMaterial);
     const startReduced = Boolean(objectsRef.current.reduceMotion);
     star.scale.setScalar(startReduced ? 1 : 0.86);
@@ -155,6 +213,7 @@ export function HomeThreeScene({
     let chromaticPass: ShaderPass | null = null;
     let outputPass: OutputPass | null = null;
 
+    let composerFailed = false;
     if (usePostFx) {
       const ChromaticAberrationShader = {
         uniforms: {
@@ -183,13 +242,29 @@ export function HomeThreeScene({
         `,
       };
 
-      composer = new EffectComposer(renderer);
-      composer.addPass(new RenderPass(scene, camera));
-      chromaticPass = new ShaderPass(ChromaticAberrationShader);
-      composer.addPass(chromaticPass);
-      outputPass = new OutputPass();
-      composer.addPass(outputPass);
-      composer.setSize(window.innerWidth, window.innerHeight);
+      try {
+        let composerTarget: THREE.WebGLRenderTarget | undefined;
+        if (conservativeGpu) {
+          const size = renderer.getSize(new THREE.Vector2());
+          const pixelRatio = renderer.getPixelRatio();
+          composerTarget = new THREE.WebGLRenderTarget(
+            Math.max(1, Math.floor(size.width * pixelRatio)),
+            Math.max(1, Math.floor(size.height * pixelRatio)),
+            { type: THREE.UnsignedByteType },
+          );
+        }
+        composer = new EffectComposer(renderer, composerTarget);
+        composer.addPass(new RenderPass(scene, camera));
+        chromaticPass = new ShaderPass(ChromaticAberrationShader);
+        composer.addPass(chromaticPass);
+        outputPass = new OutputPass();
+        composer.addPass(outputPass);
+        composer.setSize(window.innerWidth, window.innerHeight);
+      } catch {
+        composer = null;
+        chromaticPass = null;
+        composerFailed = true;
+      }
     }
 
     const mouse = new THREE.Vector2(0, 0);
@@ -201,19 +276,29 @@ export function HomeThreeScene({
     };
     window.addEventListener("mousemove", onMouseMove);
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
+    let contextLost = false;
+    let reportedReady = false;
+    let lostTimer = 0;
     const clock = new THREE.Clock();
     /** Scroll velocity (0–1 progress / sec) — spike = fast wheel/trackpad */
     let prevScrollProg = 0;
     let rgbGlitch = 0;
     const SCROLL_GLITCH_VEL = 0.42;
 
+    let loopOn = false;
     const animate = () => {
+      if (contextLost || document.hidden) {
+        loopOn = false;
+        return;
+      }
+      loopOn = true;
       animationFrameId = requestAnimationFrame(animate);
       const dt = clock.getDelta();
       const dtSafe = Math.min(Math.max(dt, 1e-5), 0.08);
       const time = clock.getElapsedTime();
-      const currentScroll = objectsRef.current.scrollProgress || 0;
+      const currentScroll = scrollProgressRef.current || 0;
+      objectsRef.current.scrollProgress = currentScroll;
 
       const scrollVelocity =
         Math.abs(currentScroll - prevScrollProg) / dtSafe;
@@ -284,38 +369,8 @@ export function HomeThreeScene({
         time * 0.11 * rotMul + currentScroll * 3 + mouse.x * 0.2;
       star.rotation.z = time * 0.075 * rotMul + mouse.y * 0.2;
 
-      const posAttribute = geometry.attributes.position;
-      const original = objectsRef.current.originalPositions;
-      const v = new THREE.Vector3();
-      const distortAmt = 0.15 + currentScroll * 0.5;
-      const frequency = 1.5;
-
-      if (original && !reduce) {
-        objectsRef.current._reducedGeomRestored = false;
-        const updateNormals = !isMobile || Math.floor(time * 30) % 2 === 0;
-        for (let i = 0; i < posAttribute.count; i++) {
-          v.fromArray(original, i * 3);
-          const noise =
-            Math.sin(time * frequency + v.x * 2.5) *
-            Math.cos(time * frequency + v.y * 2.5) *
-            Math.sin(time * frequency + v.z * 2.5);
-          v.normalize().multiplyScalar(1.8 + noise * distortAmt);
-          posAttribute.setXYZ(i, v.x, v.y, v.z);
-        }
-        posAttribute.needsUpdate = true;
-        if (updateNormals) {
-          geometry.computeVertexNormals();
-        }
-      } else if (
-        original &&
-        reduce &&
-        !objectsRef.current._reducedGeomRestored
-      ) {
-        posAttribute.array.set(original);
-        posAttribute.needsUpdate = true;
-        geometry.computeVertexNormals();
-        objectsRef.current._reducedGeomRestored = true;
-      }
+      displaceUniforms.uTime.value = reduce ? 0 : time;
+      displaceUniforms.uDistort.value = reduce ? 0 : 0.15 + currentScroll * 0.5;
 
       /** Parallax dust: drift opposite scroll direction */
       const lastDustScroll = objectsRef.current._dustScroll ?? currentScroll;
@@ -331,12 +386,59 @@ export function HomeThreeScene({
       dustMat.opacity = 0.11 + 0.09 * flicker;
       dustMat.size = baseDustSize * (1 + 0.055 * twinkle);
 
-      if (composer) {
-        composer.render();
-      } else {
-        renderer.render(scene, camera);
+      try {
+        if (composer && !composerFailed) {
+          composer.render();
+        } else {
+          renderer.render(scene, camera);
+        }
+      } catch {
+        composerFailed = true;
+        try {
+          renderer.render(scene, camera);
+        } catch {
+          contextLost = true;
+          cancelAnimationFrame(animationFrameId);
+          callbacksRef.current.onUnavailable?.();
+          return;
+        }
+      }
+
+      if (!reportedReady) {
+        reportedReady = true;
+        callbacksRef.current.onReady?.();
       }
     };
+
+    const canvas = renderer.domElement;
+    const onContextLostEvent = (event: Event) => {
+      event.preventDefault();
+      contextLost = true;
+      cancelAnimationFrame(animationFrameId);
+      window.clearTimeout(lostTimer);
+      lostTimer = window.setTimeout(() => {
+        callbacksRef.current.onUnavailable?.();
+      }, 1500);
+    };
+    const onContextRestoredEvent = () => {
+      window.clearTimeout(lostTimer);
+      callbacksRef.current.onContextLost?.();
+    };
+    canvas.addEventListener("webglcontextlost", onContextLostEvent);
+    canvas.addEventListener("webglcontextrestored", onContextRestoredEvent);
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+        loopOn = false;
+        return;
+      }
+      if (!contextLost && !loopOn) {
+        clock.getDelta();
+        animate();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
     animate();
 
@@ -354,10 +456,16 @@ export function HomeThreeScene({
     window.addEventListener("resize", handleResize);
 
     return () => {
+      window.clearTimeout(lostTimer);
+      canvas.removeEventListener("webglcontextlost", onContextLostEvent);
+      canvas.removeEventListener("webglcontextrestored", onContextRestoredEvent);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationFrameId);
-      mount.removeChild(renderer.domElement);
+      if (renderer.domElement.parentNode === mount) {
+        mount.removeChild(renderer.domElement);
+      }
 
       geometry.dispose();
       chromeMaterial.dispose();
@@ -373,10 +481,6 @@ export function HomeThreeScene({
     // Scene is intentionally mount-once; reduceMotion is read via objectsRef after init.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- WebGL bootstrap
   }, []);
-
-  useEffect(() => {
-    objectsRef.current.scrollProgress = scrollProgress;
-  }, [scrollProgress]);
 
   useEffect(() => {
     objectsRef.current.introReady = introReady;

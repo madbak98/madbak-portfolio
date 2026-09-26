@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 const LetterGlitch = ({
   glitchColors = ['#2b4539', '#61dca3', '#61b3dc'],
@@ -28,6 +28,7 @@ const LetterGlitch = ({
   const grid = useRef({ columns: 0, rows: 0 });
   const context = useRef<CanvasRenderingContext2D | null>(null);
   const lastGlitchTime = useRef(Date.now());
+  const [canvasFailed, setCanvasFailed] = useState(false);
 
   const lettersAndSymbols = Array.from(characters);
 
@@ -95,7 +96,7 @@ const LetterGlitch = ({
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = parent.getBoundingClientRect();
 
     canvas.width = rect.width * dpr;
@@ -191,6 +192,10 @@ const LetterGlitch = ({
     if (!canvas) return;
 
     context.current = canvas.getContext('2d');
+    if (!context.current) {
+      setCanvasFailed(true);
+      return;
+    }
     resizeCanvas();
     animate();
 
@@ -217,6 +222,11 @@ const LetterGlitch = ({
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
       <canvas ref={canvasRef} className="block w-full h-full" />
+      {canvasFailed ? (
+        <div className="pointer-events-none absolute inset-0 grid place-items-center px-6 text-center font-mono text-xs tracking-[0.28em] text-[#61dca3]/80">
+          {characters.slice(0, 32)}
+        </div>
+      ) : null}
       {outerVignette && (
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-[radial-gradient(circle,_rgba(0,0,0,0)_60%,_rgba(0,0,0,1)_100%)]"></div>
       )}

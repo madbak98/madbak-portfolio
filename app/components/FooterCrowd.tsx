@@ -34,6 +34,7 @@ export function FooterCrowd({ reduceMotion = false }: FooterCrowdProps) {
     if (!canvas || !context) return;
 
     let disposed = false;
+    let crowdCleanup = () => {};
     const stage = { width: 0, height: 0, scale: 0.5 };
     const allPeeps: Peep[] = [];
     const availablePeeps: Peep[] = [];
@@ -162,12 +163,23 @@ export function FooterCrowd({ reduceMotion = false }: FooterCrowdProps) {
     const resize = () => {
       if (disposed) return;
 
-      stage.width = canvas.clientWidth;
-      stage.height = canvas.clientHeight;
+      const nextWidth = canvas.clientWidth;
+      const nextHeight = canvas.clientHeight;
+      const widthChanged = Math.abs(nextWidth - stage.width) > 1;
+      const heightDelta = Math.abs(nextHeight - stage.height);
+      if (stage.width > 0 && !widthChanged && heightDelta < 80) return;
+
+      stage.width = nextWidth;
+      stage.height = nextHeight;
       stage.scale = Math.min(0.68, Math.max(0.35, stage.height / 390));
-      canvas.width = Math.max(1, Math.round(stage.width * window.devicePixelRatio));
-      canvas.height = Math.max(1, Math.round(stage.height * window.devicePixelRatio));
-      context.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      const isIos =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const dprCap = isIos ? 1.5 : 2;
+      const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
+      canvas.width = Math.max(1, Math.round(stage.width * dpr));
+      canvas.height = Math.max(1, Math.round(stage.height * dpr));
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       allPeeps.forEach((peep) => {
         peep.width = peep.frameWidth * stage.scale;
@@ -201,7 +213,34 @@ export function FooterCrowd({ reduceMotion = false }: FooterCrowdProps) {
       }
 
       resize();
-      if (!reduceMotion) gsap.ticker.add(render);
+      let tickerOn = false;
+      let inView = true;
+      const syncTicker = () => {
+        const shouldRun = !reduceMotion && inView && !document.hidden;
+        if (shouldRun && !tickerOn) {
+          gsap.ticker.add(render);
+          tickerOn = true;
+        } else if (!shouldRun && tickerOn) {
+          gsap.ticker.remove(render);
+          tickerOn = false;
+        }
+      };
+      syncTicker();
+      const onVisibility = () => syncTicker();
+      document.addEventListener("visibilitychange", onVisibility);
+      const viewObserver = new IntersectionObserver(
+        ([entry]) => {
+          inView = Boolean(entry?.isIntersecting);
+          syncTicker();
+        },
+        { rootMargin: "200px" },
+      );
+      viewObserver.observe(canvas);
+      crowdCleanup = () => {
+        document.removeEventListener("visibilitychange", onVisibility);
+        viewObserver.disconnect();
+        if (tickerOn) gsap.ticker.remove(render);
+      };
     };
     image.src = "/images/peeps/all-peeps.png";
 
@@ -210,6 +249,7 @@ export function FooterCrowd({ reduceMotion = false }: FooterCrowdProps) {
 
     return () => {
       disposed = true;
+      crowdCleanup();
       resizeObserver.disconnect();
       gsap.ticker.remove(render);
       crowd.forEach((peep) => peep.walk?.kill());

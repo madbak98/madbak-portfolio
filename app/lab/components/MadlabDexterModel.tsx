@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Component, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "motion/react";
 import { Canvas, useLoader } from "@react-three/fiber";
 import { gsap } from "gsap";
@@ -207,6 +207,21 @@ function DexterModel({ path, compact, debugSkeleton, onHoverChange }: DexterMode
   );
 }
 
+class DexterErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed) {
+      return <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(255,42,42,0.2),#0a0a0a_62%)]" />;
+    }
+    return this.props.children;
+  }
+}
+
 export function MadlabDexterModel({
   modelPath = "/dexter.glb",
   label = "Dexter laboratory",
@@ -236,6 +251,7 @@ export function MadlabDexterModel({
           <span>GLB / 001</span>
         </div>
       )}
+      <DexterErrorBoundary>
       <Canvas
         camera={{ position: [0, compact ? 0 : 0.2, compact ? 3.8 : 4.3], fov: compact ? 35 : 32 }}
         dpr={[1, 1.5]}
@@ -255,6 +271,7 @@ export function MadlabDexterModel({
           />
         </Suspense>
       </Canvas>
+      </DexterErrorBoundary>
       {!compact && (
         <div className="absolute inset-x-4 bottom-4 z-10 flex items-end justify-between font-mono text-[8px] uppercase tracking-[0.16em] text-white/35">
           <span>{label}</span>

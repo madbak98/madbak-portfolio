@@ -34,7 +34,7 @@ export const WEB_PROJECTS = [
     title: "SIGMAA.PRO",
     href: "https://sigmaa.pro",
     images: [
-      "/projects/sigmaa/home-hero.jpg",
+      "/projects/sigmaa/home.jpg",
       "/projects/sigmaa/capabilities.jpg",
       "/projects/sigmaa/system.jpg",
       "/projects/sigmaa/network.jpg",
@@ -401,7 +401,7 @@ export function getArchiveProjects(
       imageAlts: "imageAlts" in project ? project.imageAlts : undefined,
       external: true,
       layout: "lead-grid" as const,
-      fit: "cover" as const,
+      fit: "contain" as const,
     }));
   }
 

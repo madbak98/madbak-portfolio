@@ -36,32 +36,45 @@ export function SiteCursor() {
     const baseInner =
       "h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ease-out";
 
-    const moveCursor = (e: MouseEvent) => {
-      const under = document.elementFromPoint(e.clientX, e.clientY);
-      const overFlag = under?.closest("[data-cursor-no-difference]");
-      const isHoverable = under?.closest("a, button, .cursor-pointer");
+    let overFlag = false;
+    let hoverable = false;
 
-      if (outerRef.current) {
-        outerRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-        outerRef.current.style.opacity = "1";
-        outerRef.current.style.mixBlendMode = overFlag ? "normal" : "difference";
-      }
-
-      if (innerRef.current) {
-        const el = innerRef.current;
-        if (overFlag) {
-          el.className = `${baseInner} bg-[#ff2a2a]`;
-        } else if (isHoverable) {
-          el.className = `${baseInner} scale-[3] bg-white`;
-        } else {
-          el.className = `${baseInner} bg-[#ff2a2a]`;
-        }
+    const paintInner = () => {
+      const el = innerRef.current;
+      if (!el) return;
+      if (overFlag) {
+        el.className = `${baseInner} bg-[#ff2a2a]`;
+      } else if (hoverable) {
+        el.className = `${baseInner} scale-[3] bg-white`;
+      } else {
+        el.className = `${baseInner} bg-[#ff2a2a]`;
       }
     };
 
+    const moveCursor = (e: MouseEvent) => {
+      if (!outerRef.current) return;
+      outerRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      outerRef.current.style.opacity = "1";
+    };
+
+    const onOver = (event: PointerEvent) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const nextFlag = Boolean(target?.closest("[data-cursor-no-difference]"));
+      const nextHoverable = Boolean(target?.closest("a, button, .cursor-pointer"));
+      if (nextFlag === overFlag && nextHoverable === hoverable) return;
+      overFlag = nextFlag;
+      hoverable = nextHoverable;
+      if (outerRef.current) {
+        outerRef.current.style.mixBlendMode = overFlag ? "normal" : "difference";
+      }
+      paintInner();
+    };
+
     window.addEventListener("mousemove", moveCursor);
+    document.addEventListener("pointerover", onOver);
     return () => {
       window.removeEventListener("mousemove", moveCursor);
+      document.removeEventListener("pointerover", onOver);
     };
   }, [active]);
 
