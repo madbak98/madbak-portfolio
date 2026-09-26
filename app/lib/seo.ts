@@ -42,14 +42,9 @@ export const HOME_SEO: Record<LangKey, PageSeoCopy> = {
     ],
   },
   fa: {
-    title: "مدبک — توسعه‌دهنده خلاق و طراح وب",
+    title: "MADBAK — توسعه‌دهنده خلاق و طراح وب",
     description:
       "بابک روان‌بخش، توسعه‌دهنده خلاق و طراح وب مستقر در استانبول؛ ساخت وب‌سایت‌های تعاملی، تجربه‌های دیجیتال و پروژه‌های فناوری خلاق.",
-  },
-  tr: {
-    title: "MADBAK — Yaratıcı Geliştirici ve Web Tasarımcısı",
-    description:
-      "Babak Ravanbakhsh, İstanbul merkezli yaratıcı geliştirici ve web tasarımcısı; etkileşimli web siteleri, dijital deneyimler ve yaratıcı teknoloji projeleri üretir.",
   },
 };
 
@@ -70,12 +65,7 @@ export const CATEGORY_SEO: Record<
     fa: {
       title: "پروژه‌های طراحی وب",
       description:
-        "مجموعه‌ای از پروژه‌های طراحی وب‌سایت و توسعه فرانت‌اند مدبک با تمرکز بر تجربه تعاملی، موشن، هویت بصری و فناوری‌های مدرن وب.",
-    },
-    tr: {
-      title: "Web Tasarım Projeleri",
-      description:
-        "Madbak tarafından modern frontend teknolojileri, hareket tasarımı, görsel kimlik ve yaratıcı yön ile geliştirilen seçili web projeleri.",
+        "مجموعه‌ای از پروژه‌های طراحی وب‌سایت و توسعه فرانت‌اند MADBAK با تمرکز بر تجربه تعاملی، موشن، هویت بصری و فناوری‌های مدرن وب.",
     },
   },
   "character-design": {
@@ -87,12 +77,7 @@ export const CATEGORY_SEO: Record<
     fa: {
       title: "پروژه‌های طراحی کاراکتر",
       description:
-        "طراحی کاراکتر و توسعه بصری مدبک؛ کاوش استایل، سیلوئت، سیستم هویت و تصویرسازی روایی برای شخصیت‌های دیجیتال.",
-    },
-    tr: {
-      title: "Karakter Tasarım Projeleri",
-      description:
-        "Madbak’ın karakter tasarımı ve görsel geliştirme çalışmaları — stil, siluet, kimlik sistemleri ve dijital karakterler için anlatısal illüstrasyon.",
+        "طراحی کاراکتر و توسعه بصری MADBAK؛ کاوش استایل، سیلوئت، سیستم هویت و تصویرسازی روایی برای شخصیت‌های دیجیتال.",
     },
   },
   "ai-influencer": {
@@ -104,12 +89,7 @@ export const CATEGORY_SEO: Record<
     fa: {
       title: "پروژه‌های اینفلوئنسر هوش مصنوعی",
       description:
-        "پروژه Pink Army و کارهای مرتبط اینفلوئنسر هوش مصنوعی مدبک؛ طراحی پرسونای دیجیتال، توسعه ظاهر مولد و تصویرسازی کمپین.",
-    },
-    tr: {
-      title: "YZ Influencer Projeleri",
-      description:
-        "Madbak’ın Pink Army ve ilgili YZ influencer çalışmaları — dijital persona tasarımı, üretken görünüm geliştirme ve kampanya görselleri.",
+        "پروژه Pink Army و کارهای مرتبط اینفلوئنسر هوش مصنوعی MADBAK؛ طراحی پرسونای دیجیتال، توسعه ظاهر مولد و تصویرسازی کمپین.",
     },
   },
   "nft-collection": {
@@ -121,12 +101,7 @@ export const CATEGORY_SEO: Record<
     fa: {
       title: "پروژه‌های مجموعه NFT",
       description:
-        "مجموعه هنر NFT مدبک در Foundation؛ نسخه‌های دیجیتال ۱/۱ مستقل با تمرکز بر آثار کلکسیونی کاراکترمحور و تصویرسازی آن‌چین.",
-    },
-    tr: {
-      title: "NFT Koleksiyon Projeleri",
-      description:
-        "Madbak’ın Foundation üzerindeki NFT sanat koleksiyonu — karakter odaklı koleksiyonluk eserler ve deneysel zincir üstü görsellerden oluşan 1/1 edisyonlar.",
+        "مجموعه هنر NFT MADBAK در Foundation؛ نسخه‌های دیجیتال ۱/۱ مستقل با تمرکز بر آثار کلکسیونی کاراکترمحور و تصویرسازی آن‌چین.",
     },
   },
 };
@@ -148,14 +123,9 @@ export const ABOUT_SEO: Record<LangKey, PageSeoCopy> = {
       "About Babak Ravanbakhsh, a creative developer and frontend developer based in Istanbul, working across design, code, motion and interactive digital experiences.",
   },
   fa: {
-    title: "درباره — مدبک",
+    title: "درباره — MADBAK",
     description:
       "درباره بابک روان‌بخش؛ توسعه‌دهنده خلاق و فرانت‌اند مستقر در استانبول، فعال در طراحی، کد، موشن و تجربه‌های دیجیتال تعاملی.",
-  },
-  tr: {
-    title: "Hakkında — MADBAK",
-    description:
-      "İstanbul merkezli yaratıcı geliştirici ve frontend geliştiricisi Babak Ravanbakhsh hakkında — tasarım, kod, hareket ve etkileşimli dijital deneyimler.",
   },
 };
 
@@ -166,21 +136,15 @@ export const SERVICES_SEO: Record<LangKey, PageSeoCopy> = {
       "Web design, frontend development, motion, interaction, and creative direction packages by Babak Ravanbakhsh (MADBAK), based in Istanbul.",
   },
   fa: {
-    title: "خدمات — طراحی وب و توسعه خلاق | مدبک",
+    title: "خدمات — طراحی وب و توسعه خلاق | MADBAK",
     description:
-      "بسته‌های طراحی وب، توسعه فرانت‌اند، موشن، تعامل و کارگردانی خلاق توسط بابک روان‌بخش (مدبک)، مستقر در استانبول.",
-  },
-  tr: {
-    title: "Hizmetler — Web Tasarım ve Yaratıcı Geliştirme | MADBAK",
-    description:
-      "Babak Ravanbakhsh (MADBAK) tarafından sunulan web tasarım, frontend geliştirme, hareket, etkileşim ve yaratıcı yön paketleri — İstanbul.",
+      "بسته‌های طراحی وب، توسعه فرانت‌اند، موشن، تعامل و کارگردانی خلاق توسط بابک روان‌بخش (MADBAK)، مستقر در استانبول.",
   },
 };
 
 const OG_LOCALE: Record<LangKey, string> = {
   en: "en_US",
   fa: "fa_IR",
-  tr: "tr_TR",
 };
 
 const INDEXABLE_ROBOTS: Metadata["robots"] = {
@@ -196,17 +160,17 @@ const INDEXABLE_ROBOTS: Metadata["robots"] = {
 };
 
 function brandSuffix(lang: LangKey): string {
-  return lang === "fa" ? " — مدبک" : ` — ${SITE_NAME}`;
+  return lang === "fa" ? " — MADBAK" : ` — ${SITE_NAME}`;
 }
 
 export function withBrandTitle(segment: string, lang: LangKey): string {
   if (
     segment.includes("— Madbak") ||
     segment.includes("— MADBAK") ||
-    segment.includes("— مدبک") ||
+    segment.includes("— MADBAK") ||
     segment.startsWith("Madbak —") ||
     segment.startsWith("MADBAK —") ||
-    segment.startsWith("مدبک —")
+    segment.startsWith("MADBAK —")
   ) {
     return segment;
   }
@@ -214,7 +178,7 @@ export function withBrandTitle(segment: string, lang: LangKey): string {
 }
 
 /**
- * Locales are client-preferred (EN/FA/TR) with no distinct URL per language.
+ * Locales are client-preferred (EN/FA) with no distinct URL per language.
  * Emitting identical hreflang URLs confuses crawlers — canonical only.
  * When real locale paths exist, extend this to return languages + x-default.
  */
@@ -248,7 +212,7 @@ function sharedSocialMetadata({
       title,
       description,
       locale: OG_LOCALE[lang],
-      alternateLocale: (["en", "fa", "tr"] as LangKey[])
+      alternateLocale: (["en", "fa"] as LangKey[])
         .filter((code) => code !== lang)
         .map((code) => OG_LOCALE[code]),
       images: [
@@ -376,7 +340,7 @@ export function buildWebsiteJsonLd() {
     name: SITE_NAME,
     alternateName: ["MADBAK", "Madbak Portfolio"],
     publisher: { "@id": `${SITE_URL}/#person` },
-    inLanguage: ["en", "fa", "tr"],
+    inLanguage: ["en", "fa"],
   };
 }
 

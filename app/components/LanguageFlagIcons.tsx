@@ -49,29 +49,7 @@ export function FlagEn({ className = "" }: { className?: string }) {
   );
 }
 
-/** Turkey — dusty crimson field, cream emblem. */
-export function FlagTr({ className = "" }: { className?: string }) {
-  const field = "#7a3e44";
-  const cream = "#e5e1d8";
-  return (
-    <svg
-      viewBox="0 0 60 40"
-      className={`${box} ${className}`.trim()}
-      aria-hidden
-    >
-      <rect width="60" height="40" fill={field} />
-      <circle cx="22" cy="20" r="11" fill={cream} />
-      <circle cx="25.2" cy="20" r="9" fill={field} />
-      <path
-        fill={cream}
-        d="M34.8 20l2.1-6.4 2.1 6.4h6.8l-5.5 4 2.1 6.4-5.5-4-5.5 4 2.1-6.4-5.5-4h6.8z"
-      />
-    </svg>
-  );
-}
-
 const FLAG_FA_TOOLTIP = "Raise My Flag , Thats Lion & Sun";
-
 /**
  * Historical Iran — Lion & Sun (local asset, tuned to match muted nav treatment).
  * Source image stored at /public/flags/iran-lion-sun.jpg
@@ -98,7 +76,6 @@ export function FlagFa({ className = "" }: { className?: string }) {
 const FLAGS: Record<LangKey, FC<{ className?: string }>> = {
   en: FlagEn,
   fa: FlagFa,
-  tr: FlagTr,
 };
 
 export function LanguageFlag({

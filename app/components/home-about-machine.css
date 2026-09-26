@@ -16,7 +16,7 @@
   row-gap: clamp(1rem, 2.5vw, 1.75rem);
   align-items: start;
   text-align: center;
-  overflow-x: clip;
+  overflow-x: visible;
 }
 
 .home-about-machine__intro {
@@ -78,7 +78,8 @@
   height: auto;
   min-height: 0;
   min-width: 0;
-  gap: 0.825rem; /* 0.55rem × 1.5 */
+  /* ~12px clear face-to-face after 3D button shadow */
+  gap: calc(0.75rem + var(--opt-raise, 4.5px));
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -91,12 +92,34 @@
   width: auto;
   max-width: 100%;
   min-height: 4.125rem; /* 2.75rem × 1.5 */
-  padding: 0.825rem 1.575rem; /* × 1.5 */
+  padding-block: 0.825rem; /* ~13px */
+  padding-inline: 1.45rem; /* ~23px */
   border-width: 2.25px;
   border-radius: 6px;
   font-size: 1.02rem; /* 0.68rem × 1.5 */
   letter-spacing: 0.045em;
   touch-action: manipulation;
+}
+
+.home-about-machine .madbak-pet__options[dir="rtl"] {
+  align-items: stretch;
+  /*
+   * Cancel LTR right-pull. Keep options fully inside the column —
+   * a large negative translateX was clipping the left edge + border.
+   */
+  transform: none;
+}
+
+.home-about-machine .madbak-pet__options[dir="rtl"] .madbak-pet__option {
+  direction: rtl;
+  text-align: center;
+  justify-content: center;
+  letter-spacing: 0;
+  text-transform: none;
+  width: 100%;
+  /* Keep 3D shadow from being clipped by a tight parent */
+  position: relative;
+  z-index: 1;
 }
 
 .home-about-machine__placeholder {
@@ -130,6 +153,10 @@
 
   .home-about-machine .madbak-pet__options {
     transform: translateX(clamp(0px, 1.5vw, 1.25rem));
+  }
+
+  .home-about-machine .madbak-pet__options[dir="rtl"] {
+    transform: none;
   }
 }
 
@@ -184,15 +211,30 @@
     transform: none;
   }
 
+  .home-about-machine .madbak-pet__options[dir="rtl"] {
+    transform: none;
+  }
+
+  .home-about-machine .madbak-pet__options {
+    /* ~10px clear face-to-face on tablet/mobile */
+    gap: calc(0.625rem + var(--opt-raise, 3px));
+  }
+
   .home-about-machine .madbak-pet__option {
     min-height: 3rem;
     font-size: clamp(0.85rem, 3.6vw, 1.02rem);
-    padding: 0.7rem 1.15rem;
+    padding-block: 0.75rem;
+    padding-inline: 1.35rem;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     white-space: normal;
     text-align: start;
+  }
+
+  .home-about-machine .madbak-pet__options[dir="rtl"] .madbak-pet__option {
+    text-align: center;
+    justify-content: center;
   }
 
   .home-about-machine__intro {
@@ -213,7 +255,8 @@
 
   .home-about-machine .madbak-pet__option {
     min-height: 2.85rem;
-    padding: 0.65rem 1rem;
+    padding-block: 0.7rem;
+    padding-inline: 1.25rem;
     font-size: 0.88rem;
   }
 }

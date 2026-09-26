@@ -334,7 +334,9 @@ export function MadbakPet({
               onClick={onAvatarClick}
               onKeyDown={onAvatarKeyDown}
               onMouseEnter={onHoverPulse}
-              aria-label="Talk to Madbak"
+              aria-label={
+                lang === "fa" ? "با MADBAK حرف بزن" : "Talk to Madbak"
+              }
               aria-expanded={showBubble}
             >
               <span className="madbak-pet__ring">

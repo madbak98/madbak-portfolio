@@ -8,7 +8,7 @@ const STORAGE_KEY = "madbak-lang";
 const LANG_EVENT = "madbak-lang";
 
 export function isLangKey(value: string | null | undefined): value is LangKey {
-  return value === "en" || value === "fa" || value === "tr";
+  return value === "en" || value === "fa";
 }
 
 export function readPreferredLang(): LangKey {

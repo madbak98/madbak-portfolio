@@ -48,22 +48,18 @@ export const WEB_PROJECTS = [
     label: {
       en: "Website in development",
       fa: "وب‌سایت در حال توسعه",
-      tr: "GELİŞTİRME AŞAMASINDA",
     },
     liveLabel: {
       en: "Live Website",
       fa: "وب‌سایت زنده",
-      tr: "CANLI WEB SİTESİ",
     },
     platformLabel: {
       en: "Web3 growth platform",
       fa: "پلتفرم رشد Web3",
-      tr: "WEB3 BÜYÜME PLATFORMU",
     },
     description: {
       en: "A future web direction — calm, tactile, and built for immersive storytelling.",
       fa: "یک مسیر وب‌محور برای آینده — آرام، لمسی و ساخته‌شده برای روایت غوطه‌ور.",
-      tr: "Gelecekteki web yönü — sakin, dokunsal ve sürükleyici anlatı için tasarlandı.",
     },
   },
   {
@@ -88,17 +84,14 @@ export const WEB_PROJECTS = [
     label: {
       en: "Art Gallery / Cultural Website",
       fa: "گالری هنری / وب‌سایت فرهنگی",
-      tr: "SANAT GALERİSİ / KÜLTÜREL WEB SİTESİ",
     },
     liveLabel: {
       en: "Live Website",
       fa: "وب‌سایت زنده",
-      tr: "CANLI WEB SİTESİ",
     },
     description: {
       en: "An editorial cultural website for MUSE / 24 — quiet typography, living archive, and present-tense looking.",
       fa: "وب‌سایت فرهنگی ادیتوریال برای MUSE / 24 — تایپوگرافی آرام، آرشیو زنده و نگاه در زمان حال.",
-      tr: "MUSE / 24 için editoryal bir kültürel site — sakin tipografi, yaşayan arşiv ve şimdiki zamana bakış.",
     },
   },
 ] as const;
@@ -114,7 +107,6 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     marqueeText: {
       en: "WEBSITES",
       fa: "وب‌سایت‌ها",
-      tr: "WEB SİTELERİ",
     },
     marqueeBackground: "rgba(28, 26, 23, 0.08)",
     marqueeTextColor: "#1C1A17",
@@ -122,42 +114,34 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     eyebrow: {
       en: "01 / DIGITAL EXPERIENCES",
       fa: "۰۱ / تجربه‌های دیجیتال",
-      tr: "01 / DİJİTAL DENEYİMLER",
     },
     titleLines: {
       en: ["WEBSITES"],
       fa: ["وب‌سایت‌ها"],
-      tr: ["WEB SİTELERİ"],
     },
     shortTitle: {
       en: "WEBSITES",
       fa: "وب‌سایت‌ها",
-      tr: "WEB SİTELERİ",
     },
     menuLabel: {
       en: "WEBSITES",
       fa: "وب‌سایت‌ها",
-      tr: "WEB SİTELERİ",
     },
     menuDescriptor: {
       en: "Digital products and interactive experiences",
       fa: "محصولات دیجیتال و تجربه‌های تعاملی",
-      tr: "Dijital ürünler ve interaktif deneyimler",
     },
     description: {
       en: "Selected digital products, interactive experiences, and web platforms designed through strategy, identity, motion, and code.",
       fa: "مجموعه‌ای منتخب از محصولات دیجیتال، تجربه‌های تعاملی و پلتفرم‌های وب که با ترکیب استراتژی، هویت بصری، موشن و کدنویسی طراحی شده‌اند.",
-      tr: "Strateji, görsel kimlik, hareket ve kodun birleşimiyle tasarlanan seçili dijital ürünler, interaktif deneyimler ve web platformları.",
     },
     metaTitle: {
       en: "Web Design & Frontend Development Projects",
       fa: "پروژه‌های طراحی وب و توسعه فرانت‌اند",
-      tr: "Web Tasarım ve Frontend Geliştirme Projeleri",
     },
     metaDescription: {
       en: "Selected websites and interactive digital products designed and developed by Madbak using modern frontend technologies, motion, visual identity, and creative direction.",
-      fa: "مجموعه‌ای از پروژه‌های طراحی وب‌سایت و توسعه فرانت‌اند مدبک با تمرکز بر تجربه تعاملی، موشن، هویت بصری و فناوری‌های مدرن وب.",
-      tr: "Madbak tarafından modern frontend teknolojileri, hareket tasarımı, görsel kimlik ve yaratıcı yön ile geliştirilen seçili web projeleri.",
+      fa: "مجموعه‌ای از پروژه‌های طراحی وب‌سایت و توسعه فرانت‌اند MADBAK با تمرکز بر تجربه تعاملی، موشن، هویت بصری و فناوری‌های مدرن وب.",
     },
   },
   {
@@ -170,7 +154,6 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     marqueeText: {
       en: "CHARACTER DESIGN",
       fa: "طراحی کاراکتر",
-      tr: "KARAKTER TASARIMI",
     },
     marqueeBackground: "rgba(22, 125, 0, 0.38)",
     marqueeTextColor: "#d9ffcc",
@@ -178,42 +161,34 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     eyebrow: {
       en: "02 / CHARACTER SYSTEMS",
       fa: "۰۲ / سیستم‌های کاراکتر",
-      tr: "02 / KARAKTER SİSTEMLERİ",
     },
     titleLines: {
       en: ["CHARACTER", "DESIGN"],
       fa: ["طراحی", "کاراکتر"],
-      tr: ["KARAKTER", "TASARIMI"],
     },
     shortTitle: {
       en: "CHARACTER DESIGN",
       fa: "طراحی کاراکتر",
-      tr: "KARAKTER TASARIMI",
     },
     menuLabel: {
       en: "CHARACTER DESIGN",
       fa: "طراحی کاراکتر",
-      tr: "KARAKTER TASARIMI",
     },
     menuDescriptor: {
       en: "Characters and visual systems",
       fa: "کاراکترها و سیستم‌های بصری",
-      tr: "Karakterler ve görsel sistemler",
     },
     description: {
       en: "Character exploration, styling, silhouettes, visual identity, and narrative development.",
       fa: "کاوش شخصیت، استایل‌پردازی، طراحی سیلوئت، هویت بصری و توسعه روایت.",
-      tr: "Karakter keşfi, stil geliştirme, siluet, görsel kimlik ve anlatı tasarımı.",
     },
     metaTitle: {
       en: "Character Design & Visual Development",
       fa: "طراحی کاراکتر و توسعه بصری",
-      tr: "Karakter Tasarımı ve Görsel Geliştirme",
     },
     metaDescription: {
       en: "Character design and visual development by Madbak — exploration of styling, silhouettes, identity systems, and narrative illustration for digital characters.",
-      fa: "طراحی کاراکتر و توسعه بصری مدبک؛ کاوش استایل، سیلوئت، سیستم هویت و تصویرسازی روایی برای شخصیت‌های دیجیتال.",
-      tr: "Madbak’ın karakter tasarımı ve görsel geliştirme çalışmaları — stil, siluet, kimlik sistemleri ve dijital karakterler için anlatısal illüstrasyon.",
+      fa: "طراحی کاراکتر و توسعه بصری MADBAK؛ کاوش استایل، سیلوئت، سیستم هویت و تصویرسازی روایی برای شخصیت‌های دیجیتال.",
     },
   },
   {
@@ -226,7 +201,6 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     marqueeText: {
       en: "PINK ARMY",
       fa: "PINK ARMY",
-      tr: "PINK ARMY",
     },
     marqueeBackground: "rgba(180, 0, 95, 0.28)",
     marqueeTextColor: "#ff9bd5",
@@ -234,42 +208,34 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     eyebrow: {
       en: "03 / SYNTHETIC PERSONA",
       fa: "۰۳ / پرسونای مصنوعی",
-      tr: "03 / SENTETİK PERSONA",
     },
     titleLines: {
       en: ["AI", "INFLUENCER"],
       fa: ["اینفلوئنسر", "هوش مصنوعی"],
-      tr: ["YAPAY ZEKÂ", "INFLUENCER"],
     },
     shortTitle: {
       en: "AI INFLUENCER",
       fa: "اینفلوئنسر هوش مصنوعی",
-      tr: "YAPAY ZEKÂ INFLUENCER",
     },
     menuLabel: {
       en: "AI INFLUENCER",
       fa: "اینفلوئنسر هوش مصنوعی",
-      tr: "YAPAY ZEKÂ INFLUENCER",
     },
     menuDescriptor: {
       en: "Synthetic personas and digital identities",
       fa: "پرسوناهای مصنوعی و هویت‌های دیجیتال",
-      tr: "Sentetik personalar ve dijital kimlikler",
     },
     description: {
       en: "Digital persona design, generative visual direction, character consistency, and identity systems for synthetic talent.",
       fa: "طراحی پرسونای دیجیتال، هدایت بصری مولد، حفظ انسجام کاراکتر و ساخت سیستم هویت برای استعدادهای مصنوعی.",
-      tr: "Dijital persona tasarımı, üretken görsel yön, karakter tutarlılığı ve sentetik yetenekler için kimlik sistemleri.",
     },
     metaTitle: {
       en: "AI Influencer & Digital Persona Design",
       fa: "اینفلوئنسر هوش مصنوعی و طراحی پرسونای دیجیتال",
-      tr: "YZ Influencer ve Dijital Persona Tasarımı",
     },
     metaDescription: {
       en: "Pink Army and related AI influencer work by Madbak — digital persona design, generative look development, and campaign imagery for synthetic talent.",
-      fa: "پروژه Pink Army و کارهای مرتبط اینفلوئنسر هوش مصنوعی مدبک؛ طراحی پرسونای دیجیتال، توسعه ظاهر مولد و تصویرسازی کمپین.",
-      tr: "Madbak’ın Pink Army ve ilgili YZ influencer çalışmaları — dijital persona tasarımı, üretken görünüm geliştirme ve kampanya görselleri.",
+      fa: "پروژه Pink Army و کارهای مرتبط اینفلوئنسر هوش مصنوعی MADBAK؛ طراحی پرسونای دیجیتال، توسعه ظاهر مولد و تصویرسازی کمپین.",
     },
   },
   {
@@ -282,7 +248,6 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     marqueeText: {
       en: "NFT COLLECTION",
       fa: "مجموعه NFT",
-      tr: "NFT KOLEKSİYONU",
     },
     marqueeBackground: "rgba(0, 105, 135, 0.34)",
     marqueeTextColor: "#c9f7ff",
@@ -290,42 +255,34 @@ export const WORK_CATEGORIES: WorkCategory[] = [
     eyebrow: {
       en: "04 / ON-CHAIN EDITIONS",
       fa: "۰۴ / نسخه‌های آن‌چین",
-      tr: "04 / ZİNCİR ÜSTÜ EDİSYONLAR",
     },
     titleLines: {
       en: ["NFT", "COLLECTION"],
       fa: ["مجموعه", "NFT"],
-      tr: ["NFT", "KOLEKSİYONU"],
     },
     shortTitle: {
       en: "NFT COLLECTION",
       fa: "مجموعه NFT",
-      tr: "NFT KOLEKSİYONU",
     },
     menuLabel: {
       en: "NFT COLLECTION",
       fa: "مجموعه NFT",
-      tr: "NFT KOLEKSİYONU",
     },
     menuDescriptor: {
       en: "On-chain digital editions",
       fa: "نسخه‌های دیجیتال آن‌چین",
-      tr: "Zincir üstü dijital edisyonlar",
     },
     description: {
       en: "Digital editions, collectible visual systems, and experimental on-chain artwork.",
       fa: "نسخه‌های دیجیتال، سیستم‌های بصری کلکسیونی و آثار هنری تجربی مبتنی بر بلاکچین.",
-      tr: "Dijital edisyonlar, koleksiyonluk görsel sistemler ve deneysel zincir üstü sanat eserleri.",
     },
     metaTitle: {
       en: "NFT Art & Digital Collection",
       fa: "هنر NFT و مجموعه دیجیتال",
-      tr: "NFT Sanatı ve Dijital Koleksiyon",
     },
     metaDescription: {
       en: "Madbak’s NFT art collection on Foundation — independent 1/1 digital editions spanning character-led collectible artwork and experimental on-chain visuals.",
-      fa: "مجموعه هنر NFT مدبک در Foundation؛ نسخه‌های دیجیتال ۱/۱ مستقل با تمرکز بر آثار کلکسیونی کاراکترمحور و تصویرسازی آن‌چین.",
-      tr: "Madbak’ın Foundation üzerindeki NFT sanat koleksiyonu — karakter odaklı koleksiyonluk eserler ve deneysel zincir üstü görsellerden oluşan 1/1 edisyonlar.",
+      fa: "مجموعه هنر NFT MADBAK در Foundation؛ نسخه‌های دیجیتال ۱/۱ مستقل با تمرکز بر آثار کلکسیونی کاراکترمحور و تصویرسازی آن‌چین.",
     },
   },
 ];
@@ -416,11 +373,7 @@ export function getArchiveProjects(
         category: project.langs[lang]?.cat ?? "Character series",
         year: project.year,
         status:
-          lang === "fa"
-            ? "مطالعه کاراکتر"
-            : lang === "tr"
-              ? "Karakter çalışması"
-              : "Character study",
+          lang === "fa" ? "مطالعه کاراکتر" : "Character study",
         description: project.langs[lang]?.desc,
         images,
         external: false,
@@ -441,11 +394,7 @@ export function getArchiveProjects(
         category: project.langs[lang]?.cat ?? "AI influencer",
         year: project.year,
         status:
-          lang === "fa"
-            ? "هویت متحرک"
-            : lang === "tr"
-              ? "Hareketli kimlik"
-              : "Moving identity",
+          lang === "fa" ? "هویت متحرک" : "Moving identity",
         description: project.langs[lang]?.desc,
         images,
         external: false,

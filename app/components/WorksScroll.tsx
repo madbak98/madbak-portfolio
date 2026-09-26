@@ -39,11 +39,10 @@ const GENRES: {
     variant: "influencer",
     href: "/works/ai-influencer",
     projectIds: ["02"],
-    title: { en: "AI INFLUENCER", fa: "اینفلوئنسر هوش مصنوعی", tr: "YZ INFLUENCER" },
+    title: { en: "AI INFLUENCER", fa: "اینفلوئنسر هوش مصنوعی" },
     description: {
       en: "Synthetic identity, styling, and image-making in a moving feed.",
       fa: "هویت مصنوعی، استایل و تصویرسازی در یک فید همیشه متحرک.",
-      tr: "Hareketli bir akışta sentetik kimlik, stil ve görsel üretim.",
     },
   },
 ];
@@ -60,7 +59,6 @@ const WEB_CARD_CROSSFADE_S = 0.55;
 const SIGMA_META_CATEGORY: Record<LangKey, string> = {
   en: "Web3 Growth Platform",
   fa: "پلتفرم رشد وب۳",
-  tr: "Web3 Büyüme Platformu",
 };
 
 const MADLAB_HOME_ITEMS = ["Strands", "Logo Loop", "Folder"] as const;
@@ -69,36 +67,30 @@ const MADLAB_HOME_SUMMARIES: Record<(typeof MADLAB_HOME_ITEMS)[number], Record<L
   Strands: {
     en: "A flowing visual study built from layered strands, glow, and controlled motion.",
     fa: "یک مطالعه‌ی بصری روان با رشته‌های لایه‌ای، درخشش و حرکت کنترل‌شده.",
-    tr: "Katmanlı çizgiler, ışıma ve kontrollü hareketten oluşan akışkan bir görsel çalışma.",
   },
   "Logo Loop": {
     en: "A continuous brand loop built for movement, repetition, and visual balance.",
     fa: "یک لوپ پیوسته برای حرکت، تکرار و تعادل بصری برندها.",
-    tr: "Hareket, tekrar ve görsel denge için sürekli bir marka döngüsü.",
   },
   Folder: {
     en: "A tactile folder interaction for organizing small collections of content.",
     fa: "یک تعامل پوشه‌ای برای مرتب‌کردن مجموعه‌های کوچک محتوا.",
-    tr: "Küçük içerik koleksiyonlarını düzenleyen dokunsal bir klasör etkileşimi.",
   },
 };
 
 const ART_GALLERY_META_TITLE: Record<LangKey, string> = {
   en: "Art Gallery",
   fa: "گالری هنری",
-  tr: "Sanat Galerisi",
 };
 
 const ART_GALLERY_META_CATEGORY: Record<LangKey, string> = {
   en: "Cultural Website",
   fa: "وب‌سایت فرهنگی",
-  tr: "Kültürel Web Sitesi",
 };
 
 const LIVE_WEBSITE_LABEL: Record<LangKey, string> = {
   en: "Live Website",
   fa: "وب‌سایت زنده",
-  tr: "Canlı Site",
 };
 
 const ProjectTitleDisplay = memo(function ProjectTitleDisplay({
@@ -264,17 +256,10 @@ function ChapterProject({
             <ProjectMarquee
               text={
                 lang === "fa"
-                  ? "طراحی کاراکتر"
-                  : lang === "tr"
-                    ? "KARAKTER TASARIMI"
-                    : "CHARACTER DESIGN"
+                  ? "طراحی کاراکتر" : "CHARACTER DESIGN"
               }
               accessibleLabel={
-                lang === "fa"
-                  ? "طراحی کاراکتر"
-                  : lang === "tr"
-                    ? "KARAKTER TASARIMI"
-                    : "Character Design"
+                lang === "fa" ? "طراحی کاراکتر" : "Character Design"
               }
               stripBackground="rgba(22, 125, 0, 0.38)"
               textColor="#d9ffcc"
@@ -451,7 +436,7 @@ function GenreSection({
                 : "text-[#A9BDC6]"
             }`}
           >
-            {lang === "fa" ? "باز کردن آرشیو" : lang === "tr" ? "Arşivi aç" : "Open archive"}
+            {lang === "fa" ? "باز کردن آرشیو" : "Open archive"}
             <span aria-hidden className="ms-2">
               {lang === "fa" ? "←" : "→"}
             </span>
@@ -689,7 +674,7 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
               lang === "fa" ? "tracking-[0]" : "uppercase tracking-[0.22em]"
             }`}
           >
-            {lang === "fa" ? "باز کردن آرشیو وب‌سایت‌ها" : lang === "tr" ? "Web arşivini aç" : "Open websites archive"}
+            {lang === "fa" ? "باز کردن آرشیو وب‌سایت‌ها" : "Open websites archive"}
             <span aria-hidden className="ms-2">
               {lang === "fa" ? "←" : "→"}
             </span>
@@ -758,10 +743,7 @@ function MadlabHomeSection({ lang }: { lang: LangKey }) {
           <div className="max-w-md">
             <p className={`text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
               {lang === "fa"
-                ? "آزمایشگاه شخصی من برای ساخت کامپوننت‌ها، تعامل‌ها و تجربه‌های بصری از صفر."
-                : lang === "tr"
-                  ? "Bileşenleri, etkileşimleri ve görsel deneyleri sıfırdan kurduğum kişisel laboratuvar."
-                  : "A personal lab for building components, interactions, and visual experiments from scratch."}
+                ? "آزمایشگاه شخصی من برای ساخت کامپوننت‌ها، تعامل‌ها و تجربه‌های بصری از صفر." : "A personal lab for building components, interactions, and visual experiments from scratch."}
             </p>
             <Link
               href="/lab"
@@ -854,22 +836,14 @@ function NFTSection({ lang }: { lang: LangKey }) {
             <span>03 / 03</span>
             <span>
               {NFT_ITEMS.length}{" "}
-              {lang === "fa" ? "اثر" : lang === "tr" ? "edisyon" : "editions"}
+              {lang === "fa" ? "اثر" : "editions"}
             </span>
           </div>
           <motion.h2 className={`mt-6 max-w-[11ch] text-[clamp(3.75rem,12vw,12rem)] font-black uppercase leading-[0.73] tracking-[-0.1em] ${localeCase(lang)} ${trackHeading(lang)}`} style={{ y: headingY }}>
-            {lang === "fa"
-              ? "مجموعه NFT"
-              : lang === "tr"
-                ? "NFT KOLEKSİYONU"
-                : "NFT COLLECTION"}
+            {lang === "fa" ? "مجموعه NFT" : "NFT COLLECTION"}
           </motion.h2>
           <p className={`mt-7 max-w-md text-sm leading-relaxed text-black/70 sm:text-base ${localeCase(lang)}`}>
-            {lang === "fa"
-              ? "تمام نسخه‌ها در یک فید متحرک؛ هر اثر به صفحه‌ی اصلی خودش لینک شده است."
-              : lang === "tr"
-                ? "Her edisyon tek bir hareketli akışta; her parça kendi mint sayfasına bağlı."
-                : "Every edition in one moving feed, with each piece linked to its original mint page."}
+            {lang === "fa" ? "تمام نسخه‌ها در یک فید متحرک؛ هر اثر به صفحه‌ی اصلی خودش لینک شده است." : "Every edition in one moving feed, with each piece linked to its original mint page."}
           </p>
           <Link
             href="/works/nft-collection"
@@ -877,7 +851,7 @@ function NFTSection({ lang }: { lang: LangKey }) {
               lang === "fa" ? "tracking-[0]" : "uppercase tracking-[0.22em]"
             }`}
           >
-            {lang === "fa" ? "باز کردن آرشیو NFT" : lang === "tr" ? "NFT arşivini aç" : "Open NFT archive"}
+            {lang === "fa" ? "باز کردن آرشیو NFT" : "Open NFT archive"}
             <span aria-hidden className="ms-2">
               {lang === "fa" ? "←" : "→"}
             </span>
@@ -926,17 +900,10 @@ function NFTSection({ lang }: { lang: LangKey }) {
           <ProjectMarquee
             text={
               lang === "fa"
-                ? "مجموعه NFT"
-                : lang === "tr"
-                  ? "NFT KOLEKSİYONU"
-                  : "NFT COLLECTION"
+                ? "مجموعه NFT" : "NFT COLLECTION"
             }
             accessibleLabel={
-              lang === "fa"
-                ? "مجموعه NFT"
-                : lang === "tr"
-                  ? "NFT KOLEKSİYONU"
-                  : "NFT Collection"
+              lang === "fa" ? "مجموعه NFT" : "NFT Collection"
             }
             stripBackground="rgba(0, 105, 135, 0.34)"
             textColor="#c9f7ff"
@@ -946,19 +913,11 @@ function NFTSection({ lang }: { lang: LangKey }) {
 
           <div className="mt-8 flex flex-col gap-4 pt-0 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
             <p className={`max-w-md text-sm leading-relaxed text-black/70 sm:text-base ${localeCase(lang)}`}>
-              {lang === "fa"
-                ? "مجموعه‌ای از آثار دیجیتال مستقل، هرکدام با صفحه‌ی اختصاصی برای مشاهده و مینت."
-                : lang === "tr"
-                  ? "Her biri görüntüleme ve mint için kendi sayfasına sahip bağımsız dijital parçalar koleksiyonu."
-                  : "A collection of independent digital pieces, each with its own page for viewing and minting."}
+              {lang === "fa" ? "مجموعه‌ای از آثار دیجیتال مستقل، هرکدام با صفحه‌ی اختصاصی برای مشاهده و مینت." : "A collection of independent digital pieces, each with its own page for viewing and minting."}
             </p>
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/75">
               {NFT_ITEMS.length} / {NFT_ITEMS.length} ·{" "}
-              {lang === "fa"
-                ? "نسخه‌های تاییدشده"
-                : lang === "tr"
-                  ? "doğrulanmış edisyonlar"
-                  : "verified editions"}
+              {lang === "fa" ? "نسخه‌های تاییدشده" : "verified editions"}
             </span>
           </div>
         </div>
@@ -983,7 +942,7 @@ export function WorksScroll({
               {lang === "fa" ? "آثار" : "WORKS"}
             </h2>
             <p className={`mt-8 max-w-sm text-sm leading-relaxed text-white/55 sm:text-base ${localeCase(lang)}`}>
-              {lang === "fa" ? "هر ژانر، یک فصل مستقل با ریتم و زبان تصویری مخصوص خودش." : lang === "tr" ? "Her tür, kendi ritmi ve görsel dili olan bağımsız bir bölüm." : "Each genre is its own chapter, with a distinct visual language and motion rhythm."}
+              {lang === "fa" ? "هر ژانر، یک فصل مستقل با ریتم و زبان تصویری مخصوص خودش." : "Each genre is its own chapter, with a distinct visual language and motion rhythm."}
             </p>
           </div>
         </div>

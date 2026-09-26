@@ -11,7 +11,7 @@ import { ReactBitsLivePreview } from "./ReactBitsLivePreview";
 
 const CATEGORIES: Array<"ALL" | ReactBitsFreeCategory> = ["ALL", "ANIMATIONS", "BACKGROUNDS", "COMPONENTS", "TEXT ANIMATIONS"];
 
-function CatalogCard({ item, lang }: { item: ReactBitsFreeItem; lang: "en" | "fa" | "tr" }) {
+function CatalogCard({ item, lang }: { item: ReactBitsFreeItem; lang: "en" | "fa" }) {
   return (
     <article id={item.slug} className="group min-w-0 scroll-mt-32">
       <div className="relative">

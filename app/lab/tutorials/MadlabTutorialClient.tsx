@@ -13,7 +13,7 @@ import { getTutorialForItem } from "./tutorial-data";
 export default function MadlabTutorialClient({ item }: { item: ReactBitsFreeItem }) {
   const [lang] = usePreferredLang();
   const tutorial = getTutorialForItem(item);
-  const text = (copy: { en: string; fa: string; tr: string }) => copy[lang];
+  const text = (copy: { en: string; fa: string }) => copy[lang];
   const tx = (key: Parameters<typeof madlabText>[1]) => madlabText(lang, key);
 
   return (

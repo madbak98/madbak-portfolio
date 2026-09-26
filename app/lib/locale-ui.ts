@@ -4,17 +4,16 @@ import type { LangKey } from "./portfolio-data";
 export const LANGUAGE_DISPLAY: Record<LangKey, string> = {
   en: "English",
   fa: "فارسی",
-  tr: "Türkçe",
 };
 
-/** Root typography + optional Turkish tuning */
+/** Root typography classes for the active locale */
 export function rootLocaleClasses(lang: LangKey): string {
   if (lang === "fa") return "lang-fa";
-  return lang === "tr" ? "lang-latin lang-tr" : "lang-latin";
+  return "lang-latin";
 }
 
-export function htmlLangAttr(lang: LangKey): "en" | "fa" | "tr" {
-  return lang === "fa" ? "fa" : lang === "tr" ? "tr" : "en";
+export function htmlLangAttr(lang: LangKey): "en" | "fa" {
+  return lang === "fa" ? "fa" : "en";
 }
 
 /**
@@ -24,7 +23,7 @@ export function localeCase(lang: LangKey): string {
   return lang === "fa" ? "normal-case" : "uppercase";
 }
 
-/** Brand-only Latin lockups (MADBAK, EN/FA/TR codes, Sys_Boot) */
+/** Brand-only Latin lockups (MADBAK, EN/FA codes, Sys_Boot) */
 export function brandUppercase(): string {
   return "uppercase";
 }
@@ -56,9 +55,8 @@ export function heroSubTracking(lang: LangKey): string {
     : "tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.28em]";
 }
 
-/** Turkish long words + FA paragraph rhythm */
+/** FA paragraph rhythm vs Latin leading */
 export function bodyProse(lang: LangKey): string {
-  if (lang === "tr") return "text-pretty hyphens-auto [overflow-wrap:anywhere] leading-[1.65] sm:leading-[1.7]";
   if (lang === "fa")
     return "text-pretty [overflow-wrap:anywhere] leading-[1.82] sm:leading-[1.78] tracking-[0]";
   return "text-pretty leading-relaxed";
@@ -67,14 +65,10 @@ export function bodyProse(lang: LangKey): string {
 export function leadProse(lang: LangKey): string {
   if (lang === "fa")
     return "text-pretty [overflow-wrap:anywhere] leading-[1.38] sm:leading-[1.34] tracking-[0]";
-  if (lang === "tr")
-    return "text-pretty hyphens-auto [overflow-wrap:anywhere] leading-[1.1] sm:leading-[1.08]";
   return "text-pretty leading-[1.1]";
 }
 
 export function modalBody(lang: LangKey): string {
-  if (lang === "tr")
-    return "text-pretty hyphens-auto [overflow-wrap:anywhere] leading-relaxed";
   if (lang === "fa")
     return "text-pretty [overflow-wrap:anywhere] leading-[1.82] tracking-[0]";
   return "text-pretty leading-relaxed";

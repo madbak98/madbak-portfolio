@@ -110,7 +110,7 @@ export function HomeAboutPetSection() {
             id="home-about-title"
             className={`max-w-[18ch] text-[clamp(1.75rem,5vw,2.75rem)] font-black leading-[0.95] tracking-tight ${localeCase(lang)} ${trackHeading(lang)}`}
           >
-            talk to the machine
+            {lang === "fa" ? "با ماشین حرف بزن" : "talk to the machine"}
           </h2>
         </div>
 
@@ -129,14 +129,16 @@ export function HomeAboutPetSection() {
           )}
 
           {consoleMount ? (
-            <GameConsole3D className="home-about-machine__console" />
+            <GameConsole3D className="home-about-machine__console" lang={lang} />
           ) : null}
         </div>
 
         <p
           className={`home-about-machine__footnote font-mono text-[11px] leading-relaxed text-black/40 ${localeCase(lang)} ${trackMeta(lang)}`}
         >
-          the resume got bored. ask the pet instead.
+          {lang === "fa"
+            ? "رزومه حوصله‌ش سر رفته. برو از پت بپرس."
+            : "the resume got bored. ask the pet instead."}
         </p>
       </div>
     </section>

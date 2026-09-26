@@ -257,122 +257,6 @@ const SERVICES: Record<LangKey, ServicePackage[]> = {
       featured: true,
     },
   ],
-  tr: [
-    {
-      index: "01",
-      title: "Landing Page Paketi",
-      price: "$900 – $1,400",
-      description: "Keskin bir görsel yön ve yayına çıkmak için gereken her şeyi içeren odaklı tek sayfalık lansman deneyimi.",
-      includesLabel: "İçerik",
-      includes: [
-        "Tek sayfalık landing page tasarımı ve geliştirmesi",
-        "Modern, özgün UI tasarımı",
-        "Mobil ve masaüstü için tam responsive yapı",
-        "Basit animasyonlar ve mikro etkileşimler",
-        "İletişim formu",
-        "Vercel deployment ve domain bağlantısı",
-      ],
-      suitableLabel: "Uygun olduğu projeler",
-      suitableFor: "Startup’lar, ürün tanıtımları ve reklam kampanyaları",
-    },
-    {
-      index: "02",
-      title: "Kişisel / Portfolyo Sitesi",
-      price: "$1,500 – $2,200",
-      description: "Çalışmalarınızı, hikâyenizi ve bakış açınızı güçlü bir portfolyoya dönüştüren kişisel dijital alan.",
-      includesLabel: "İçerik",
-      includes: [
-        "4–6 sayfalık kişisel veya portfolyo sitesi",
-        "Hafif görsel kimlik yönü",
-        "Animasyon ve scroll etkileşimleri",
-        "Tam responsive yapı",
-        "İletişim formu",
-        "İlk SEO ve performans optimizasyonu",
-        "Deployment ve domain bağlantısı",
-      ],
-      suitableLabel: "Uygun olduğu projeler",
-      suitableFor: "Freelancer’lar, tasarımcılar, geliştiriciler ve sanatçılar",
-    },
-    {
-      index: "03",
-      title: "Kurumsal / Şirket Sitesi",
-      price: "$2,400 – $3,500",
-      description: "Netlik, güven ve büyüme alanına ihtiyaç duyan işletmeler için eksiksiz ve güvenilir bir web sistemi.",
-      includesLabel: "İçerik",
-      includes: [
-        "6–10 sayfalık kurumsal web sitesi",
-        "Tam UI / UX tasarımı",
-        "Tipografi ve renk sistemi",
-        "Scroll animasyonları ve geçişler",
-        "İhtiyaca göre çoklu dil",
-        "Gelişmiş formlar",
-        "Temel teknik SEO",
-        "Deployment ve performans optimizasyonu",
-      ],
-      suitableLabel: "Uygun olduğu projeler",
-      suitableFor: "Şirketler, ajanslar, klinikler ve hizmet işletmeleri",
-    },
-    {
-      index: "04",
-      title: "Yaratıcı / Sinematik Web Sitesi",
-      price: "$3,800 – $5,500",
-      description: "Sanat yönetimi, hareket ve scroll tabanlı hikâye anlatımını tek bir premium deneyimde buluşturan site.",
-      includesLabel: "İçerik",
-      includes: [
-        "Sinematik ve interaktif web sitesi tasarımı ve geliştirmesi",
-        "Tam sanat yönetimi",
-        "GSAP / Framer Motion ile gelişmiş animasyonlar",
-        "Scroll tabanlı hikâye anlatımı",
-        "İnteraktif ve motion-driven öğeler",
-        "Özgün ve premium görsel yön",
-        "Performans optimizasyonu ve hassas responsive yapı",
-        "Profesyonel deployment",
-      ],
-      suitableLabel: "Uygun olduğu projeler",
-      suitableFor: "Yaratıcı markalar, moda, sanat, lüks ve reklam ajansları",
-      featured: true,
-    },
-    {
-      index: "05",
-      title: "İleri Etkileşimli / Web3 Sitesi",
-      price: "$5,800 – $8,500",
-      description: "Derinlik, hareket ve ölçeklenebilir teknik altyapı isteyen iddialı ürünler için karmaşık interaktif deneyim.",
-      includesLabel: "İçerik",
-      includes: [
-        "Karmaşık web sitesinin tam tasarım ve geliştirmesi",
-        "Uygun olduğunda 3D / WebGL öğeleriyle güçlü etkileşim",
-        "İleri sanat yönetimi ve motion design",
-        "Çoklu dil ve RTL desteği",
-        "Ölçeklenebilir component sistemi ve yapı",
-        "Performans, SEO ve erişilebilirlik optimizasyonu",
-        "Lansman sonrası ilk destek",
-      ],
-      suitableLabel: "Uygun olduğu projeler",
-      suitableFor: "Web3, crypto, fintech ve premium marka projeleri",
-      featured: true,
-    },
-    {
-      index: "06",
-      title: "Tam Yaratıcı Ürün Paketi",
-      price: "$9,000 – $14,000",
-      discountPrice: "$5,850 – $9,100",
-      description: "İlk fikirden farklılaşan, tamamlanmış ve dokümante edilmiş dijital ürüne kadar uçtan uca yaratıcı ortaklık.",
-      includesLabel: "İçerik",
-      includes: [
-        "Konseptten tamamlanmış ürüne",
-        "Creative direction ve brand visual direction",
-        "Tam UI / UX tasarımı ve design system",
-        "Next.js ile full frontend geliştirme",
-        "İleri animasyon ve interaktif deneyim",
-        "MVP veya ürünün ilk versiyonu",
-        "Tam optimizasyon, deployment ve dokümantasyon",
-        "İlk destek ve revizyonlar",
-      ],
-      suitableLabel: "Uygun olduğu projeler",
-      suitableFor: "Gerçek ve farklılaşan dijital ürün kurmak isteyen startup’lar",
-      featured: true,
-    },
-  ],
 };
 
 const INTRO: Record<LangKey, { eyebrow: string; title: string; description: string; cta: string }> = {
@@ -388,24 +272,16 @@ const INTRO: Record<LangKey, { eyebrow: string; title: string; description: stri
     description: "از اولین مسیر بصری تا آخرین خط کد، به ایده‌های بلندپروازانه کمک می‌کنم شفاف، ملموس و آماده دنیای واقعی شوند.",
     cta: "شروع گفتگو",
   },
-  tr: {
-    eyebrow: "[005] HİZMETLER",
-    title: "BAKIŞ AÇISI OLAN BİR ŞEY ÜRETELİM.",
-    description: "İlk görsel yönden son kod satırına kadar iddialı fikirlerin net, dokunsal ve gerçek dünyaya hazır deneyimlere dönüşmesine yardımcı oluyorum.",
-    cta: "Konuşmaya başlayalım",
-  },
 };
 
 const WEEKLY_OFFER: Record<LangKey, { label: string; days: string }> = {
   en: { label: "35% OFF", days: "THU–FRI" },
   fa: { label: "۳۵٪ تخفیف", days: "پنج‌شنبه و جمعه" },
-  tr: { label: "%35 İNDİRİM", days: "PERŞ–CUMA" },
 };
 
 const PACKAGE_CONTACT_CTA: Record<LangKey, string> = {
   en: "Ask about this package",
   fa: "درخواست این پکیج",
-  tr: "Bu paket hakkında konuş",
 };
 
 function telegramServiceHref(
@@ -417,18 +293,10 @@ function telegramServiceHref(
     ? service.discountPrice
     : service.price;
   const offerNote = isOfferActive && service.discountPrice
-    ? lang === "fa"
-      ? " (با ۳۵٪ تخفیف پنج‌شنبه و جمعه)"
-      : lang === "tr"
-        ? " (%35 Perşembe–Cuma indirimiyle)"
-        : " (with the 35% Thursday–Friday offer)"
+    ? lang === "fa" ? " (با ۳۵٪ تخفیف پنج‌شنبه و جمعه)" : " (with the 35% Thursday–Friday offer)"
     : "";
   const message =
-    lang === "fa"
-      ? `سلام بابک، درباره «${service.title}» با قیمت ${price}${offerNote} علاقه‌مندم. می‌خواهم درباره پروژه‌ام صحبت کنم.`
-      : lang === "tr"
-        ? `Merhaba Babak, ${service.title} paketiyle (${price}${offerNote}) ilgileniyorum. Projem hakkında konuşmak istiyorum.`
-        : `Hi Babak, I’m interested in the ${service.title} package (${price}${offerNote}). I’d like to discuss my project.`;
+    lang === "fa" ? `سلام بابک، درباره «${service.title}» با قیمت ${price}${offerNote} علاقه‌مندم. می‌خواهم درباره پروژه‌ام صحبت کنم.` : `Hi Babak, I’m interested in the ${service.title} package (${price}${offerNote}). I’d like to discuss my project.`;
 
   const telegramUrl = new URL(SOCIAL_LINKS.telegram);
   telegramUrl.searchParams.set("text", message);
@@ -607,11 +475,11 @@ export default function ServicesPage() {
 
         <section className="border-t border-white/12 px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
           <div className="mx-auto flex max-w-[1400px] flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
-            <p className="max-w-2xl text-[clamp(1.7rem,4vw,4rem)] font-black leading-[0.95] tracking-[-0.06em]">{lang === "fa" ? "هر پروژه از یک گفت‌وگوی خوب شروع می‌شود." : lang === "tr" ? "Her proje iyi bir konuşmayla başlar." : "Every project starts with a good conversation."}</p>
+            <p className="max-w-2xl text-[clamp(1.7rem,4vw,4rem)] font-black leading-[0.95] tracking-[-0.06em]">{lang === "fa" ? "هر پروژه از یک گفت‌وگوی خوب شروع می‌شود." : "Every project starts with a good conversation."}</p>
             <Link href={SOCIAL_LINKS.telegram} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[48px] w-fit items-center rounded-full bg-[#ff2a2a] px-6 font-mono text-[10px] text-[#0A0A0A] transition-transform hover:scale-[1.03]">{copy.cta}<span className="ms-3" aria-hidden>→</span></Link>
           </div>
           <nav
-            aria-label={lang === "fa" ? "نمونه‌کارها" : lang === "tr" ? "Portföy" : "Selected work"}
+            aria-label={lang === "fa" ? "نمونه‌کارها" : "Selected work"}
             className="mx-auto mt-12 flex max-w-[1400px] flex-wrap gap-x-5 gap-y-3 border-t border-white/12 pt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-white/40"
           >
             <Link href="/works/websites" className="transition-colors hover:text-[#ebe8e1]">Websites</Link>

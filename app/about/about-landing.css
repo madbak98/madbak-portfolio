@@ -378,15 +378,21 @@
     width: 100%;
     max-width: none;
     height: auto;
-    gap: 0.55rem;
+    gap: calc(0.75rem + var(--opt-raise, 3px));
     border: 0;
     background: transparent;
     box-shadow: none;
   }
 
+  .about-crt-stage__inner .madbak-pet__options[dir="rtl"] {
+    align-items: stretch;
+  }
+
   .about-crt-stage__inner .madbak-pet__option {
     width: auto;
     max-width: 100%;
+    padding-block: 0.75rem;
+    padding-inline: 1.35rem;
   }
 
   .about-crt-stage__hint {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bevan, Geist, Geist_Mono, Vazirmatn } from "next/font/google";
 import { SiteCursor } from "./components/SiteCursor";
 import { SitePetCompanion } from "./components/SitePetCompanion";
+import { SiteGuardians } from "./components/guardians/SiteGuardians";
 import {
   absoluteUrl,
   DEFAULT_OG_IMAGE_HEIGHT,
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    alternateLocale: ["fa_IR", "tr_TR"],
+    alternateLocale: ["fa_IR"],
     url: absoluteUrl("/"),
     siteName: SITE_NAME,
     title: home.title,
@@ -117,6 +118,7 @@ export default function RootLayout({
     >
       <body className="min-h-full overflow-x-hidden">
         {children}
+        <SiteGuardians />
         <SiteCursor />
         <SitePetCompanion />
       </body>

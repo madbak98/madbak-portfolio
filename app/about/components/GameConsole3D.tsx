@@ -167,7 +167,12 @@ function ensureLcdUvs(mesh: Mesh) {
   geom.attributes.uv.needsUpdate = true;
 }
 
-function applyCoverUv(texture: VideoTexture, screenAspect: number) {
+function applyCoverUv(
+  texture: VideoTexture,
+  screenAspect: number,
+  /** Extra horizontal flip for when console scale.x is opposite of the UV bake. */
+  flipHorizontal = false,
+) {
   const video = texture.image as HTMLVideoElement | undefined;
   const vw = video?.videoWidth || 16;
   const vh = video?.videoHeight || 9;
@@ -185,6 +190,13 @@ function applyCoverUv(texture: VideoTexture, screenAspect: number) {
     texture.repeat.set(1, s);
     texture.offset.set(0, (1 - s) / 2);
   }
+
+  // UV bake assumes EN console scale.x = -1. FA uses +1 → flip map once more.
+  if (flipHorizontal) {
+    texture.offset.x = 1 - texture.offset.x - texture.repeat.x;
+    texture.repeat.x *= -1;
+  }
+
   texture.needsUpdate = true;
 }
 
@@ -321,10 +333,13 @@ function ConsoleModel({
   texture,
   video,
   generation,
+  /** Persian/RTL: horizontal mirror of the EN console orientation. */
+  mirrorHorizontal,
 }: {
   texture: VideoTexture;
   video: HTMLVideoElement;
   generation: number;
+  mirrorHorizontal: boolean;
 }) {
   const gltf = useLoader(GLTFLoader, MODEL_PATH);
   const invalidate = useThree((s) => s.invalidate);
@@ -335,9 +350,13 @@ function ConsoleModel({
     [gltf, texture, generation],
   );
 
+  // EN keeps the existing orientation (scale.x = -1).
+  // FA mirrors left↔right only (scale.x = +1).
+  const scaleX = mirrorHorizontal ? 1 : -1;
+
   useLayoutEffect(() => {
     const apply = () => {
-      applyCoverUv(texture, prepared.screenAspect);
+      applyCoverUv(texture, prepared.screenAspect, mirrorHorizontal);
       invalidate();
     };
 
@@ -365,10 +384,17 @@ function ConsoleModel({
       video.removeEventListener("loadedmetadata", apply);
       window.cancelAnimationFrame(raf);
     };
-  }, [prepared.screenAspect, texture, video, invalidate, generation]);
+  }, [
+    prepared.screenAspect,
+    texture,
+    video,
+    invalidate,
+    generation,
+    mirrorHorizontal,
+  ]);
 
   return (
-    <group rotation={[0.1, 0.18, 0]} scale={[-1, 1, 1]}>
+    <group rotation={[0.1, 0.18, 0]} scale={[scaleX, 1, 1]}>
       <primitive object={prepared.root} />
     </group>
   );
@@ -376,15 +402,34 @@ function ConsoleModel({
 
 type GameConsole3DProps = {
   className?: string;
+  lang?: "en" | "fa";
 };
 
 /**
  * Static handheld game-console with LCD VideoTexture (+ sound toggle).
  * Video/audio are independent of Pet dialogue.
  */
-export function GameConsole3D({ className = "" }: GameConsole3DProps) {
+export function GameConsole3D({ className = "", lang = "en" }: GameConsole3DProps) {
   const { texture, video, soundOn, toggleSound, ready, generation } =
     useConsoleVideo(VIDEO_PLAYLIST);
+
+  const soundLabel =
+    lang === "fa"
+      ? soundOn
+        ? "قطع صدای کنسول"
+        : "روشن کردن صدای کنسول"
+      : soundOn
+        ? "Turn console sound off"
+        : "Turn console sound on";
+
+  const soundText =
+    lang === "fa"
+      ? soundOn
+        ? "صدا روشن"
+        : "صدا خاموش"
+      : soundOn
+        ? "SOUND ON"
+        : "SOUND OFF";
 
   return (
     <div className={["game-console-3d", className].filter(Boolean).join(" ")}>
@@ -414,6 +459,7 @@ export function GameConsole3D({ className = "" }: GameConsole3DProps) {
                   texture={texture}
                   video={video}
                   generation={generation}
+                  mirrorHorizontal={lang === "fa"}
                 />
               ) : null}
             </Suspense>
@@ -429,11 +475,9 @@ export function GameConsole3D({ className = "" }: GameConsole3DProps) {
         ].join(" ")}
         onClick={toggleSound}
         aria-pressed={soundOn}
-        aria-label={
-          soundOn ? "Turn console sound off" : "Turn console sound on"
-        }
+        aria-label={soundLabel}
       >
-        {soundOn ? "SOUND ON" : "SOUND OFF"}
+        {soundText}
       </button>
     </div>
   );

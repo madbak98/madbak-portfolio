@@ -790,16 +790,16 @@ export default function HomePage() {
               }`}
             >
               <Link href="/works/websites" className="transition-opacity hover:opacity-100 hover:text-white">
-                {lang === "fa" ? "وب‌سایت‌ها" : lang === "tr" ? "Web Siteleri" : "Websites"}
+                {lang === "fa" ? "وب‌سایت‌ها" : "Websites"}
               </Link>
               <Link href="/works/character-design" className="transition-opacity hover:opacity-100 hover:text-white">
-                {lang === "fa" ? "طراحی کاراکتر" : lang === "tr" ? "Karakter Tasarımı" : "Character Design"}
+                {lang === "fa" ? "طراحی کاراکتر" : "Character Design"}
               </Link>
               <Link href="/works/ai-influencer" className="transition-opacity hover:opacity-100 hover:text-white">
-                {lang === "fa" ? "اینفلوئنسر AI" : lang === "tr" ? "YZ Influencer" : "AI Influencer"}
+                {lang === "fa" ? "اینفلوئنسر AI" : "AI Influencer"}
               </Link>
               <Link href="/works/nft-collection" className="transition-opacity hover:opacity-100 hover:text-white">
-                {lang === "fa" ? "مجموعه NFT" : lang === "tr" ? "NFT Koleksiyonu" : "NFT Collection"}
+                {lang === "fa" ? "مجموعه NFT" : "NFT Collection"}
               </Link>
               <Link href="/services" className="transition-opacity hover:opacity-100 hover:text-white">
                 {t("nav_services")}

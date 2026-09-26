@@ -261,7 +261,7 @@ export function SiteNav({
             role="group"
             aria-label={t("nav_lang_aria")}
           >
-            {(["en", "fa", "tr"] as const).map((code) => {
+            {(["en", "fa"] as const).map((code) => {
               const active = lang === code;
               return (
                 <button
@@ -508,7 +508,7 @@ export function MobileNavOverlay({
           role="group"
           aria-label={t("nav_lang_aria")}
         >
-          {(["en", "fa", "tr"] as const).map((code) => {
+          {(["en", "fa"] as const).map((code) => {
             const active = lang === code;
             return (
               <button
@@ -667,10 +667,10 @@ export function MobileNavOverlay({
             <p
               className={`mb-2 font-mono text-[9px] text-white/35 ${localeCase(lang)} ${trackMeta(lang)}`}
             >
-              {lang === "fa" ? "زبان" : lang === "tr" ? "Dil" : "Language"}
+              {lang === "fa" ? "زبان" : "Language"}
             </p>
             <div className="flex flex-col gap-1.5 border-b border-white/10 pb-6">
-              {(["en", "fa", "tr"] as const).map((code, i) => (
+              {(["en", "fa"] as const).map((code, i) => (
                 <motion.button
                   key={code}
                   type="button"
