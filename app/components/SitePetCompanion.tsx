@@ -15,7 +15,7 @@ import { FloatingPetComputer } from "./FloatingPetComputer";
  * Layout-level Pet host — persistent floating Old PC + Pet companion.
  *
  * /       → floating (hidden while homepage #about is in view)
- * /about  → none here (AboutPage owns the dedicated CRT installation)
+ * /about  → none (editorial About; no Pet)
  * others  → floating companion with route-aware dialogue
  */
 export function SitePetCompanion() {
@@ -82,7 +82,7 @@ export function SitePetCompanion() {
     };
   }, [isHome]);
 
-  // /about CRT is owned by AboutPage — do not mount a second Pet
+  // /about is editorial — no Pet mount on this route
   if (presentation !== "floating") return null;
 
   const suppressed = isHome && aboutInView;

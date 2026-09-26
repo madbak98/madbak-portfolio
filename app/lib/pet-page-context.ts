@@ -86,11 +86,12 @@ export type PetPresentation = "none" | "installation" | "floating";
 
 /**
  * Visual presentation only — conversation always uses the shared MadbakPet engine.
- * installation = dedicated /about CRT (AboutPage owns it)
+ * none = no Pet on this route (/about is editorial; Pet lives on homepage + floating)
  * floating = persistent compact Old PC companion (homepage + other routes)
+ * installation = reserved (unused; homepage About owns the CRT install)
  */
 export function petPresentationForContext(ctx: PetPageContext): PetPresentation {
-  if (ctx.pageType === "about") return "installation";
+  if (ctx.pageType === "about") return "none";
   return "floating";
 }
 

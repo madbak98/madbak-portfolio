@@ -8,8 +8,6 @@ import { TRANSLATIONS } from "../lib/portfolio-data";
 import { aboutText } from "../lib/about-i18n";
 import { usePreferredLang } from "../lib/locale-preference";
 import { htmlLangAttr, rootLocaleClasses } from "../lib/locale-ui";
-import { resolvePetPageContext } from "../lib/pet-page-context";
-import { AboutPetComputer } from "./components/AboutPetComputer";
 import { GlassCard } from "./components/GlassCard";
 import { PageScrollVideo } from "./components/PageScrollVideo";
 import { ScrollRevealObserver } from "./components/ScrollRevealObserver";
@@ -103,39 +101,29 @@ export default function AboutPage() {
       <main className="about-landing__content">
         <ScrollRevealObserver />
 
-        {/* 01 CRT Operator installation — primary About experience */}
+        {/* 01 Hero — editorial About; Pet lives on homepage / floating routes only */}
         <section
-          className="about-crt-stage"
+          className="about-hero about-hero--copy-only"
           id="top"
           aria-labelledby="about-hero-title"
         >
-          <div className="about-crt-stage__inner" data-scroll-reveal>
-            <div className="about-crt-stage__label">
-              <span>OPERATOR</span>
-              <span className="unicode-bidi-isolate tabular-nums">( ID: 001 )</span>
-            </div>
-            <p className="about-kicker about-crt-stage__kicker">MADBAK / ABOUT</p>
-            <h1 id="about-hero-title" className="about-crt-stage__title">
-              {a("heroHeadline1")} {a("heroHeadline2")}
+          <div className="about-hero__copy" data-scroll-reveal>
+            <p className="about-kicker">MADBAK / ABOUT</p>
+            <h1 id="about-hero-title" className="about-display about-hero__headline">
+              {a("heroHeadline1")}
+              <br />
+              {a("heroHeadline2")}
             </h1>
-            <p className="about-crt-stage__status">
+            <p className="about-hero__sub">{a("heroSub")}</p>
+            <p className="about-hero__axes">{a("heroAxes")}</p>
+            <GlassCard className="about-hero__status">
               <i aria-hidden />
               {a("status")}
-            </p>
-
-            <AboutPetComputer
-              pageContext={resolvePetPageContext("/about")}
-              lang={lang}
-              portraitAlt={a("portraitAlt")}
-              reducedMotion={prefersReducedMotion}
-              layout="split"
-            />
-
-            <p className="about-crt-stage__hint">the machine knows more than the resume.</p>
+            </GlassCard>
           </div>
         </section>
 
-        {/* Selected work — still browseable after conversation */}
+        {/* Selected work */}
         <section className="about-section" aria-labelledby="about-work-title">
           <p className="about-kicker" data-scroll-reveal>
             ARCHIVE
