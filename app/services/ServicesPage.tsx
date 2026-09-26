@@ -500,6 +500,7 @@ export default function ServicesPage() {
         worksMenuOpen={worksMenuOpen}
         setWorksMenuOpen={setWorksMenuOpen}
         homeLinks={false}
+        size="lg"
       />
       <MobileNavOverlay
         lang={lang}
@@ -512,9 +513,10 @@ export default function ServicesPage() {
         homeLinks={false}
         worksAccordionOpen={worksAccordionOpen}
         setWorksAccordionOpen={setWorksAccordionOpen}
+        size="lg"
       />
 
-      <main className="pt-14 sm:pt-[3.75rem]">
+      <main className="pt-[8.5rem] sm:pt-[10.5rem] lg:pt-[7.5rem]">
         <section className="relative overflow-hidden border-b border-white/12 px-5 pb-20 pt-20 sm:px-8 sm:pb-28 sm:pt-28 lg:px-12 lg:pb-40">
           <div className="pointer-events-none absolute -end-8 top-8 select-none font-black text-[clamp(12rem,30vw,34rem)] leading-none tracking-[-0.15em] text-white/[0.035]" aria-hidden>
             05

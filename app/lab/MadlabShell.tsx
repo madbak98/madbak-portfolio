@@ -61,6 +61,7 @@ export function MadlabShell({ children }: { children: ReactNode }) {
         worksMenuOpen={worksMenuOpen}
         setWorksMenuOpen={setWorksMenuOpen}
         homeLinks={false}
+        size="lg"
       />
       <MobileNavOverlay
         lang={lang}
@@ -73,8 +74,9 @@ export function MadlabShell({ children }: { children: ReactNode }) {
         homeLinks={false}
         worksAccordionOpen={worksAccordionOpen}
         setWorksAccordionOpen={setWorksAccordionOpen}
+        size="lg"
       />
-      <div className="pt-14 sm:pt-[3.75rem]">{children}</div>
+      <div className="pt-[8.5rem] sm:pt-[10.5rem] lg:pt-[7.5rem]">{children}</div>
     </div>
   );
 }

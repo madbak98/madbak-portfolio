@@ -71,6 +71,7 @@ export function WorksPageShell({ category }: { category: WorkCategory }) {
         worksMenuOpen={worksMenuOpen}
         setWorksMenuOpen={setWorksMenuOpen}
         homeLinks={false}
+        size="lg"
       />
       <MobileNavOverlay
         lang={lang}
@@ -83,6 +84,7 @@ export function WorksPageShell({ category }: { category: WorkCategory }) {
         homeLinks={false}
         worksAccordionOpen={worksAccordionOpen}
         setWorksAccordionOpen={setWorksAccordionOpen}
+        size="lg"
       />
       <WorksCategoryPage category={category} lang={lang} />
     </div>

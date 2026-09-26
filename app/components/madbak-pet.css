@@ -1,61 +1,46 @@
-/* Persistent floating MADBAK pet — fixed to viewport */
-.madbak-pet {
-  --pet-size: 23rem;
-  --pet-bubble: #f7f4f1;
-  --pet-ink: #141416;
-  --pet-muted: rgba(20, 20, 22, 0.55);
-  --pet-accent: #ff2a2a;
-  position: fixed;
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(1.1rem, env(safe-area-inset-bottom));
-  z-index: 90;
-  width: min(23rem, calc(100vw - 1.5rem));
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.45s ease,
-    transform 0.45s ease;
-}
+/* Shared MADBAK Pet — full (About Operator) + compact (fixed companion) */
 
-.madbak-pet.is-ready {
-  opacity: 1;
-  transform: translateY(0);
+.madbak-pet {
+  --pet-ink: #0a0a0a;
+  --pet-muted: rgba(10, 10, 10, 0.55);
+  --pet-line: rgba(0, 0, 0, 0.12);
+  --pet-bubble: #ffffff;
+  --pet-accent: #ff2a2a;
+  --pet-size: 17.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .madbak-pet__stack {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 0.55rem;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
 }
 
 .madbak-pet__bubble {
   position: relative;
   width: 100%;
-  padding: 0.7rem 0.8rem 0.85rem;
-  border: 1px solid rgba(20, 20, 22, 0.08);
-  border-radius: 14px;
+  padding: 0.95rem 1.05rem 1.1rem;
+  border: 1px solid var(--pet-line);
+  border-radius: 2px;
   background: var(--pet-bubble);
-  box-shadow:
-    0 14px 36px rgba(0, 0, 0, 0.22),
-    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
   color: var(--pet-ink);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  pointer-events: none;
 }
 
 .madbak-pet__name {
   display: block;
-  margin-bottom: 0.28rem;
+  margin-bottom: 0.35rem;
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .madbak-pet__line {
-  min-height: 2.6em;
-  font-size: 0.68rem;
+  min-height: 3.1em;
+  font-size: 0.82rem;
   letter-spacing: 0.01em;
   line-height: 1.45;
 }
@@ -78,68 +63,50 @@
 
 .madbak-pet__tail {
   position: absolute;
-  right: 8.5rem;
+  left: 2.4rem;
   bottom: -7px;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   background: var(--pet-bubble);
-  border-right: 1px solid rgba(20, 20, 22, 0.08);
-  border-bottom: 1px solid rgba(20, 20, 22, 0.08);
+  border-right: 1px solid var(--pet-line);
+  border-bottom: 1px solid var(--pet-line);
   transform: rotate(45deg);
 }
 
 .madbak-pet__avatar {
+  position: relative;
   display: block;
   width: var(--pet-size);
-  height: var(--pet-size);
+  max-width: 100%;
+  aspect-ratio: 1;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   pointer-events: auto;
+  transition: transform 0.25s ease;
+}
+
+.madbak-pet__avatar:hover {
+  transform: translateY(-2px);
 }
 
 .madbak-pet__avatar:focus-visible {
   outline: 2px solid var(--pet-accent);
-  outline-offset: 3px;
-  border-radius: 8px;
+  outline-offset: 4px;
+  border-radius: 50%;
 }
 
-.madbak-pet__pc {
+.madbak-pet__ring {
   position: relative;
   display: block;
+  overflow: hidden;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.4));
-  animation: madbak-pet-breathe 4.2s ease-in-out infinite;
-}
-
-.madbak-pet.is-reduced .madbak-pet__pc {
-  animation: none;
-}
-
-.madbak-pet__pc-frame {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none;
-  object-fit: contain;
-  object-position: center bottom;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Teal CRT screen bounds measured from old-pc.png */
-.madbak-pet__screen {
-  position: absolute;
-  top: 19.59%;
-  left: 30.41%;
-  width: 39.18%;
-  height: 30.41%;
-  overflow: hidden;
-  border-radius: 2px;
-  background: #2a8f8a;
-  pointer-events: none;
+  border: 1px solid var(--pet-line);
+  border-radius: 50%;
+  background: #121214;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
 .madbak-pet__img {
@@ -150,22 +117,32 @@
   height: 100% !important;
   max-width: none;
   object-fit: cover;
-  object-position: center 18%;
+  object-position: center 16%;
   opacity: 0;
   pointer-events: none;
   image-rendering: pixelated;
-  transform: none;
 }
 
-.madbak-pet__img.madbak-pet__img--active {
+.madbak-pet__img--active {
   opacity: 1;
+}
+
+.madbak-pet__hint {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--pet-accent);
+  box-shadow: 0 0 0 3px rgba(255, 42, 42, 0.18);
 }
 
 .madbak-pet__options {
   display: grid;
-  gap: 0.28rem;
+  gap: 0.4rem;
   width: 100%;
-  margin: 0;
+  margin: 0.15rem 0 0;
   padding: 0;
   list-style: none;
   pointer-events: auto;
@@ -174,21 +151,19 @@
 .madbak-pet__option {
   display: flex;
   align-items: flex-start;
-  gap: 0.4rem;
+  gap: 0.55rem;
   width: 100%;
-  padding: 0.35rem 0.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  background: rgba(12, 12, 14, 0.55);
-  color: #f4f0f2;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--pet-line);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--pet-ink);
   cursor: pointer;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.01em;
+  font-family: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
   line-height: 1.35;
   text-align: start;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition:
     background 0.15s ease,
     border-color 0.15s ease;
@@ -196,59 +171,122 @@
 
 .madbak-pet__option-mark {
   flex: 0 0 auto;
-  color: rgba(244, 240, 242, 0.55);
+  color: rgba(10, 10, 10, 0.4);
 }
 
 .madbak-pet__option:hover,
 .madbak-pet__option:focus-visible {
-  background: rgba(255, 42, 42, 0.18);
+  background: rgba(255, 42, 42, 0.06);
   border-color: rgba(255, 42, 42, 0.45);
   outline: none;
 }
 
-@keyframes madbak-pet-breathe {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+/* ——— FULL (About Operator installation) ——— */
+.madbak-pet--full {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 22rem;
+}
+
+.madbak-pet--full .madbak-pet__stack {
+  align-items: flex-start;
+}
+
+/* ——— COMPACT (fixed viewport companion) ——— */
+.madbak-pet--compact {
+  --pet-size: 6.75rem;
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
+  z-index: 90;
+  width: min(16.5rem, calc(100vw - 1.5rem));
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.madbak-pet--compact.is-ready {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.madbak-pet--compact .madbak-pet__stack {
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.madbak-pet--compact .madbak-pet__bubble {
+  padding: 0.7rem 0.8rem 0.85rem;
+  border-radius: 10px;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  pointer-events: none;
+}
+
+.madbak-pet--compact .madbak-pet__line {
+  min-height: 2.4em;
+  font-size: 0.68rem;
+}
+
+.madbak-pet--compact .madbak-pet__name {
+  font-size: 0.65rem;
+}
+
+.madbak-pet--compact .madbak-pet__tail {
+  left: auto;
+  right: 2.1rem;
+}
+
+.madbak-pet--compact .madbak-pet__avatar {
+  width: var(--pet-size);
+}
+
+.madbak-pet--compact .madbak-pet__ring {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.madbak-pet--compact .madbak-pet__option {
+  font-size: 0.62rem;
+  padding: 0.45rem 0.55rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.madbak-pet--compact:not(.is-expanded) .madbak-pet__options {
+  display: none;
 }
 
 @media (max-width: 640px) {
-  .madbak-pet {
-    --pet-size: 14rem;
-    right: 0.7rem;
-    bottom: 0.85rem;
-    width: min(14rem, calc(100vw - 1.2rem));
+  .madbak-pet--full {
+    --pet-size: min(100%, 14rem);
+    max-width: none;
   }
 
-  .madbak-pet__bubble {
-    padding: 0.6rem 0.7rem 0.75rem;
+  .madbak-pet--full .madbak-pet__line {
+    font-size: 0.76rem;
   }
 
-  .madbak-pet__line {
-    font-size: 0.62rem;
-  }
-
-  .madbak-pet__option {
-    font-size: 0.55rem;
+  .madbak-pet--compact {
+    --pet-size: 5.75rem;
+    width: min(14.5rem, calc(100vw - 1.25rem));
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.9rem, env(safe-area-inset-bottom));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .madbak-pet,
-  .madbak-pet.is-ready {
-    transition: none;
-    transform: none;
-  }
-
-  .madbak-pet__pc {
-    animation: none;
-  }
-
+  .madbak-pet--compact,
+  .madbak-pet__avatar,
   .madbak-pet__option {
     transition: none;
+  }
+
+  .madbak-pet__avatar:hover {
+    transform: none;
   }
 }

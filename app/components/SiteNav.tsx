@@ -44,7 +44,7 @@ export function SiteNav({
   worksMenuOpen,
   setWorksMenuOpen,
   homeLinks = true,
-  size = "md",
+  size = "lg",
 }: {
   lang: LangKey;
   setLang: (code: LangKey) => void;
@@ -56,7 +56,7 @@ export function SiteNav({
   worksMenuOpen: boolean;
   setWorksMenuOpen: (open: boolean) => void;
   homeLinks?: boolean;
-  /** `lg` ≈ 2× scale (About page). */
+  /** Site-wide large nav is the default; `md` kept for rare compact cases. */
   size?: "md" | "lg";
 }) {
   const pathname = usePathname();
@@ -438,7 +438,7 @@ export function MobileNavOverlay({
   homeLinks = true,
   worksAccordionOpen,
   setWorksAccordionOpen,
-  size = "md",
+  size = "lg",
 }: {
   lang: LangKey;
   t: TFn;

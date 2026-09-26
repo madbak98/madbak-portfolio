@@ -1,18 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
-import { AboutPetCompanion } from "../about/components/AboutPetCompanion";
 import { aboutText } from "../lib/about-i18n";
 import { usePreferredLang } from "../lib/locale-preference";
+import {
+  petPresentationForContext,
+  resolvePetPageContext,
+} from "../lib/pet-page-context";
+import { MadbakPet } from "./MadbakPet";
 import "./madbak-pet.css";
 
 /**
- * Site-wide fixed Madbak pet — mounted once in the root layout.
+ * Layout-level Pet host.
+ *
+ * /        → none (homepage stays clean)
+ * /about   → none here (About page embeds MadbakPet mode="full")
+ * others   → compact fixed companion
  */
 export function SitePetCompanion() {
+  const pathname = usePathname();
   const [lang] = usePreferredLang();
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  const pageContext = useMemo(
+    () => resolvePetPageContext(pathname),
+    [pathname],
+  );
+  const presentation = petPresentationForContext(pageContext);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -22,8 +38,12 @@ export function SitePetCompanion() {
     return () => media.removeEventListener("change", sync);
   }, []);
 
+  if (presentation !== "compact") return null;
+
   return (
-    <AboutPetCompanion
+    <MadbakPet
+      mode="compact"
+      pageContext={pageContext}
       lang={lang}
       portraitAlt={aboutText(lang, "portraitAlt")}
       reducedMotion={reducedMotion}

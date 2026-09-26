@@ -64,7 +64,7 @@ export function MadlabComponentGallery() {
           </div>
         </header>
 
-        <div className="sticky top-14 z-20 -mx-5 border-b border-white/12 bg-[#0A0A0A]/95 px-5 py-4 backdrop-blur sm:top-[3.75rem] sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12">
+        <div className="sticky top-[8.5rem] z-20 -mx-5 border-b border-white/12 bg-[#0A0A0A]/95 px-5 py-4 backdrop-blur sm:top-[10.5rem] sm:-mx-8 sm:px-8 lg:top-[7.5rem] lg:-mx-12 lg:px-12">
           <div className="mx-auto flex max-w-[1600px] flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <label className="flex min-h-10 min-w-0 items-center gap-3 border border-white/15 px-3 focus-within:border-[#ff2a2a] lg:w-[20rem]">
               <span className="font-mono text-xs text-white/40" aria-hidden>⌕</span>

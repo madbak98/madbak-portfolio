@@ -39,7 +39,7 @@ export function MadlabHero() {
     <section
       ref={heroRef}
       aria-labelledby="madlab-hero-title"
-      className="relative isolate min-h-[calc(100svh-3.5rem)] overflow-hidden border-b border-white/12 bg-[#0A0A0A] sm:min-h-[calc(100svh-3.75rem)]"
+      className="relative isolate min-h-[calc(100svh-8.5rem)] overflow-hidden border-b border-white/12 bg-[#0A0A0A] sm:min-h-[calc(100svh-10.5rem)] lg:min-h-[calc(100svh-7.5rem)]"
     >
       <div
         aria-hidden="true"
@@ -47,7 +47,7 @@ export function MadlabHero() {
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_50%_0%,rgba(255,42,42,0.13),transparent_62%)]" />
 
-      <div className="relative mx-auto flex min-h-[calc(100svh-3.5rem)] max-w-[1600px] flex-col px-5 pb-8 pt-8 sm:min-h-[calc(100svh-3.75rem)] sm:px-8 sm:pb-10 sm:pt-10 lg:px-12">
+      <div className="relative mx-auto flex min-h-[calc(100svh-8.5rem)] max-w-[1600px] flex-col px-5 pb-8 pt-8 sm:min-h-[calc(100svh-10.5rem)] sm:px-8 sm:pb-10 sm:pt-10 lg:min-h-[calc(100svh-7.5rem)] lg:px-12">
         <div className="flex items-start justify-between gap-8 border-b border-white/12 pb-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/45 sm:text-[10px]">
           <p className="max-w-[22rem] text-[#ff2a2a]">{madlabText(lang, "heroKicker")}</p>
           <p className="shrink-0 text-end">LAB / 001</p>

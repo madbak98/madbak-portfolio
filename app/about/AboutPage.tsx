@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { MobileNavOverlay, SiteNav } from "../components/SiteNav";
-import { ABOUT_OPERATOR_IMAGE_SRC, TRANSLATIONS } from "../lib/portfolio-data";
+import { TRANSLATIONS } from "../lib/portfolio-data";
 import {
   ABOUT_INTERESTS,
   ABOUT_SKILL_GROUPS,
@@ -13,6 +12,9 @@ import {
 } from "../lib/about-i18n";
 import { usePreferredLang } from "../lib/locale-preference";
 import { htmlLangAttr, rootLocaleClasses } from "../lib/locale-ui";
+import { resolvePetPageContext } from "../lib/pet-page-context";
+import { MadbakPet } from "../components/MadbakPet";
+import "../components/madbak-pet.css";
 import { GlassCard } from "./components/GlassCard";
 import { PageScrollVideo } from "./components/PageScrollVideo";
 import { ScrollRevealObserver } from "./components/ScrollRevealObserver";
@@ -132,15 +134,20 @@ export default function AboutPage() {
           </div>
 
           <div className="about-hero__portrait-wrap" data-scroll-reveal data-reveal-delay="1">
-            <GlassCard as="figure" className="about-hero__portrait">
-              <Image
-                src={ABOUT_OPERATOR_IMAGE_SRC}
-                alt={a("portraitAlt")}
-                width={720}
-                height={960}
-                sizes="(max-width: 720px) 90vw, 22rem"
-                priority
-              />
+            <GlassCard as="figure" className="about-hero__portrait about-hero__portrait--pet">
+              <div className="about-operator-pet">
+                <div className="about-operator-pet__label">
+                  <span>OPERATOR</span>
+                  <span className="unicode-bidi-isolate tabular-nums">( ID: 001 )</span>
+                </div>
+                <MadbakPet
+                  mode="full"
+                  pageContext={resolvePetPageContext("/about")}
+                  lang={lang}
+                  portraitAlt={a("portraitAlt")}
+                  reducedMotion={prefersReducedMotion}
+                />
+              </div>
               <div className="about-hero__meta about-glass">
                 <strong>BABAK RAVANBAKHSH</strong>
                 <span>MADBAK</span>

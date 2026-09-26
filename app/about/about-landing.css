@@ -360,6 +360,32 @@
   padding: 0.75rem;
 }
 
+.about-hero__portrait--pet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.about-operator-pet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.about-operator-pet__label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  padding-top: 0.65rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
 .about-hero__portrait img {
   display: block;
   width: 100%;
@@ -367,6 +393,31 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   object-fit: cover;
+}
+
+.about-hero__portrait--pet .madbak-pet--full {
+  max-width: none;
+}
+
+.about-hero__portrait--pet .madbak-pet__bubble {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.about-hero__portrait--pet .madbak-pet__option {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f4f1ea;
+}
+
+.about-hero__portrait--pet .madbak-pet__option-mark {
+  color: rgba(244, 241, 234, 0.45);
+}
+
+.about-hero__portrait--pet .madbak-pet__option:hover,
+.about-hero__portrait--pet .madbak-pet__option:focus-visible {
+  background: rgba(255, 42, 42, 0.16);
+  border-color: rgba(255, 42, 42, 0.55);
 }
 
 .about-hero__meta {

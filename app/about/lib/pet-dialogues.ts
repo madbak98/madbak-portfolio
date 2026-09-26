@@ -1,3 +1,6 @@
+import type { PetPageContext, PetPageType } from "../../lib/pet-page-context";
+import { PET_SERVICE_META } from "../../lib/pet-page-context";
+
 export type PetEmotion = "smile" | "angry" | "sleepy";
 export type PetState = "idle" | "talking" | PetEmotion;
 
@@ -35,11 +38,21 @@ export const PET_CHARACTER_SRC = {
   talking2: "/pet/talking2.jpeg",
 } as const;
 
-const TOPICS: readonly DialogueOption[] = [
+/** Global MADBAK questions — secondary paths from any page. */
+export const GLOBAL_OPTIONS: readonly DialogueOption[] = [
   { id: "opt-who", label: "Who is Madbak?", nextDialogueId: "about-who" },
   { id: "opt-build", label: "What does he build?", nextDialogueId: "work-build" },
   { id: "opt-vibe", label: "What's his design style?", nextDialogueId: "design-style" },
+  { id: "opt-tools", label: "What tools does he use?", nextDialogueId: "work-tech" },
+  { id: "opt-into", label: "What's he into?", nextDialogueId: "interest-into" },
   { id: "opt-random", label: "Tell me something random", nextDialogueId: "fun-random" },
+];
+
+const TOPICS: readonly DialogueOption[] = [
+  GLOBAL_OPTIONS[0]!,
+  GLOBAL_OPTIONS[1]!,
+  GLOBAL_OPTIONS[2]!,
+  GLOBAL_OPTIONS[5]!,
 ];
 
 export const PET_DEFAULT_OPTIONS = TOPICS;
@@ -55,6 +68,58 @@ const MORE_BANTER: readonly DialogueOption[] = [
   { id: "opt-cute", label: "you're kinda cute", nextDialogueId: "banter-cute" },
   { id: "opt-annoy", label: "you're annoying", nextDialogueId: "banter-annoy" },
   { id: "opt-back2", label: "← topics", nextDialogueId: "root-menu" },
+];
+
+const BANTER_OPTIONS: readonly DialogueOption[] = [
+  { id: "opt-banter-annoy", label: "You're annoying.", nextDialogueId: "banter-annoy" },
+  { id: "opt-banter-useful", label: "Are you actually useful?", nextDialogueId: "banter-useful" },
+  { id: "opt-banter-impress", label: "Impress me.", nextDialogueId: "banter-impress" },
+  { id: "opt-banter-stupid", label: "Can I ask something stupid?", nextDialogueId: "banter-stupid" },
+  { id: "opt-banter-stare", label: "Why are you staring at me?", nextDialogueId: "banter-stare" },
+  { id: "opt-banter-cute", label: "You're kinda cute.", nextDialogueId: "banter-cute" },
+];
+
+const ABOUT_OPEN_OPTIONS: readonly DialogueOption[] = [
+  { id: "ao1", label: "Who is Madbak?", nextDialogueId: "about-who" },
+  { id: "ao2", label: "What does he build?", nextDialogueId: "work-build" },
+  { id: "ao3", label: "What's his design style?", nextDialogueId: "design-style" },
+  { id: "ao4", label: "What's he into?", nextDialogueId: "interest-into" },
+  { id: "ao5", label: "Tell me something random.", nextDialogueId: "fun-random" },
+];
+
+const WORKS_OPEN_OPTIONS: readonly DialogueOption[] = [
+  { id: "wo1", label: "What kind of projects are these?", nextDialogueId: "page-works-kinds" },
+  { id: "wo2", label: "Which one took the longest?", nextDialogueId: "page-works-longest" },
+  { id: "wo3", label: "What's your favorite part of building websites?", nextDialogueId: "page-works-favorite" },
+  { id: "wo4", label: "Tell me something random.", nextDialogueId: "fun-random" },
+];
+
+const SERVICES_OPEN_OPTIONS: readonly DialogueOption[] = [
+  { id: "so1", label: "What do you actually do?", nextDialogueId: "about-do" },
+  { id: "so2", label: "Do you build websites?", nextDialogueId: "work-websites" },
+  { id: "so3", label: "Do you build AI products?", nextDialogueId: "work-ai" },
+  { id: "so4", label: "What kind of projects do you take?", nextDialogueId: "page-services-take" },
+];
+
+const SERVICE_DETAIL_OPTIONS: readonly DialogueOption[] = [
+  { id: "sd1", label: "What's included?", nextDialogueId: "page-service-included" },
+  { id: "sd2", label: "How does the process work?", nextDialogueId: "page-service-process" },
+  { id: "sd3", label: "How long does it take?", nextDialogueId: "page-service-time" },
+  { id: "sd4", label: "What makes this different?", nextDialogueId: "page-service-diff" },
+];
+
+const CONTACT_OPEN_OPTIONS: readonly DialogueOption[] = [
+  { id: "co1", label: "How can I work with you?", nextDialogueId: "page-contact-work" },
+  { id: "co2", label: "What kind of projects do you accept?", nextDialogueId: "page-services-take" },
+  { id: "co3", label: "Where are you based?", nextDialogueId: "about-where" },
+  { id: "co4", label: "Tell me something before I contact you.", nextDialogueId: "page-contact-before" },
+];
+
+const MADLAB_OPEN_OPTIONS: readonly DialogueOption[] = [
+  { id: "mo1", label: "What's MADLAB?", nextDialogueId: "page-madlab-what" },
+  { id: "mo2", label: "What are you experimenting with?", nextDialogueId: "page-madlab-exp" },
+  { id: "mo3", label: "What tech do you use?", nextDialogueId: "work-tech" },
+  { id: "mo4", label: "Show me something weird.", nextDialogueId: "page-madlab-weird" },
 ];
 
 export const PET_DIALOGUES: readonly PetDialogue[] = [
@@ -87,7 +152,199 @@ export const PET_DIALOGUES: readonly PetDialogue[] = [
     options: TOPICS,
   },
 
-  // ——— ABOUT ———
+  // ——— PAGE OPENINGS ———
+  {
+    id: "open-about",
+    text: "okay, you wanna know who you're dealing with?",
+    emotion: "smile",
+    options: ABOUT_OPEN_OPTIONS,
+  },
+  {
+    id: "open-works",
+    text: "checking out the work, huh?",
+    emotion: "smile",
+    options: WORKS_OPEN_OPTIONS,
+  },
+  {
+    id: "open-services",
+    text: "so... you might actually need something built?",
+    emotion: "smile",
+    options: SERVICES_OPEN_OPTIONS,
+  },
+  {
+    id: "open-contact",
+    text: "okay... this is the part where things get serious.",
+    emotion: "sleepy",
+    options: CONTACT_OPEN_OPTIONS,
+  },
+  {
+    id: "open-madlab",
+    text: "welcome to the lab. don't touch anything.",
+    emotion: "smile",
+    options: MADLAB_OPEN_OPTIONS,
+  },
+  {
+    id: "open-other",
+    text: "yo. still exploring?",
+    emotion: "smile",
+    options: [
+      { id: "oo1", label: "About me", nextDialogueId: "about-who" },
+      { id: "oo2", label: "What I build", nextDialogueId: "work-build" },
+      { id: "oo3", label: "Something random", nextDialogueId: "fun-random" },
+    ],
+  },
+
+  // ——— PAGE-SPECIFIC BRANCHES ———
+  {
+    id: "page-works-kinds",
+    text: "mostly websites and digital products. some are clean. some get a little... experimental.",
+    emotion: "smile",
+    options: [
+      { id: "pwk1", label: "What's the most experimental one?", nextDialogueId: "page-works-experimental" },
+      { id: "pwk2", label: "What tech do you use?", nextDialogueId: "work-tech" },
+      { id: "pwk3", label: "What's your design style?", nextDialogueId: "design-style" },
+      { id: "pwk4", label: "Tell me something random.", nextDialogueId: "fun-random" },
+    ],
+  },
+  {
+    id: "page-works-longest",
+    text: "the ones that look simple. that's always the trap.",
+    emotion: "sleepy",
+    options: [
+      { id: "pwl1", label: "What's your favorite part of building websites?", nextDialogueId: "page-works-favorite" },
+      { id: "pwl2", label: "What tech do you use?", nextDialogueId: "work-tech" },
+      { id: "pwl3", label: "Who is Madbak?", nextDialogueId: "about-who" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-works-favorite",
+    text: "that moment when motion, type, and attitude finally click and the page stops feeling like a template.",
+    emotion: "smile",
+    options: [
+      { id: "pwf1", label: "What's his design style?", nextDialogueId: "design-style" },
+      { id: "pwf2", label: "What tools does he use?", nextDialogueId: "work-tech" },
+      { id: "pwf3", label: "Tell me something random.", nextDialogueId: "fun-random" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-works-experimental",
+    text: "the lab stuff. also anything that made a client say 'wait... websites can do that?'",
+    emotion: "smile",
+    options: [
+      { id: "pwe1", label: "What's MADLAB?", nextDialogueId: "page-madlab-what" },
+      { id: "pwe2", label: "What does he build?", nextDialogueId: "work-build" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-services-take",
+    text: "projects with a point of view. if it's 'make it like apple but cheaper,' we might not vibe.",
+    emotion: "smile",
+    options: [
+      { id: "pst1", label: "How does the process work?", nextDialogueId: "page-service-process" },
+      { id: "pst2", label: "Who is Madbak?", nextDialogueId: "about-who" },
+      { id: "pst3", label: "Tell me something random.", nextDialogueId: "fun-random" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-service-included",
+    text: "design, build, motion, polish — the whole 'it looks expensive on purpose' pipeline. details depend on the package.",
+    emotion: "smile",
+    options: [
+      { id: "psi1", label: "How does the process work?", nextDialogueId: "page-service-process" },
+      { id: "psi2", label: "How long does it take?", nextDialogueId: "page-service-time" },
+      { id: "psi3", label: "Who is Madbak?", nextDialogueId: "about-who" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-service-process",
+    text: "talk → direction → design → build → obsess → ship. fewer meetings. more taste.",
+    emotion: "smile",
+    options: [
+      { id: "psp1", label: "How long does it take?", nextDialogueId: "page-service-time" },
+      { id: "psp2", label: "What makes this different?", nextDialogueId: "page-service-diff" },
+      { id: "psp3", label: "Tell me something random.", nextDialogueId: "fun-random" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-service-time",
+    text: "faster than a committee. slower than a template farm. usually weeks, not 'yesterday please.'",
+    emotion: "sleepy",
+    options: [
+      { id: "pstt1", label: "How can I work with you?", nextDialogueId: "page-contact-work" },
+      { id: "pstt2", label: "What's his design style?", nextDialogueId: "design-style" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-service-diff",
+    text: "it's built by someone who designs and codes. less telephone. more intentional weirdness.",
+    emotion: "smile",
+    options: [
+      { id: "psd1", label: "Who is Madbak?", nextDialogueId: "about-who" },
+      { id: "psd2", label: "What's his design style?", nextDialogueId: "design-style" },
+      { id: "psd3", label: "Tell me something random.", nextDialogueId: "fun-random" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-contact-work",
+    text: "email him. bring context, references, and whatever chaos you're trying to make look intentional.",
+    emotion: "smile",
+    options: [
+      { id: "pcw1", label: "What kind of projects do you accept?", nextDialogueId: "page-services-take" },
+      { id: "pcw2", label: "Where are you based?", nextDialogueId: "about-where" },
+      { id: "pcw3", label: "Who is Madbak?", nextDialogueId: "about-who" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-contact-before",
+    text: "he's nicer than this pixel. slightly. also based in Istanbul. timezone: ambitious.",
+    emotion: "smile",
+    options: [
+      { id: "pcb1", label: "What does he build?", nextDialogueId: "work-build" },
+      { id: "pcb2", label: "Tell me something random.", nextDialogueId: "fun-random" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-madlab-what",
+    text: "a personal lab for components, interactions, and visual experiments that may or may not escape containment.",
+    emotion: "smile",
+    options: [
+      { id: "pmw1", label: "What are you experimenting with?", nextDialogueId: "page-madlab-exp" },
+      { id: "pmw2", label: "What tech do you use?", nextDialogueId: "work-tech" },
+      { id: "pmw3", label: "Show me something weird.", nextDialogueId: "page-madlab-weird" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-madlab-exp",
+    text: "motion systems, weird UI toys, scroll stories, and whatever refuses to stay a static mockup.",
+    emotion: "smile",
+    options: [
+      { id: "pme1", label: "What's his design style?", nextDialogueId: "design-style" },
+      { id: "pme2", label: "What does he build?", nextDialogueId: "work-build" },
+      { id: "pme3", label: "Tell me something random.", nextDialogueId: "fun-random" },
+      BACK,
+    ],
+  },
+  {
+    id: "page-madlab-weird",
+    text: "you're already talking to a pixel guy in a hoodie. the lab is just more of that energy.",
+    emotion: "smile",
+    options: [
+      { id: "pmww1", label: "What's his design style?", nextDialogueId: "design-style" },
+      { id: "pmww2", label: "just banter", nextDialogueId: "banter-hub" },
+      BACK,
+    ],
+  },
   {
     id: "about-who",
     text: "he's a designer who got tired of stopping at Figma.",
@@ -395,12 +652,31 @@ export const PET_DIALOGUES: readonly PetDialogue[] = [
       { id: "bh2", label: "You look suspicious", nextDialogueId: "banter-suspicious" },
       { id: "bh3", label: "Can I ask something stupid?", nextDialogueId: "banter-stupid" },
       { id: "bh4", label: "Rate my vibe", nextDialogueId: "banter-rate" },
+      ...BANTER_OPTIONS.slice(0, 3),
     ],
   },
   {
     id: "banter-cool",
     text: "i'm a talking pixel in a hoodie. the bar was on the floor and i vaulted it.",
     emotion: "smile",
+    options: MORE_BANTER,
+  },
+  {
+    id: "banter-useful",
+    text: "depends. you're still talking to me.",
+    emotion: "smile",
+    options: MORE_BANTER,
+  },
+  {
+    id: "banter-stare",
+    text: "occupational hazard. also the sunglasses are doing most of the work.",
+    emotion: "smile",
+    options: MORE_BANTER,
+  },
+  {
+    id: "banter-problem",
+    text: "taste. deadlines. people who say 'make it pop.'",
+    emotion: "angry",
     options: MORE_BANTER,
   },
   {
@@ -459,7 +735,7 @@ export const PET_DIALOGUES: readonly PetDialogue[] = [
   },
   {
     id: "banter-annoy",
-    text: "and yet here you are.",
+    text: "and yet you clicked me.",
     emotion: "angry",
     options: MORE_BANTER,
   },
@@ -488,16 +764,16 @@ export const PET_DIALOGUES: readonly PetDialogue[] = [
   {
     id: "ambient-about-01",
     trigger: "aboutOpen",
-    text: "home turf. behave.",
+    text: "okay, you wanna know who you're dealing with?",
     emotion: "smile",
-    options: TOPICS,
+    options: ABOUT_OPEN_OPTIONS,
   },
   {
     id: "ambient-about-02",
     trigger: "aboutOpen",
     text: "about page energy. ambitious of you.",
     emotion: "smile",
-    options: TOPICS,
+    options: ABOUT_OPEN_OPTIONS,
   },
   {
     id: "ambient-hover-01",
@@ -628,4 +904,93 @@ export function triggerFromClickCount(count: number): PetTrigger {
   if (count >= 6) return "spamClick";
   if (count >= 3) return "repeatedClick";
   return "click";
+}
+
+const OPENING_ID_BY_PAGE: Partial<Record<PetPageType, string>> = {
+  about: "open-about",
+  works: "open-works",
+  services: "open-services",
+  contact: "open-contact",
+  madlab: "open-madlab",
+  other: "open-other",
+};
+
+function serviceKindOpening(ctx: PetPageContext): PetDialogue {
+  const slug = ctx.serviceSlug;
+  const meta = slug ? PET_SERVICE_META[slug] : undefined;
+  const kind =
+    meta?.kind ??
+    inferServiceKind(ctx.title ?? "") ??
+    "general";
+
+  const byKind: Record<string, string> = {
+    web: "looking for a website, or just browsing suspiciously?",
+    ai: "ai stuff, huh? don't worry. i won't replace you. yet.",
+    creative: "cinematic ambitions detected. i respect the drama.",
+    general: ctx.title
+      ? `looking at ${ctx.title.toLowerCase()}? bold of you.`
+      : "looking for a service, or just browsing suspiciously?",
+  };
+
+  return {
+    id: `open-service-${slug ?? "generic"}`,
+    text: byKind[kind] ?? byKind.general!,
+    emotion: "smile",
+    options: SERVICE_DETAIL_OPTIONS,
+  };
+}
+
+function inferServiceKind(title: string): "web" | "ai" | "creative" | "general" {
+  const t = title.toLowerCase();
+  if (t.includes("ai") || t.includes("automation")) return "ai";
+  if (t.includes("cinematic") || t.includes("creative")) return "creative";
+  if (
+    t.includes("website") ||
+    t.includes("landing") ||
+    t.includes("portfolio") ||
+    t.includes("business") ||
+    t.includes("web")
+  ) {
+    return "web";
+  }
+  return "general";
+}
+
+/**
+ * Page-aware opening dialogue.
+ * Global personality + page-specific first line/options.
+ */
+export function getOpeningForContext(ctx: PetPageContext): PetDialogue {
+  if (ctx.pageType === "service-detail") {
+    return serviceKindOpening(ctx);
+  }
+  if (ctx.pageType === "works" && ctx.title && ctx.workSlug) {
+    const base = getDialogue("open-works")!;
+    return {
+      ...base,
+      id: `open-works-${ctx.workSlug}`,
+      text:
+        ctx.workSlug === "ai-influencer"
+          ? "synthetic talent? dangerous taste."
+          : ctx.workSlug === "nft-collection"
+            ? "on-chain stuff. chaotic good energy."
+            : ctx.workSlug === "character-design"
+              ? "character work. the fun corner."
+              : base.text,
+    };
+  }
+  const id = OPENING_ID_BY_PAGE[ctx.pageType] ?? "open-other";
+  return getDialogue(id) ?? getDialogue("root-hello")!;
+}
+
+/** Compact first-click options: page-specific, then a couple global. */
+export function getCompactSeedOptions(
+  ctx: PetPageContext,
+): readonly DialogueOption[] {
+  const opening = getOpeningForContext(ctx);
+  const primary = opening.options?.slice(0, 3) ?? TOPICS.slice(0, 3);
+  return [
+    ...primary,
+    { id: "cmp-random", label: "Something random", nextDialogueId: "fun-random" },
+  ];
 }

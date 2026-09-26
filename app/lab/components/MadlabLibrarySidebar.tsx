@@ -103,7 +103,7 @@ function MadlabLibraryMobileAndDesktop() {
       {isOpen && (
         <div className="fixed inset-0 z-[90] lg:hidden" role="dialog" aria-modal="true" aria-label="MADLAB component library">
           <button type="button" className="absolute inset-0 bg-[#0A0A0A]/80" onClick={() => setIsOpen(false)} aria-label="Close MADLAB library" />
-          <aside id="madlab-mobile-library" className="relative h-full w-[min(88vw,22rem)] overflow-y-auto border-r border-white/15 bg-[#0A0A0A] pt-14 shadow-[20px_0_80px_rgba(0,0,0,0.45)] sm:pt-[3.75rem]">
+          <aside id="madlab-mobile-library" className="relative h-full w-[min(88vw,22rem)] overflow-y-auto border-r border-white/15 bg-[#0A0A0A] pt-[8.5rem] shadow-[20px_0_80px_rgba(0,0,0,0.45)] sm:pt-[10.5rem]">
             <LibraryContents onClose={() => setIsOpen(false)} />
           </aside>
         </div>
