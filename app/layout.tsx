@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bevan, Geist, Geist_Mono, Vazirmatn } from "next/font/google";
 import { SiteCursor } from "./components/SiteCursor";
+import { SitePetCompanion } from "./components/SitePetCompanion";
 import {
   absoluteUrl,
   DEFAULT_OG_IMAGE_HEIGHT,
@@ -117,6 +118,7 @@ export default function RootLayout({
       <body className="min-h-full overflow-x-hidden">
         {children}
         <SiteCursor />
+        <SitePetCompanion />
       </body>
     </html>
   );
