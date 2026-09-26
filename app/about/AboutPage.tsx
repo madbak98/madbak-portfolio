@@ -108,6 +108,7 @@ export default function AboutPage() {
         homeLinks={false}
         worksAccordionOpen={worksAccordionOpen}
         setWorksAccordionOpen={setWorksAccordionOpen}
+        size="lg"
       />
 
       <main className="about-landing__content">

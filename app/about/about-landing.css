@@ -73,10 +73,16 @@
 .about-landing__content {
   position: relative;
   z-index: 1;
-  padding-top: 7rem;
+  padding-top: 8.5rem;
 }
 
 @media (min-width: 640px) {
+  .about-landing__content {
+    padding-top: 10.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
   .about-landing__content {
     padding-top: 7.5rem;
   }
@@ -213,6 +219,12 @@
 .about-landing [data-scroll-reveal].is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Keep above-the-fold hero readable on first paint (esp. mobile) */
+.about-hero [data-scroll-reveal] {
+  opacity: 1;
+  transform: none;
 }
 
 .about-landing [data-reveal-delay="1"] {
@@ -879,14 +891,30 @@
 @media (max-width: 1024px) {
   .about-hero {
     grid-template-columns: 1fr;
-    min-height: auto;
-    padding-top: 3rem;
+    min-height: calc(100svh - 8.5rem);
+    align-items: start;
+    gap: 2rem;
+    padding-top: 1.25rem;
+  }
+
+  .about-hero__copy {
+    order: 0;
+    max-width: none;
   }
 
   .about-hero__portrait-wrap {
-    justify-self: start;
-    width: min(100%, 20rem);
-    order: -1;
+    justify-self: stretch;
+    width: 100%;
+    max-width: 28rem;
+    order: 1;
+  }
+
+  .about-hero__headline {
+    font-size: clamp(2.6rem, 11vw, 4.25rem);
+  }
+
+  .about-hero__sub {
+    font-size: clamp(1.1rem, 3.6vw, 1.35rem);
   }
 
   .about-intro-grid,
@@ -897,23 +925,6 @@
 
   .about-now-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 720px) {
-  .about-glass {
-    backdrop-filter: blur(22px) saturate(0.95);
-    -webkit-backdrop-filter: blur(22px) saturate(0.95);
-    background: rgba(255, 255, 255, 0.26);
-  }
-}
-
-/* Safari: keep matte frost while video scrubs */
-@supports (font: -apple-system-body) {
-  .about-glass {
-    backdrop-filter: blur(18px) saturate(0.95);
-    -webkit-backdrop-filter: blur(18px) saturate(0.95);
-    background: rgba(255, 255, 255, 0.24);
   }
 }
 
@@ -932,12 +943,8 @@
     grid-template-columns: 1fr;
   }
 
-  .about-hero__headline {
-    font-size: clamp(2.35rem, 12vw, 3.5rem);
-  }
-
   .about-scrub-spacer {
-    height: 40vh;
+    height: 48vh;
   }
 }
 

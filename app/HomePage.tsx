@@ -529,7 +529,7 @@ export default function HomePage() {
         />
       )}
 
-      <main className="relative z-10 overflow-x-hidden pt-28 sm:pt-[7.5rem]">
+      <main className="relative z-10 overflow-x-hidden pt-[8.5rem] sm:pt-[10.5rem] lg:pt-[7.5rem]">
         <SiteNav
           lang={lang}
           setLang={setLang}
@@ -552,6 +552,7 @@ export default function HomePage() {
           onNavigate={navigateToHash}
           worksAccordionOpen={worksAccordionOpen}
           setWorksAccordionOpen={setWorksAccordionOpen}
+          size="lg"
         />
 
         <section
@@ -562,7 +563,7 @@ export default function HomePage() {
           <div className="absolute inset-0 flex w-full flex-col items-center justify-center text-[#EBE8E1]">
             <div ref={wordmarkShiftRef} className="relative z-10">
               <motion.p
-                className={`fa-wordmark-latin max-w-[100%] text-center font-sans text-[clamp(2.75rem,16vw,24rem)] leading-[0.75] font-black text-[#EBE8E1] select-none [text-shadow:0_2px_28px_rgba(0,0,0,0.72),0_0_2px_rgba(0,0,0,0.9)] sm:text-[18vw] lg:text-[20vw] lg:whitespace-nowrap ${brandUppercase()} ${trackHeading(lang)}`}
+                className={`fa-wordmark-latin max-w-[100%] whitespace-nowrap text-center font-sans text-[clamp(2.35rem,14vw,24rem)] leading-[0.75] font-black text-[#EBE8E1] select-none [text-shadow:0_2px_28px_rgba(0,0,0,0.72),0_0_2px_rgba(0,0,0,0.9)] sm:text-[18vw] lg:text-[20vw] ${brandUppercase()} ${trackHeading(lang)}`}
                 initial={
                   reduceMotion ? false : { opacity: 0, y: 56 }
                 }
