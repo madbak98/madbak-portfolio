@@ -591,7 +591,7 @@ function EditorialWebCard({
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 42rem"
                 priority={activeImage === 0}
                 quality={92}
-                className="object-contain object-center p-2 sm:p-2.5"
+                className="object-cover object-top"
                 draggable={false}
               />
             </motion.div>

@@ -1,0 +1,124 @@
+/* Homepage #about — left-column static game console (~1.7× prior visual) */
+
+.game-console-3d {
+  position: relative;
+  z-index: 40;
+  display: block;
+  width: min(100%, 40rem);
+  height: 40rem;
+  max-width: 40rem;
+  margin-inline: auto;
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
+}
+
+.game-console-3d__viewport {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.game-console-3d__canvas {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+}
+
+.game-console-3d__canvas,
+.game-console-3d canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* R3F wraps canvas in a div that defaults to overflow:hidden */
+.game-console-3d__viewport > div,
+.game-console-3d__canvas > div {
+  overflow: visible !important;
+}
+
+.game-console-3d__sound {
+  position: absolute;
+  z-index: 5;
+  right: 0.35rem;
+  bottom: 0.85rem;
+  pointer-events: auto;
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border: 1.5px solid rgba(10, 10, 10, 0.88);
+  border-radius: 3px;
+  background: #f7f4ee;
+  box-shadow: 2px 2px 0 rgba(10, 10, 10, 0.9);
+  color: #0a0a0a;
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.game-console-3d__sound:hover {
+  background: #fffdf8;
+}
+
+.game-console-3d__sound:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(10, 10, 10, 0.9);
+}
+
+.game-console-3d__sound:focus-visible {
+  outline: 2px solid #ff2a2a;
+  outline-offset: 2px;
+}
+
+.game-console-3d__sound.is-on {
+  border-color: #ff2a2a;
+}
+
+@media (max-width: 1199px) {
+  .game-console-3d {
+    width: min(100%, 28rem);
+    height: 28rem;
+    max-width: 28rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .game-console-3d {
+    width: min(78vw, 22rem);
+    height: min(78vw, 22rem);
+    max-width: min(78vw, 22rem);
+  }
+
+  .game-console-3d__sound {
+    right: 0.2rem;
+    bottom: 0.45rem;
+    font-size: 0.55rem;
+    padding: 0.35rem 0.55rem;
+    min-height: 2.25rem;
+    min-width: 2.25rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .game-console-3d {
+    width: min(86vw, 18rem);
+    height: min(86vw, 18rem);
+    max-width: min(86vw, 18rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-console-3d__sound {
+    transition: none;
+  }
+}

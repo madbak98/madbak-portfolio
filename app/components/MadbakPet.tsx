@@ -8,18 +8,23 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 
 import type { LangKey } from "../lib/portfolio-data";
 import type { PetPageContext } from "../lib/pet-page-context";
 import TextType from "../lab/react-bits/TextAnimations/TextType/TextType";
 import {
+  BACK_ID,
   PET_CHARACTER_SRC,
+  emotionToPetState,
+  getClickDialogue,
   getCompactSeedOptions,
-  getDialogue,
+  getDialogueText,
+  getIdleDialogue,
   getOpeningForContext,
-  pickDialogue,
-  triggerFromClickCount,
+  getOptionLabel,
+  resolveNextDialogueId,
   type DialogueOption,
   type PetDialogue,
   type PetEmotion,
@@ -29,9 +34,8 @@ import {
 export type PetMode = "full" | "compact";
 
 const TALK_FRAME_MS = 130;
-const CLICK_WINDOW_MS = 900;
-const LONG_IDLE_MS = 36000;
 const TYPING_SPEED = 34;
+const LONG_IDLE_MS = 36000;
 
 const FRAME_KEYS = [
   "idle",
@@ -44,12 +48,14 @@ const FRAME_KEYS = [
 
 type FrameKey = (typeof FRAME_KEYS)[number];
 
-type MadbakPetProps = {
+export type MadbakPetProps = {
   mode: PetMode;
   pageContext: PetPageContext;
   lang: LangKey;
   portraitAlt: string;
   reducedMotion?: boolean;
+  frame?: ReactNode;
+  layout?: "stack" | "split";
 };
 
 function activeFrameKey(state: PetState, talkingFrame: 0 | 1): FrameKey {
@@ -60,9 +66,8 @@ function activeFrameKey(state: PetState, talkingFrame: 0 | 1): FrameKey {
 }
 
 /**
- * Shared MADBAK Pet — one conversation engine, two presentations.
- * full: editorial Operator installation (About)
- * compact: fixed viewport companion (other internal pages)
+ * Shared MADBAK Pet — simple conversation tree + TextType + emotions.
+ * No AI. Options → next node. Back pops a small visit stack.
  */
 export function MadbakPet({
   mode,
@@ -70,6 +75,8 @@ export function MadbakPet({
   lang,
   portraitAlt,
   reducedMotion = false,
+  frame,
+  layout = "stack",
 }: MadbakPetProps) {
   const [ready, setReady] = useState(false);
   const [expanded, setExpanded] = useState(mode === "full");
@@ -84,12 +91,11 @@ export function MadbakPet({
     [],
   );
 
-  const usedIdsRef = useRef(new Set<string>());
   const busyRef = useRef(false);
   const activeDialogueRef = useRef<PetDialogue | null>(null);
-  const clickTimesRef = useRef<number[]>([]);
+  const visitStackRef = useRef<string[]>([]);
+  const petClickCountRef = useRef(0);
   const lastActivityRef = useRef(0);
-  const historyRef = useRef<string[]>([]);
   const openedForRouteRef = useRef<string | null>(null);
   const contextKey = `${pageContext.pageType}:${pageContext.route}`;
 
@@ -105,29 +111,57 @@ export function MadbakPet({
     return () => window.cancelAnimationFrame(id);
   }, [preloadList]);
 
-  const playDialogue = useCallback((dialogue: PetDialogue) => {
-    busyRef.current = true;
-    lastActivityRef.current = Date.now();
-    historyRef.current = [...historyRef.current.slice(-24), dialogue.id];
-    usedIdsRef.current.add(dialogue.id);
-    if (usedIdsRef.current.size > 50) usedIdsRef.current.clear();
-    activeDialogueRef.current = dialogue;
-    setTypingDone(false);
-    setVisibleOptions([]);
-    setActiveDialogue(dialogue);
-    setDialogueKey((k) => k + 1);
-    setTalkingFrame(0);
-    setPetState("idle");
-  }, []);
+  const playDialogue = useCallback(
+    (dialogue: PetDialogue, opts?: { pushHistory?: boolean; clearStack?: boolean }) => {
+      busyRef.current = true;
+      lastActivityRef.current = Date.now();
+
+      if (opts?.clearStack) {
+        visitStackRef.current = [];
+      } else if (
+        opts?.pushHistory !== false &&
+        activeDialogueRef.current &&
+        activeDialogueRef.current.id !== dialogue.id
+      ) {
+        visitStackRef.current = [
+          ...visitStackRef.current.slice(-24),
+          activeDialogueRef.current.id,
+        ];
+      }
+
+      activeDialogueRef.current = dialogue;
+      setTypingDone(false);
+      setVisibleOptions([]);
+      setActiveDialogue(dialogue);
+      setDialogueKey((k) => k + 1);
+      setTalkingFrame(0);
+      setPetState(emotionToPetState(dialogue.emotion));
+    },
+    [],
+  );
 
   const selectOption = useCallback(
     (nextDialogueId: string) => {
       if (busyRef.current) return;
-      const next = getDialogue(nextDialogueId);
+
+      if (nextDialogueId === BACK_ID) {
+        const prevId = visitStackRef.current.pop();
+        if (!prevId) {
+          playDialogue(getOpeningForContext(pageContext), { clearStack: true });
+          return;
+        }
+        const prev = resolveNextDialogueId(prevId);
+        if (prev) playDialogue(prev, { pushHistory: false });
+        return;
+      }
+
+      const next = resolveNextDialogueId(nextDialogueId);
       if (!next) return;
-      playDialogue(next);
+      const clear =
+        nextDialogueId === "__start" || next.id === "root";
+      playDialogue(next, { clearStack: clear });
     },
-    [playDialogue],
+    [pageContext, playDialogue],
   );
 
   const handleTypingStart = useCallback(() => {
@@ -138,7 +172,7 @@ export function MadbakPet({
   const handleTypingComplete = useCallback(() => {
     const dialogue = activeDialogueRef.current;
     const emotion: PetEmotion = dialogue?.emotion ?? "smile";
-    setPetState(emotion);
+    setPetState(emotionToPetState(emotion));
     setTalkingFrame(0);
     setTypingDone(true);
     busyRef.current = false;
@@ -157,23 +191,24 @@ export function MadbakPet({
     return () => window.clearInterval(id);
   }, [petState, reducedMotion]);
 
-  // Route change: reset presentation UI; full auto-opens with page context.
   useEffect(() => {
     if (!ready) return;
     if (openedForRouteRef.current === contextKey) return;
     openedForRouteRef.current = contextKey;
 
-    const openingDelay = mode === "full" ? 650 : 0;
+    const openingDelay = 0;
     const t = window.setTimeout(() => {
       busyRef.current = false;
       activeDialogueRef.current = null;
+      visitStackRef.current = [];
+      petClickCountRef.current = 0;
       setActiveDialogue(null);
       setTypingDone(false);
       setPetState("idle");
 
       if (mode === "full") {
         setExpanded(true);
-        playDialogue(getOpeningForContext(pageContext));
+        playDialogue(getOpeningForContext(pageContext), { clearStack: true });
         return;
       }
 
@@ -190,7 +225,7 @@ export function MadbakPet({
       if (busyRef.current) return;
       if (Date.now() - lastActivityRef.current >= LONG_IDLE_MS) {
         lastActivityRef.current = Date.now();
-        playDialogue(pickDialogue("longIdle", usedIdsRef.current));
+        playDialogue(getIdleDialogue());
       }
     }, 4000);
     return () => window.clearInterval(id);
@@ -198,28 +233,14 @@ export function MadbakPet({
 
   const openWithPageContext = useCallback(() => {
     setExpanded(true);
-    playDialogue(getOpeningForContext(pageContext));
+    playDialogue(getOpeningForContext(pageContext), { clearStack: true });
   }, [pageContext, playDialogue]);
 
   const onAvatarClick = () => {
     lastActivityRef.current = Date.now();
     if (busyRef.current) return;
 
-    const now = Date.now();
-    clickTimesRef.current = clickTimesRef.current.filter(
-      (t) => now - t < CLICK_WINDOW_MS,
-    );
-    clickTimesRef.current.push(now);
-    const burst = clickTimesRef.current.length;
-
-    if (burst >= 3) {
-      setExpanded(true);
-      playDialogue(
-        pickDialogue(triggerFromClickCount(burst), usedIdsRef.current),
-      );
-      return;
-    }
-
+    // Compact closed → open page conversation first
     if (mode === "compact" && !expanded) {
       openWithPageContext();
       return;
@@ -230,9 +251,11 @@ export function MadbakPet({
       return;
     }
 
-    if (typingDone) {
-      playDialogue(getDialogue("root-again") ?? getOpeningForContext(pageContext));
-    }
+    // Progressive click teasing while conversation is open
+    petClickCountRef.current += 1;
+    const count = petClickCountRef.current;
+    setExpanded(true);
+    playDialogue(getClickDialogue(count), { pushHistory: true });
   };
 
   const onAvatarKeyDown = (event: KeyboardEvent) => {
@@ -257,6 +280,7 @@ export function MadbakPet({
   const rootClass = [
     "madbak-pet",
     `madbak-pet--${mode}`,
+    layout === "split" ? "madbak-pet--split" : "",
     ready ? "is-ready" : "",
     expanded ? "is-expanded" : "",
     reducedMotion ? "is-reduced" : "",
@@ -267,75 +291,89 @@ export function MadbakPet({
   return (
     <aside className={rootClass} aria-label="Madbak companion" data-lang={lang}>
       <div className="madbak-pet__stack">
-        {showBubble ? (
-          <div className="madbak-pet__bubble" aria-live="polite">
-            <strong className="madbak-pet__name">Madbak:</strong>
-            <div className="madbak-pet__line" key={`${lang}-${dialogueKey}`}>
-              {activeDialogue ? (
-                <TextType
-                  key={dialogueKey}
-                  text={activeDialogue.text}
-                  as="p"
-                  className="madbak-pet__type"
-                  typingSpeed={reducedMotion ? 10 : TYPING_SPEED}
-                  initialDelay={reducedMotion ? 0 : 50}
-                  loop={false}
-                  showCursor={!reducedMotion}
-                  cursorCharacter="▌"
-                  cursorClassName="madbak-pet__cursor"
-                  onTypingStart={handleTypingStart}
-                  onTypingComplete={handleTypingComplete}
-                />
-              ) : (
-                <p className="madbak-pet__placeholder">
-                  {getOpeningForContext(pageContext).text}
-                </p>
-              )}
+        <div className="madbak-pet__present">
+          {showBubble ? (
+            <div
+              className="madbak-pet__bubble"
+              aria-live="polite"
+              dir={lang === "fa" ? "rtl" : "ltr"}
+              lang={lang === "fa" ? "fa" : "en"}
+            >
+              <strong className="madbak-pet__name">Madbak:</strong>
+              <div className="madbak-pet__line" key={`${lang}-${dialogueKey}`}>
+                {activeDialogue ? (
+                  <TextType
+                    key={`${dialogueKey}-${lang}`}
+                    text={getDialogueText(activeDialogue, lang)}
+                    as="p"
+                    className="madbak-pet__type"
+                    typingSpeed={reducedMotion ? 10 : TYPING_SPEED}
+                    initialDelay={reducedMotion ? 0 : 50}
+                    loop={false}
+                    showCursor={!reducedMotion}
+                    cursorCharacter="▌"
+                    cursorClassName="madbak-pet__cursor"
+                    onTypingStart={handleTypingStart}
+                    onTypingComplete={handleTypingComplete}
+                  />
+                ) : (
+                  <p className="madbak-pet__placeholder">
+                    {getDialogueText(getOpeningForContext(pageContext), lang)}
+                  </p>
+                )}
+              </div>
+              <span className="madbak-pet__tail" aria-hidden />
             </div>
-            <span className="madbak-pet__tail" aria-hidden />
-          </div>
-        ) : null}
-
-        <button
-          type="button"
-          className="madbak-pet__avatar"
-          onClick={onAvatarClick}
-          onKeyDown={onAvatarKeyDown}
-          onMouseEnter={onHoverPulse}
-          aria-label="Talk to Madbak"
-          aria-expanded={showBubble}
-        >
-          <span className="madbak-pet__ring">
-            {FRAME_KEYS.map((key) => (
-              <Image
-                key={key}
-                src={PET_CHARACTER_SRC[key]}
-                alt={key === visibleKey ? portraitAlt : ""}
-                width={480}
-                height={480}
-                sizes={
-                  mode === "full"
-                    ? "(max-width: 1023px) min(70vw, 280px), 240px"
-                    : "112px"
-                }
-                priority={key === "idle"}
-                draggable={false}
-                aria-hidden={key !== visibleKey}
-                className={
-                  key === visibleKey
-                    ? "madbak-pet__img madbak-pet__img--active"
-                    : "madbak-pet__img"
-                }
-              />
-            ))}
-          </span>
-          {mode === "compact" && !expanded ? (
-            <span className="madbak-pet__hint" aria-hidden />
           ) : null}
-        </button>
+
+          <div className="madbak-pet__stage">
+            {frame}
+            <button
+              type="button"
+              className="madbak-pet__avatar"
+              onClick={onAvatarClick}
+              onKeyDown={onAvatarKeyDown}
+              onMouseEnter={onHoverPulse}
+              aria-label="Talk to Madbak"
+              aria-expanded={showBubble}
+            >
+              <span className="madbak-pet__ring">
+                {FRAME_KEYS.map((key) => (
+                  <Image
+                    key={key}
+                    src={PET_CHARACTER_SRC[key]}
+                    alt={key === visibleKey ? portraitAlt : ""}
+                    width={480}
+                    height={480}
+                    sizes={
+                      mode === "full"
+                        ? "(max-width: 1023px) min(70vw, 280px), 240px"
+                        : "112px"
+                    }
+                    priority={key === "idle"}
+                    draggable={false}
+                    aria-hidden={key !== visibleKey}
+                    className={
+                      key === visibleKey
+                        ? "madbak-pet__img madbak-pet__img--active"
+                        : "madbak-pet__img"
+                    }
+                  />
+                ))}
+              </span>
+              {mode === "compact" && !expanded ? (
+                <span className="madbak-pet__hint" aria-hidden />
+              ) : null}
+            </button>
+          </div>
+        </div>
 
         {showOptions ? (
-          <ul className="madbak-pet__options">
+          <ul
+            className="madbak-pet__options"
+            dir={lang === "fa" ? "rtl" : "ltr"}
+            lang={lang === "fa" ? "fa" : "en"}
+          >
             {visibleOptions.map((option) => (
               <li key={option.id}>
                 <button
@@ -346,10 +384,7 @@ export function MadbakPet({
                     selectOption(option.nextDialogueId);
                   }}
                 >
-                  <span className="madbak-pet__option-mark" aria-hidden>
-                    ○
-                  </span>
-                  {option.label}
+                  {getOptionLabel(option, lang)}
                 </button>
               </li>
             ))}

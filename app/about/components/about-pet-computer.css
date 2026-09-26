@@ -1,0 +1,367 @@
+/* About Pet installation — stack (default) + split (desktop About layout) */
+
+.about-pet-computer {
+  --apc-frame: clamp(18.5rem, 88vw, 32.5rem);
+  --apc-size: clamp(16.5rem, 72vw, 29rem);
+  --apc-panel: min(100%, var(--apc-frame));
+  --apc-options: minmax(15rem, 22rem);
+  position: relative;
+  display: flex;
+  width: var(--apc-frame);
+  max-width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ——— SPLIT: presentation (Green 1) | options (Green 2) ——— */
+.about-pet-computer--split {
+  --apc-frame: min(100%, 72rem);
+  --apc-size: clamp(18rem, 38vw, 30rem);
+  --apc-panel: min(100%, 34rem);
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+}
+
+.about-pet-computer--split .madbak-pet--full {
+  width: 100%;
+}
+
+.about-pet-computer--split .madbak-pet__stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) var(--apc-options);
+  align-items: stretch;
+  column-gap: clamp(1.25rem, 3.5vw, 3.25rem);
+  row-gap: clamp(0.85rem, 2vw, 1.25rem);
+  width: 100%;
+}
+
+.about-pet-computer--split .madbak-pet__present {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(0.75rem, 2vw, 1.1rem);
+  min-width: 0;
+  width: 100%;
+}
+
+.about-pet-computer--split .madbak-pet__options {
+  align-self: start;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: 0;
+}
+
+.about-pet-computer--split .madbak-pet__bubble {
+  width: min(100%, var(--apc-panel));
+  max-width: 100%;
+}
+
+.about-pet-computer--split .madbak-pet__stage {
+  width: var(--apc-size);
+}
+
+.about-pet-computer--split .madbak-pet__option {
+  min-height: 2.85rem;
+  padding: 0.6rem 1rem;
+  font-size: clamp(0.66rem, 1.15vw, 0.74rem);
+}
+
+/* Cream homepage — monitor glow */
+.about-pet-computer--light .about-pet-computer__monitor {
+  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.22));
+}
+
+.about-pet-computer--light .madbak-pet__ring {
+  box-shadow:
+    inset 0 0 18px rgba(0, 0, 0, 0.35),
+    0 0 14px rgba(26, 111, 107, 0.22);
+}
+
+.about-pet-computer .madbak-pet--full {
+  max-width: none;
+  width: 100%;
+}
+
+.about-pet-computer .madbak-pet__stack {
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.1rem);
+  width: 100%;
+}
+
+.about-pet-computer .madbak-pet__present {
+  align-items: center;
+}
+
+.about-pet-computer .madbak-pet__bubble {
+  z-index: 4;
+  width: var(--apc-panel);
+  max-width: 100%;
+  flex: 0 0 auto;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+.about-pet-computer .madbak-pet__line {
+  min-height: 2.6em;
+  font-size: clamp(0.78rem, 1.6vw, 0.9rem);
+}
+
+.about-pet-computer .madbak-pet__tail {
+  left: 50%;
+  margin-left: -6px;
+  top: auto;
+  bottom: -7px;
+  transform: rotate(45deg);
+}
+
+.about-pet-computer .madbak-pet__stage {
+  width: var(--apc-size);
+  max-width: 100%;
+  aspect-ratio: 1;
+  animation: about-pet-computer-breathe 4.2s ease-in-out infinite;
+}
+
+.about-pet-computer:has(.madbak-pet.is-reduced) .madbak-pet__stage {
+  animation: none;
+}
+
+.about-pet-computer .madbak-pet__options {
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  width: var(--apc-panel);
+  max-width: 100%;
+  margin: 0;
+  flex: 0 0 auto;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.about-pet-computer--split .madbak-pet__options {
+  align-self: start;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: 0;
+  padding-top: 0.25rem;
+}
+
+.about-pet-computer--split .madbak-pet__option {
+  width: auto;
+  max-width: 100%;
+  min-height: 2.85rem;
+  font-size: clamp(0.66rem, 1.15vw, 0.74rem);
+}
+
+/* Light tone — cream homepage */
+.about-pet-computer--light .madbak-pet__bubble {
+  border: 1px solid rgba(10, 10, 10, 0.22);
+  background: #fff;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.about-pet-computer--light .madbak-pet__options {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Dark CRT — keep cream face buttons for contrast */
+.about-pet-computer:not(.about-pet-computer--light) .madbak-pet__option {
+  --opt-face: #f4f1ea;
+  --opt-ink: #0a0a0a;
+  --opt-edge: rgba(244, 241, 234, 0.35);
+  --opt-depth: rgba(0, 0, 0, 0.85);
+}
+
+.about-pet-computer__monitor {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.45));
+}
+
+.about-pet-computer__chassis {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  object-fit: contain;
+  object-position: center bottom;
+  user-select: none;
+}
+
+.about-pet-computer__power {
+  position: absolute;
+  right: 27%;
+  bottom: 18.5%;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: #ff2a2a;
+  box-shadow: 0 0 8px rgba(255, 42, 42, 0.85);
+  animation: about-pet-computer-power 2.4s ease-in-out infinite;
+}
+
+.about-pet-computer:has(.madbak-pet.is-reduced) .about-pet-computer__power {
+  animation: none;
+}
+
+.about-pet-computer .madbak-pet__avatar {
+  z-index: 2;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.about-pet-computer .madbak-pet__avatar:focus-visible {
+  border-radius: 8px;
+}
+
+.about-pet-computer .madbak-pet__avatar:hover {
+  transform: none;
+}
+
+.about-pet-computer .madbak-pet__ring {
+  position: absolute;
+  top: 19.59%;
+  left: 30.41%;
+  width: 39.18%;
+  height: 30.41%;
+  border: 0;
+  border-radius: 2px;
+  background: #1a6f6b;
+  box-shadow:
+    inset 0 0 18px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(80, 220, 200, 0.18);
+}
+
+.about-pet-computer .madbak-pet__ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 50% 35%,
+      rgba(180, 255, 240, 0.18),
+      transparent 65%
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.035) 0,
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.7;
+}
+
+.about-pet-computer .madbak-pet__img {
+  object-position: center 18%;
+}
+
+@keyframes about-pet-computer-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes about-pet-computer-power {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Tablet + mobile: stack console-friendly — presentation then options */
+@media (max-width: 1023px) {
+  .about-pet-computer {
+    --apc-frame: min(94vw, 28rem);
+    --apc-size: min(78vw, 22rem);
+  }
+
+  .about-pet-computer--split {
+    --apc-frame: min(94vw, 28rem);
+    --apc-size: min(78vw, 22rem);
+    --apc-panel: 100%;
+    width: 100%;
+  }
+
+  .about-pet-computer--split .madbak-pet__stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .about-pet-computer--split .madbak-pet__present,
+  .about-pet-computer--split .madbak-pet__options {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    max-width: var(--apc-panel);
+    height: auto;
+    min-height: 0;
+  }
+
+  .about-pet-computer--split .madbak-pet__options {
+    display: flex;
+    width: 100%;
+    max-width: var(--apc-panel);
+  }
+
+  .about-pet-computer--split .madbak-pet__option {
+    width: 100%;
+    max-width: 100%;
+    min-height: 3rem;
+    font-size: clamp(0.85rem, 3.4vw, 1rem);
+    padding: 0.7rem 1.1rem;
+    box-sizing: border-box;
+    white-space: normal;
+    text-align: start;
+  }
+
+  .about-pet-computer .madbak-pet__stack {
+    gap: 0.7rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .about-pet-computer,
+  .about-pet-computer--split {
+    --apc-frame: min(94vw, 24rem);
+    --apc-size: min(86vw, 20rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-pet-computer .madbak-pet__stage,
+  .about-pet-computer__power {
+    animation: none;
+  }
+}

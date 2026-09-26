@@ -9,7 +9,6 @@ import { ModalImageGallery } from "./components/ModalImageGallery";
 import Link from "next/link";
 
 import {
-  ABOUT_OPERATOR_IMAGE_SRC,
   NFT_ITEMS,
   PROJECTS,
   TRANSLATIONS,
@@ -19,13 +18,12 @@ import {
   usePreferredLang,
 } from "./lib/locale-preference";
 import { documentTitleForPath } from "./lib/seo";
+import { HomeAboutPetSection } from "./components/HomeAboutPetSection";
 import { MobileNavOverlay, SiteNav } from "./components/SiteNav";
 import {
   bodyProse,
   brandUppercase,
-  displayStackLeading,
   htmlLangAttr,
-  leadProse,
   localeCase,
   modalBody,
   nftDisplayLeading,
@@ -631,115 +629,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section
-          id="about"
-          className="relative z-20 scroll-mt-[5.5rem] bg-[#EBE8E1] px-4 py-16 sm:px-6 sm:py-24 md:px-8 md:py-32 lg:px-12 lg:py-48"
-        >
-          <div className="mx-auto grid w-full max-w-screen-xl grid-cols-1 gap-12 sm:gap-16 md:gap-20 lg:max-w-[90vw] lg:grid-cols-12 lg:gap-24">
-            <div className="flex min-w-0 flex-col justify-between lg:col-span-4">
-              <div className="min-w-0">
-                <div
-                  className={`mb-8 flex justify-between border-t-2 border-black pt-4 font-mono text-[10px] ${localeCase(lang)} ${trackMeta(lang)}`}
-                >
-                  <span>{t("about_op")}</span>
-                  <span className="unicode-bidi-isolate tabular-nums">
-                    ( ID: 001 )
-                  </span>
-                </div>
-                <h2
-                  className={`max-w-full break-words text-[clamp(1.875rem,8.5vw,3rem)] font-black sm:text-[clamp(1.875rem,7.5vw,2.85rem)] md:text-[clamp(1.75rem,6.25vw,2.65rem)] lg:text-[clamp(1.25rem,2.35vw,1.875rem)] xl:text-[clamp(1.35rem,2.55vw,2rem)] ${displayStackLeading(lang)} ${localeCase(lang)} ${trackHeading(lang)}`}
-                >
-                  {t("about_h1_1")}
-                  <br />
-                  {t("about_h1_2")}
-                </h2>
-                <figure className="group relative mt-6 w-full min-w-0 sm:mt-8">
-                  <div className="relative aspect-[3/4] w-full max-w-full overflow-hidden border border-black/12 bg-[#0A0A0A]/[0.06] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
-                    <PortfolioImage
-                      src={ABOUT_OPERATOR_IMAGE_SRC}
-                      alt={t("about_operator_image_alt")}
-                      fill
-                      sizes="(max-width: 640px) min(100vw - 2rem, 36rem), (max-width: 1023px) min(100vw - 3rem, 40rem), (max-width: 1536px) 30vw, 380px"
-                      className="object-cover object-center transition-[filter,transform] duration-[480ms] ease-out group-hover:brightness-[1.025] group-hover:contrast-[1.02] motion-reduce:transition-none"
-                    />
-                  </div>
-                </figure>
-              </div>
-              <div className="mt-24 hidden lg:flex">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="h-32 w-32 animate-orbit-20s"
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="48"
-                    fill="none"
-                    stroke="black"
-                    strokeWidth="1"
-                    strokeDasharray="5 5"
-                    opacity="0.3"
-                  />
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="30"
-                    fill="none"
-                    stroke="#ff2a2a"
-                    strokeWidth="2"
-                  />
-                  <circle cx="50" cy="50" r="10" fill="black" />
-                </svg>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center lg:col-span-8">
-              <p
-                className={`mb-7 max-w-4xl text-xl font-black sm:mb-9 sm:text-3xl md:mb-10 md:text-5xl ${localeCase(lang)} ${leadProse(lang)} ${trackHeading(lang)}`}
-              >
-                {t("about_intro_before")}
-                <span
-                  className={`text-[#ff2a2a] drop-shadow-[0_0_24px_rgba(255,42,42,0.22)] ${brandUppercase()}`}
-                >
-                  MADBAK
-                </span>
-                {t("about_intro_after")}
-              </p>
-              <div
-                className={`mb-12 max-w-3xl space-y-6 text-base font-light opacity-70 sm:mb-16 sm:space-y-7 sm:text-lg md:space-y-8 md:text-2xl ${bodyProse(lang)}`}
-              >
-                <p>{t("about_p2")}</p>
-                <p>{t("about_p3")}</p>
-                <p>{t("about_p4")}</p>
-                <p>{t("about_p5")}</p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 border-t border-black/10 pt-8 sm:grid-cols-2 sm:gap-8 sm:pt-10 lg:grid-cols-4 lg:pt-12">
-                {(
-                  [
-                    { l: t("stat_role"), v: t("val_role") },
-                    { l: t("stat_stack"), v: "React / Next" },
-                    { l: t("stat_engine"), v: "Three.js / WebGL" },
-                    { l: t("stat_loc"), v: t("val_loc") },
-                  ] as const
-                ).map((stat, idx) => (
-                  <div key={idx}>
-                    <div
-                      className={`mb-2 font-mono text-[10px] opacity-40 ${localeCase(lang)} ${trackMeta(lang)}`}
-                    >
-                      {stat.l}
-                    </div>
-                    <div
-                      className={`text-sm font-black ${localeCase(lang)} ${lang === "fa" ? "tracking-normal" : "tracking-tight"}`}
-                    >
-                      {stat.v}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <HomeAboutPetSection />
 
         <WorksScroll key={lang} lang={lang} />
 

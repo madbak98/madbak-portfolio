@@ -82,10 +82,16 @@ export function resolvePetPageContext(pathname: string | null): PetPageContext {
   return { route, pageType: "other" };
 }
 
-export function petPresentationForContext(ctx: PetPageContext): "none" | "full" | "compact" {
-  if (ctx.pageType === "home") return "none";
-  if (ctx.pageType === "about") return "full";
-  return "compact";
+export type PetPresentation = "none" | "installation" | "floating";
+
+/**
+ * Visual presentation only — conversation always uses the shared MadbakPet engine.
+ * installation = dedicated /about CRT (AboutPage owns it)
+ * floating = persistent compact Old PC companion (homepage + other routes)
+ */
+export function petPresentationForContext(ctx: PetPageContext): PetPresentation {
+  if (ctx.pageType === "about") return "installation";
+  return "floating";
 }
 
 function humanizeSlug(slug?: string): string | undefined {

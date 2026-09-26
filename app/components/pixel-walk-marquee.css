@@ -1,0 +1,119 @@
+/* Pixel-art MADBAK walker — About → Works transition strip */
+
+.pixel-walk-marquee {
+  /* Source sheet: 2048×356 — 8 frames × 256×356 */
+  --pwm-src-fw: 256;
+  --pwm-src-fh: 356;
+  --pwm-frames: 8;
+  /* Desktop target: ~280px character, strip only slightly taller */
+  --pwm-display-h: 280px;
+  --pwm-display-w: calc(var(--pwm-display-h) * var(--pwm-src-fw) / var(--pwm-src-fh));
+  --pwm-sheet-w: calc(var(--pwm-display-w) * var(--pwm-frames));
+  --pwm-walk-cycle: 0.8s;
+  --pwm-walk-across: 14s;
+  --pwm-pad-y: 0.65rem;
+
+  position: relative;
+  z-index: 20;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  overflow: hidden;
+  background: #ebe8e1;
+  /* Tight strip around the character — no huge empty band */
+  height: calc(var(--pwm-display-h) + (var(--pwm-pad-y) * 2));
+  max-height: 320px;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.pixel-walk-marquee__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+.pixel-walk-marquee__walker {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  bottom: auto;
+  width: var(--pwm-display-w);
+  height: var(--pwm-display-h);
+  /* Sprite faces right → walk left to right; -50% Y keeps vertical center */
+  animation: pwm-walk-across var(--pwm-walk-across) linear infinite;
+  will-change: transform;
+}
+
+.pixel-walk-marquee__sprite {
+  width: 100%;
+  height: 100%;
+  background-image: url("/pixel-walk.png");
+  background-repeat: no-repeat;
+  background-size: var(--pwm-sheet-w) var(--pwm-display-h);
+  background-position: 0 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  animation: pwm-walk-cycle var(--pwm-walk-cycle) steps(8) infinite;
+  will-change: background-position;
+}
+
+@media (max-width: 639px) {
+  .pixel-walk-marquee {
+    --pwm-display-h: 170px;
+    --pwm-walk-across: 12s;
+    --pwm-pad-y: 0.45rem;
+    max-height: 190px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .pixel-walk-marquee {
+    --pwm-display-h: 220px;
+    --pwm-pad-y: 0.55rem;
+    max-height: 250px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pixel-walk-marquee {
+    --pwm-display-h: 290px;
+    --pwm-pad-y: 0.7rem;
+    max-height: 320px;
+  }
+}
+
+@keyframes pwm-walk-across {
+  from {
+    transform: translate3d(-110%, -50%, 0);
+  }
+  to {
+    transform: translate3d(100vw, -50%, 0);
+  }
+}
+
+@keyframes pwm-walk-cycle {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: calc(var(--pwm-sheet-w) * -1) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-walk-marquee__walker {
+    animation: none;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+  }
+
+  .pixel-walk-marquee__sprite {
+    animation: none;
+    background-position: 0 0;
+  }
+}

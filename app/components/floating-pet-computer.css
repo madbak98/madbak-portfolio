@@ -1,0 +1,166 @@
+/* Persistent floating companion — one fixed parent for the full composition */
+
+.floating-pet-computer {
+  --fpc-size: 9.5rem;
+  position: fixed;
+  right: max(0.85rem, env(safe-area-inset-right));
+  bottom: max(0.95rem, env(safe-area-inset-bottom));
+  z-index: 90;
+  display: flex;
+  width: min(16.5rem, calc(100vw - 1.4rem));
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.floating-pet-computer:has(.madbak-pet.is-ready) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Homepage #about in view — soft hide, keep mount to avoid flicker */
+.floating-pet-computer.is-suppressed,
+.floating-pet-computer.is-suppressed:has(.madbak-pet.is-ready) {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.floating-pet-computer.is-suppressed .madbak-pet__avatar,
+.floating-pet-computer.is-suppressed .madbak-pet__options {
+  pointer-events: none;
+}
+
+.floating-pet-computer .madbak-pet--compact {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  opacity: 1;
+  transform: none;
+  pointer-events: none;
+}
+
+.floating-pet-computer .madbak-pet__stack {
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.floating-pet-computer .madbak-pet__bubble {
+  z-index: 4;
+  width: 100%;
+  max-width: 14.5rem;
+  flex: 0 0 auto;
+  pointer-events: none;
+}
+
+.floating-pet-computer .madbak-pet__tail {
+  left: auto;
+  right: 2.4rem;
+  top: auto;
+  bottom: -7px;
+  transform: rotate(45deg);
+}
+
+.floating-pet-computer .madbak-pet__stage {
+  align-self: flex-end;
+  width: var(--fpc-size);
+  aspect-ratio: 1;
+}
+
+.floating-pet-computer .madbak-pet__options {
+  z-index: 4;
+  width: 100%;
+  max-width: 14.5rem;
+  flex: 0 0 auto;
+  pointer-events: auto;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.floating-pet-computer__monitor {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.4));
+}
+
+.floating-pet-computer__chassis {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  object-fit: contain;
+  object-position: center bottom;
+  user-select: none;
+}
+
+.floating-pet-computer__power {
+  position: absolute;
+  right: 27%;
+  bottom: 18.5%;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 50%;
+  background: #ff2a2a;
+  box-shadow: 0 0 6px rgba(255, 42, 42, 0.85);
+}
+
+.floating-pet-computer .madbak-pet__avatar {
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  pointer-events: auto;
+}
+
+.floating-pet-computer .madbak-pet__avatar:focus-visible {
+  border-radius: 6px;
+}
+
+.floating-pet-computer .madbak-pet__avatar:hover {
+  transform: none;
+}
+
+.floating-pet-computer .madbak-pet__ring {
+  position: absolute;
+  top: 19.59%;
+  left: 30.41%;
+  width: 39.18%;
+  height: 30.41%;
+  border: 0;
+  border-radius: 2px;
+  background: #1a6f6b;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.35);
+}
+
+.floating-pet-computer .madbak-pet__img {
+  object-position: center 18%;
+}
+
+.floating-pet-computer .madbak-pet__hint {
+  top: 18%;
+  right: 28%;
+}
+
+@media (max-width: 640px) {
+  .floating-pet-computer {
+    --fpc-size: 7.75rem;
+    width: min(14rem, calc(100vw - 1.2rem));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-pet-computer {
+    transition: none;
+  }
+}

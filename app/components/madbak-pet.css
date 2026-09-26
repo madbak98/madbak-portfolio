@@ -1,4 +1,4 @@
-/* Shared MADBAK Pet — full (About Operator) + compact (fixed companion) */
+/* Shared MADBAK Pet — circular character only (no Old PC) */
 
 .madbak-pet {
   --pet-ink: #0a0a0a;
@@ -16,6 +16,14 @@
   align-items: flex-start;
   gap: 1rem;
   width: 100%;
+}
+
+.madbak-pet__present {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: inherit;
+  gap: inherit;
 }
 
 .madbak-pet__bubble {
@@ -97,6 +105,25 @@
   border-radius: 50%;
 }
 
+/* Stage wraps optional CRT frame + avatar so they move as one unit */
+.madbak-pet__stage {
+  position: relative;
+  flex: 0 0 auto;
+  display: block;
+  width: var(--pet-size);
+  max-width: 100%;
+  aspect-ratio: 1;
+}
+
+.madbak-pet__stage .madbak-pet__avatar {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
 .madbak-pet__ring {
   position: relative;
   display: block;
@@ -139,49 +166,80 @@
 }
 
 .madbak-pet__options {
-  display: grid;
-  gap: 0.4rem;
+  display: flex;
   width: 100%;
-  margin: 0.15rem 0 0;
+  max-width: 18rem;
+  margin: 0.35rem 0 0;
   padding: 0;
   list-style: none;
-  pointer-events: auto;
-}
-
-.madbak-pet__option {
-  display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 0.55rem;
-  width: 100%;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid var(--pet-line);
-  border-radius: 2px;
+  pointer-events: auto;
+  border: 0;
   background: transparent;
-  color: var(--pet-ink);
+  box-shadow: none;
+}
+
+/* Minimal physical option button — CSS depth only */
+.madbak-pet__option {
+  --opt-raise: 3px;
+  --opt-face: #f7f4ee;
+  --opt-ink: #0a0a0a;
+  --opt-edge: rgba(10, 10, 10, 0.88);
+  --opt-depth: rgba(10, 10, 10, 0.92);
+
+  display: inline-flex;
+  width: auto;
+  max-width: 100%;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.55rem 1.05rem;
+  border: 1.5px solid var(--opt-edge);
+  border-radius: 4px;
+  background: var(--opt-face);
+  box-shadow: var(--opt-raise) var(--opt-raise) 0 var(--opt-depth);
+  color: var(--opt-ink);
   cursor: pointer;
   font-family: inherit;
   font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.3;
   text-align: start;
+  text-transform: uppercase;
+  transform: translate3d(0, 0, 0);
   transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease,
+    border-color 0.12s ease;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.madbak-pet__option:hover {
+  --opt-raise: 4px;
+  background: #fffdf8;
+}
+
+.madbak-pet__option:active {
+  --opt-raise: 1px;
+  transform: translate3d(2px, 2px, 0);
+  box-shadow: 1px 1px 0 var(--opt-depth);
+}
+
+.madbak-pet__option:focus-visible {
+  outline: 2px solid var(--pet-accent);
+  outline-offset: 3px;
 }
 
 .madbak-pet__option-mark {
-  flex: 0 0 auto;
-  color: rgba(10, 10, 10, 0.4);
+  display: none;
 }
 
-.madbak-pet__option:hover,
-.madbak-pet__option:focus-visible {
-  background: rgba(255, 42, 42, 0.06);
-  border-color: rgba(255, 42, 42, 0.45);
-  outline: none;
-}
-
-/* ——— FULL (About Operator installation) ——— */
+/* ——— FULL (inside AboutPetComputer installation) ——— */
 .madbak-pet--full {
   position: relative;
   z-index: 1;
@@ -193,7 +251,7 @@
   align-items: flex-start;
 }
 
-/* ——— COMPACT (fixed viewport companion) ——— */
+/* ——— COMPACT (hosted by FloatingPetComputer; fixed pos overridden there) ——— */
 .madbak-pet--compact {
   --pet-size: 6.75rem;
   position: fixed;
@@ -250,11 +308,16 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
 
+.madbak-pet--compact .madbak-pet__options {
+  align-items: flex-end;
+  max-width: 14.5rem;
+  gap: 0.45rem;
+}
+
 .madbak-pet--compact .madbak-pet__option {
-  font-size: 0.62rem;
-  padding: 0.45rem 0.55rem;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  min-height: 2.55rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.6rem;
 }
 
 .madbak-pet--compact:not(.is-expanded) .madbak-pet__options {
@@ -269,6 +332,17 @@
 
   .madbak-pet--full .madbak-pet__line {
     font-size: 0.76rem;
+  }
+
+  .madbak-pet--full .madbak-pet__options {
+    max-width: min(100%, 20rem);
+  }
+
+  .madbak-pet--full .madbak-pet__option {
+    min-height: 2.85rem;
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.66rem;
   }
 
   .madbak-pet--compact {
