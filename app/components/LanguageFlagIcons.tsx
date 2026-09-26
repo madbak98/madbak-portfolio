@@ -79,7 +79,7 @@ const FLAG_FA_TOOLTIP = "Raise My Flag , Thats Lion & Sun";
 export function FlagFa({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex ${className}`.trim()}
+      className={`inline-flex shrink-0 overflow-hidden ${box} ${className}`.trim()}
       title={FLAG_FA_TOOLTIP}
     >
       <Image
@@ -87,8 +87,8 @@ export function FlagFa({ className = "" }: { className?: string }) {
         alt=""
         width={894}
         height={511}
-        sizes="24px"
-        className={`${box} object-cover object-[center_42%] contrast-[0.94] saturate-[0.82] brightness-[0.99]`.trim()}
+        sizes="(min-width: 640px) 49px, 42px"
+        className="h-full w-full object-cover object-[center_42%] contrast-[0.94] saturate-[0.82] brightness-[0.99]"
         aria-hidden
       />
     </span>

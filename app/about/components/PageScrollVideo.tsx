@@ -4,184 +4,206 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 type PageScrollVideoProps = {
-  videoSrc: string;
+  /** Kept for API compatibility; sequence scrub no longer seeks the mp4. */
+  videoSrc?: string;
   posterSrc?: string;
+  framesManifestSrc?: string;
 };
 
+type FramesManifest = {
+  count: number;
+  fps: number;
+  pad: number;
+  ext: string;
+  basePath: string;
+};
+
+function frameUrl(manifest: FramesManifest, index1Based: number) {
+  const n = String(index1Based).padStart(manifest.pad, "0");
+  return `${manifest.basePath}/frame-${n}.${manifest.ext}`;
+}
+
 /**
- * Fixed full-page background video scrubbed by document scroll.
- *
- * - Loads the full file into a blob URL (smooth reverse seeks)
- * - Continuous rAF with eased target chasing
- * - Serialized seeks (never stack currentTime while seeking)
+ * Full-viewport scroll scrub via preloaded image sequence + canvas.
+ * No H.264 seeking — forward/reverse are equally smooth after preload.
  */
-export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export function PageScrollVideo({
+  posterSrc,
+  framesManifestSrc = "/about-hero-frames/manifest.json",
+}: PageScrollVideoProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showPoster, setShowPoster] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const poster = posterSrc || "/about-hero-poster.webp";
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
 
-    let duration = 0;
-    let scrollTarget = 0;
-    let smoothTime = 0;
-    let seeking = false;
-    let pendingSeek: number | null = null;
-    let rafId = 0;
     let destroyed = false;
-    let objectUrl: string | null = null;
-    let abort: AbortController | null = null;
+    let rafId = 0;
+    let frames: HTMLImageElement[] = [];
     let ready = false;
+    let targetProgress = 0;
+    let smoothProgress = 0;
 
-    const LERP = 0.12;
-    const SEEK_MIN = 1 / 48;
+    const LERP = 0.18;
 
     const prefersReduced = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const maxTime = () =>
-      Number.isFinite(duration) && duration > 0 ? Math.max(duration - 0.04, 0) : 0;
-
-    const clamp = (t: number) => {
-      const end = maxTime();
-      return end > 0 ? Math.min(Math.max(t, 0), end) : 0;
-    };
-
-    const updateScrollTarget = () => {
+    const readProgress = () => {
       if (prefersReduced()) {
-        scrollTarget = 0;
+        targetProgress = 0;
         return;
       }
       const range = Math.max(
         document.documentElement.scrollHeight - window.innerHeight,
         1,
       );
-      const progress = Math.min(1, Math.max(0, window.scrollY / range));
-      scrollTarget = clamp(progress * maxTime());
+      targetProgress = Math.min(1, Math.max(0, window.scrollY / range));
     };
 
-    const applySeek = (time: number) => {
-      if (destroyed || !ready) return;
-      if (video.readyState < HTMLMediaElement.HAVE_METADATA) return;
-
-      const next = clamp(time);
-      if (Math.abs(next - video.currentTime) < SEEK_MIN) {
-        pendingSeek = null;
-        return;
-      }
-
-      if (seeking) {
-        pendingSeek = next;
-        return;
-      }
-
-      seeking = true;
-      pendingSeek = null;
-      try {
-        video.currentTime = next;
-      } catch {
-        seeking = false;
-      }
+    const coverDraw = (img: CanvasImageSource, w: number, h: number, alpha: number) => {
+      const iw =
+        "naturalWidth" in (img as HTMLImageElement)
+          ? (img as HTMLImageElement).naturalWidth || w
+          : w;
+      const ih =
+        "naturalHeight" in (img as HTMLImageElement)
+          ? (img as HTMLImageElement).naturalHeight || h
+          : h;
+      const scale = Math.max(w / iw, h / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(img, dx, dy, dw, dh);
     };
 
-    const onSeeked = () => {
-      seeking = false;
-      if (pendingSeek !== null) {
-        const next = pendingSeek;
-        pendingSeek = null;
-        applySeek(next);
+    const draw = () => {
+      const w = canvas.width;
+      const h = canvas.height;
+      if (!ready || frames.length === 0 || w < 2 || h < 2) return;
+
+      const maxIndex = frames.length - 1;
+      const exact = smoothProgress * maxIndex;
+      const i0 = Math.min(maxIndex, Math.max(0, Math.floor(exact)));
+      const i1 = Math.min(maxIndex, i0 + 1);
+      const blend = exact - i0;
+
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, w, h);
+
+      const a = frames[i0];
+      const b = frames[i1];
+      if (!a?.complete) return;
+
+      coverDraw(a, w, h, 1);
+      if (b && b !== a && b.complete && blend > 0.001) {
+        coverDraw(b, w, h, blend);
       }
+      ctx.globalAlpha = 1;
+    };
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.max(1, Math.floor(window.innerWidth * dpr));
+      const h = Math.max(1, Math.floor(window.innerHeight * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      draw();
     };
 
     const tick = () => {
       if (destroyed) return;
       rafId = window.requestAnimationFrame(tick);
-      if (!ready || prefersReduced()) return;
-
-      updateScrollTarget();
-
-      const delta = scrollTarget - smoothTime;
-      if (Math.abs(delta) < 0.004) {
-        smoothTime = scrollTarget;
+      readProgress();
+      const delta = targetProgress - smoothProgress;
+      if (Math.abs(delta) < 0.0004) {
+        smoothProgress = targetProgress;
       } else {
-        smoothTime += delta * LERP;
+        smoothProgress += delta * LERP;
       }
-
-      applySeek(smoothTime);
+      if (ready) draw();
     };
 
-    const onReady = () => {
-      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
-      duration = video.duration;
-      ready = true;
-      updateScrollTarget();
-      smoothTime = scrollTarget;
-      setShowPoster(false);
-      void (async () => {
-        try {
-          video.muted = true;
-          await video.play();
-          video.pause();
-        } catch {
-          /* ignore */
-        }
-      })();
-    };
+    const loadImage = (src: string) =>
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new window.Image();
+        img.decoding = "async";
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(src));
+        img.src = src;
+      });
 
-    const loadBlob = async () => {
-      abort = new AbortController();
+    const loadFrames = async () => {
       try {
-        const res = await fetch(videoSrc, {
-          signal: abort.signal,
-          cache: "force-cache",
-        });
-        if (!res.ok) throw new Error(String(res.status));
-        const blob = await res.blob();
+        const res = await fetch(framesManifestSrc, { cache: "force-cache" });
+        if (!res.ok) throw new Error("manifest");
+        const manifest = (await res.json()) as FramesManifest;
+        const urls = Array.from({ length: manifest.count }, (_, i) =>
+          frameUrl(manifest, i + 1),
+        );
+
+        // Parallel preload — keep concurrency moderate for mobile
+        const loaded: HTMLImageElement[] = new Array(urls.length);
+        const concurrency = 8;
+        let cursor = 0;
+
+        const worker = async () => {
+          while (cursor < urls.length) {
+            const i = cursor++;
+            loaded[i] = await loadImage(urls[i]);
+            if (destroyed) return;
+          }
+        };
+
+        await Promise.all(
+          Array.from({ length: Math.min(concurrency, urls.length) }, () =>
+            worker(),
+          ),
+        );
+
         if (destroyed) return;
-        objectUrl = URL.createObjectURL(blob);
-        video.src = objectUrl;
-        video.load();
-      } catch (err) {
-        if (destroyed || (err as Error)?.name === "AbortError") return;
-        video.src = videoSrc;
-        video.load();
+        frames = loaded;
+        ready = true;
+        setShowPoster(false);
+        readProgress();
+        smoothProgress = targetProgress;
+        resize();
+        draw();
+      } catch {
+        if (!destroyed) setLoadError(true);
       }
     };
 
-    video.muted = true;
-    video.playsInline = true;
-    video.preload = "auto";
-    video.pause();
-
-    video.addEventListener("loadedmetadata", onReady);
-    video.addEventListener("durationchange", onReady);
-    video.addEventListener("seeked", onSeeked);
-    window.addEventListener("scroll", updateScrollTarget, { passive: true });
-    window.addEventListener("resize", updateScrollTarget);
-
+    resize();
+    window.addEventListener("resize", resize);
+    window.addEventListener("scroll", readProgress, { passive: true });
     rafId = window.requestAnimationFrame(tick);
-    void loadBlob();
+    void loadFrames();
 
     return () => {
       destroyed = true;
-      abort?.abort();
-      video.removeEventListener("loadedmetadata", onReady);
-      video.removeEventListener("durationchange", onReady);
-      video.removeEventListener("seeked", onSeeked);
-      window.removeEventListener("scroll", updateScrollTarget);
-      window.removeEventListener("resize", updateScrollTarget);
       window.cancelAnimationFrame(rafId);
-      video.removeAttribute("src");
-      video.load();
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("scroll", readProgress);
+      frames = [];
     };
-  }, [videoSrc]);
+  }, [framesManifestSrc]);
 
   return (
     <div className="about-page-video" aria-hidden="true">
-      {showPoster ? (
+      {(showPoster || loadError) && (
         <Image
           src={poster}
           alt=""
@@ -189,15 +211,10 @@ export function PageScrollVideo({ videoSrc, posterSrc }: PageScrollVideoProps) {
           priority
           className="about-page-video__media object-cover"
         />
-      ) : null}
-      <video
-        ref={videoRef}
-        className="about-page-video__media"
-        poster={poster}
-        muted
-        playsInline
-        preload="auto"
-      />
+      )}
+      {!loadError && (
+        <canvas ref={canvasRef} className="about-page-video__media" />
+      )}
       <div className="about-page-video__tint" />
     </div>
   );

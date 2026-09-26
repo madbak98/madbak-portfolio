@@ -77,11 +77,11 @@ export default function AboutPage() {
     <div
       lang={htmlLangAttr(lang)}
       dir={lang === "fa" ? "rtl" : "ltr"}
-      className={`about-landing selection:bg-[#ff2a2a] selection:text-[#EBE8E1] ${rootLocaleClasses(lang)} ${lang !== "fa" ? "font-sans" : ""}`}
+      className={`about-landing selection:bg-[#f4978e] selection:text-[#121214] ${rootLocaleClasses(lang)} ${lang !== "fa" ? "font-sans" : ""}`}
     >
       <PageScrollVideo
-        videoSrc="/about-hero.mp4"
-        posterSrc="/about-hero-poster.png"
+        posterSrc="/about-hero-poster.webp"
+        framesManifestSrc="/about-hero-frames/manifest.json"
       />
 
       <SiteNav
@@ -95,6 +95,7 @@ export default function AboutPage() {
         setWorksMenuOpen={setWorksMenuOpen}
         onNavigate={onNavigate}
         homeLinks={false}
+        size="lg"
       />
       <MobileNavOverlay
         lang={lang}

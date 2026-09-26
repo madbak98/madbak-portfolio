@@ -529,7 +529,7 @@ export default function HomePage() {
         />
       )}
 
-      <main className="relative z-10 overflow-x-hidden pt-14 sm:pt-[3.75rem]">
+      <main className="relative z-10 overflow-x-hidden pt-28 sm:pt-[7.5rem]">
         <SiteNav
           lang={lang}
           setLang={setLang}
@@ -540,6 +540,7 @@ export default function HomePage() {
           onNavigate={navigateToHash}
           worksMenuOpen={worksMenuOpen}
           setWorksMenuOpen={setWorksMenuOpen}
+          size="lg"
         />
         <MobileNavOverlay
           lang={lang}

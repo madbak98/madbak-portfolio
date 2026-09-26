@@ -44,6 +44,7 @@ export function SiteNav({
   worksMenuOpen,
   setWorksMenuOpen,
   homeLinks = true,
+  size = "md",
 }: {
   lang: LangKey;
   setLang: (code: LangKey) => void;
@@ -55,6 +56,8 @@ export function SiteNav({
   worksMenuOpen: boolean;
   setWorksMenuOpen: (open: boolean) => void;
   homeLinks?: boolean;
+  /** `lg` ≈ 2× scale (About page). */
+  size?: "md" | "lg";
 }) {
   const pathname = usePathname();
   const activeSlug = worksSlugFromPath(pathname);
@@ -64,6 +67,7 @@ export function SiteNav({
   const aboutActive = pathname === "/about";
   const menuId = useId();
   const menuShellRef = useRef<HTMLDivElement>(null);
+  const large = size === "lg";
 
   useEffect(() => {
     if (!worksMenuOpen) return;
@@ -89,11 +93,15 @@ export function SiteNav({
     setWorksMenuOpen(false);
   }, [pathname, setWorksMenuOpen]);
 
-  const linkClass = `group relative font-mono text-[10px] uppercase ${lang === "fa" ? "tracking-[0]" : "tracking-[0.18em]"} text-[#EBE8E1]/75 transition-colors duration-200 hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${localeCase(lang)} ${trackMeta(lang)}`;
+  const linkClass = `group relative font-mono uppercase ${lang === "fa" ? "tracking-[0]" : "tracking-[0.18em]"} text-[#EBE8E1]/75 transition-colors duration-200 hover:text-[#ff2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${localeCase(lang)} ${trackMeta(lang)} ${
+    large ? "text-[20px]" : "text-[10px]"
+  }`;
 
   const linkUnderline = (
     <span
-      className="pointer-events-none absolute -bottom-1 start-0 h-px w-0 bg-[#ff2a2a] transition-[width] duration-300 ease-out group-hover:w-full"
+      className={`pointer-events-none absolute start-0 w-0 bg-[#ff2a2a] transition-[width] duration-300 ease-out group-hover:w-full ${
+        large ? "-bottom-2 h-0.5" : "-bottom-1 h-px"
+      }`}
       aria-hidden
     />
   );
@@ -111,8 +119,14 @@ export function SiteNav({
           : "border-white/[0.08] bg-[#0A0A0A]/40 backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-14 max-w-[100vw] items-center justify-between gap-3 px-4 sm:h-[3.75rem] sm:gap-4 sm:px-6 md:px-10">
-        <div className="flex min-w-0 items-center gap-3">
+      <div
+        className={`mx-auto flex max-w-[100vw] items-center justify-between ${
+          large
+            ? "h-28 gap-6 px-6 sm:h-[7.5rem] sm:gap-8 sm:px-10 md:px-14"
+            : "h-14 gap-3 px-4 sm:h-[3.75rem] sm:gap-4 sm:px-6 md:px-10"
+        }`}
+      >
+        <div className={`flex min-w-0 items-center ${large ? "gap-5" : "gap-3"}`}>
           {homeLinks ? (
             <a
               href={logoHref}
@@ -121,15 +135,21 @@ export function SiteNav({
                 onNavigate("hero");
                 setWorksMenuOpen(false);
               }}
-              className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)}`}
+              className={`group flex min-w-0 shrink-0 touch-manipulation items-center text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)} ${
+                large ? "min-h-[72px] gap-4" : "min-h-[44px] gap-2"
+              }`}
               aria-label={t("nav_logo_aria")}
             >
               <span
-                className="block h-2 w-2 shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110"
+                className={`block shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110 ${
+                  large ? "h-4 w-4" : "h-2 w-2"
+                }`}
                 aria-hidden
               />
               <span
-                className={`fa-wordmark-latin font-sans text-lg font-black leading-none sm:text-xl ${lang === "fa" ? "tracking-[0]" : "tracking-tight"}`}
+                className={`fa-wordmark-latin font-sans font-black leading-none ${lang === "fa" ? "tracking-[0]" : "tracking-tight"} ${
+                  large ? "text-3xl sm:text-4xl" : "text-lg sm:text-xl"
+                }`}
               >
                 MADBAK
               </span>
@@ -137,16 +157,22 @@ export function SiteNav({
           ) : (
             <Link
               href="/"
-              className={`group flex min-h-[44px] min-w-0 shrink-0 touch-manipulation items-center gap-2 text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)}`}
+              className={`group flex min-w-0 shrink-0 touch-manipulation items-center text-[#EBE8E1] transition-opacity duration-200 hover:opacity-95 active:opacity-90 ${brandUppercase()} ${lang === "fa" ? "" : trackHeading(lang)} ${
+                large ? "min-h-[72px] gap-4" : "min-h-[44px] gap-2"
+              }`}
               aria-label={t("nav_logo_aria")}
               onClick={() => setWorksMenuOpen(false)}
             >
               <span
-                className="block h-2 w-2 shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110"
+                className={`block shrink-0 bg-[#ff2a2a] shadow-[0_0_12px_rgba(255,42,42,0.45)] transition-transform duration-300 group-hover:scale-110 ${
+                  large ? "h-4 w-4" : "h-2 w-2"
+                }`}
                 aria-hidden
               />
               <span
-                className={`fa-wordmark-latin font-sans text-lg font-black leading-none sm:text-xl ${lang === "fa" ? "tracking-[0]" : "tracking-tight"}`}
+                className={`fa-wordmark-latin font-sans font-black leading-none ${lang === "fa" ? "tracking-[0]" : "tracking-tight"} ${
+                  large ? "text-3xl sm:text-4xl" : "text-lg sm:text-xl"
+                }`}
               >
                 MADBAK
               </span>
@@ -154,9 +180,15 @@ export function SiteNav({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-4 sm:gap-6 md:gap-8">
+        <div
+          className={`flex min-w-0 flex-1 items-center justify-end ${
+            large ? "gap-8 sm:gap-10 md:gap-12" : "gap-4 sm:gap-6 md:gap-8"
+          }`}
+        >
           <nav
-            className="hidden items-center gap-6 md:gap-7 lg:flex"
+            className={`hidden items-center lg:flex ${
+              large ? "gap-10 md:gap-12" : "gap-6 md:gap-7"
+            }`}
             aria-label={t("nav_primary_aria")}
           >
             <button
@@ -223,7 +255,9 @@ export function SiteNav({
           </nav>
 
           <div
-            className="hidden items-center gap-px rounded-full border border-white/[0.09] bg-black/25 p-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm sm:flex"
+            className={`hidden items-center gap-px rounded-full border border-white/[0.09] bg-black/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm sm:flex ${
+              large ? "p-1.5" : "p-0.5"
+            }`}
             role="group"
             aria-label={t("nav_lang_aria")}
           >
@@ -237,7 +271,11 @@ export function SiteNav({
                   title={LANGUAGE_DISPLAY[code]}
                   aria-label={LANGUAGE_DISPLAY[code]}
                   aria-pressed={active}
-                  className={`group relative flex min-h-[32px] min-w-[32px] touch-manipulation items-center justify-center rounded-full p-[5px] transition-all duration-300 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
+                  className={`group relative flex touch-manipulation items-center justify-center rounded-full transition-all duration-300 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff2a2a]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
+                    large
+                      ? "min-h-[64px] min-w-[64px] p-2.5"
+                      : "min-h-[32px] min-w-[32px] p-[5px]"
+                  } ${
                     active
                       ? "bg-[#ff2a2a]/[0.12] shadow-[inset_0_0_0_1px_rgba(255,42,42,0.28),0_0_24px_rgba(255,42,42,0.1)]"
                       : "opacity-[0.58] hover:bg-white/[0.05] hover:opacity-100"
@@ -253,7 +291,9 @@ export function SiteNav({
                   >
                     <LanguageFlag
                       code={code}
-                      className="origin-center rounded-[2px] transition-transform duration-200 ease-out will-change-transform group-hover:scale-[1.24] motion-reduce:group-hover:scale-100"
+                      className={`origin-center rounded-[2px] transition-transform duration-200 ease-out will-change-transform group-hover:scale-[1.24] motion-reduce:group-hover:scale-100 ${
+                        large ? "!h-6 !w-[42px] sm:!h-7 sm:!w-[49px]" : ""
+                      }`}
                     />
                   </span>
                 </button>
@@ -269,12 +309,16 @@ export function SiteNav({
               setWorksMenuOpen(false);
               setMobileNavOpen(!mobileNavOpen);
             }}
-            className="flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-full border border-white/18 bg-black/35 text-[#EBE8E1] backdrop-blur-sm transition-[transform,colors] duration-200 hover:border-white/25 hover:bg-black/50 active:scale-90 lg:hidden"
+            className={`flex shrink-0 touch-manipulation items-center justify-center rounded-full border border-white/18 bg-black/35 text-[#EBE8E1] backdrop-blur-sm transition-[transform,colors] duration-200 hover:border-white/25 hover:bg-black/50 active:scale-90 lg:hidden ${
+              large
+                ? "min-h-[72px] min-w-[72px]"
+                : "min-h-[44px] min-w-[44px]"
+            }`}
           >
             {mobileNavOpen ? (
               <svg
                 viewBox="0 0 24 24"
-                className="h-5 w-5"
+                className={large ? "h-10 w-10" : "h-5 w-5"}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -286,7 +330,7 @@ export function SiteNav({
             ) : (
               <svg
                 viewBox="0 0 24 24"
-                className="h-5 w-5"
+                className={large ? "h-10 w-10" : "h-5 w-5"}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
