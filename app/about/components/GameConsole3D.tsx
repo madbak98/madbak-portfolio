@@ -137,11 +137,14 @@ function isLcdMesh(obj: Mesh): boolean {
   return size.z < 0.02 && size.x > 0.4 && size.y > 0.3;
 }
 
-/** GLB screen quad has no UVs — generate planar UVs from local XY. */
-function ensureLcdUvs(mesh: Mesh) {
+/**
+ * GLB screen quad has no UVs — generate planar UVs from local XY.
+ * `mirrorU` compensates for console scale.x = -1 (EN). FA uses scale.x = +1 → mirrorU false.
+ * Never flip via negative texture.repeat — ClampToEdge + VideoTexture breaks that.
+ */
+function ensureLcdUvs(mesh: Mesh, mirrorU: boolean) {
   const geom = mesh.geometry;
-  if (geom.getAttribute("uv")) return;
-
+  // Always rewrite — orientation can change with lang without a new GLB clone source
   const pos = geom.attributes.position;
   let minX = Infinity;
   let maxX = -Infinity;
@@ -159,20 +162,15 @@ function ensureLcdUvs(mesh: Mesh) {
   const spanY = Math.max(maxY - minY, 1e-6);
   const uvs = new Float32Array(pos.count * 2);
   for (let i = 0; i < pos.count; i++) {
-    // Mirror U so video stays readable after console scale.x = -1
-    uvs[i * 2] = 1 - (pos.getX(i) - minX) / spanX;
+    const u = (pos.getX(i) - minX) / spanX;
+    uvs[i * 2] = mirrorU ? 1 - u : u;
     uvs[i * 2 + 1] = (pos.getY(i) - minY) / spanY;
   }
   geom.setAttribute("uv", new BufferAttribute(uvs, 2));
   geom.attributes.uv.needsUpdate = true;
 }
 
-function applyCoverUv(
-  texture: VideoTexture,
-  screenAspect: number,
-  /** Extra horizontal flip for when console scale.x is opposite of the UV bake. */
-  flipHorizontal = false,
-) {
+function applyCoverUv(texture: VideoTexture, screenAspect: number) {
   const video = texture.image as HTMLVideoElement | undefined;
   const vw = video?.videoWidth || 16;
   const vh = video?.videoHeight || 9;
@@ -180,6 +178,9 @@ function applyCoverUv(
 
   texture.wrapS = ClampToEdgeWrapping;
   texture.wrapT = ClampToEdgeWrapping;
+  // Reset any prior negative-repeat flip from older FA builds
+  texture.center.set(0, 0);
+  texture.rotation = 0;
 
   if (videoAspect > screenAspect) {
     const s = screenAspect / videoAspect;
@@ -191,16 +192,15 @@ function applyCoverUv(
     texture.offset.set(0, (1 - s) / 2);
   }
 
-  // UV bake assumes EN console scale.x = -1. FA uses +1 → flip map once more.
-  if (flipHorizontal) {
-    texture.offset.x = 1 - texture.offset.x - texture.repeat.x;
-    texture.repeat.x *= -1;
-  }
-
   texture.needsUpdate = true;
 }
 
-function prepareConsole(scene: Object3D, texture: VideoTexture) {
+function prepareConsole(
+  scene: Object3D,
+  texture: VideoTexture,
+  /** true when console group scale.x is -1 (EN). */
+  mirrorU: boolean,
+) {
   const root = scene.clone(true);
   let screenAspect = 16 / 9;
 
@@ -211,7 +211,7 @@ function prepareConsole(scene: Object3D, texture: VideoTexture) {
 
     if (isLcdMesh(obj)) {
       obj.geometry = obj.geometry.clone();
-      ensureLcdUvs(obj);
+      ensureLcdUvs(obj, mirrorU);
       const box = new Box3().setFromObject(obj);
       const size = new Vector3();
       box.getSize(size);
@@ -343,20 +343,21 @@ function ConsoleModel({
 }) {
   const gltf = useLoader(GLTFLoader, MODEL_PATH);
   const invalidate = useThree((s) => s.invalidate);
+
+  // EN: scale.x = -1 → bake mirrored U. FA: scale.x = +1 → bake normal U.
+  const scaleX = mirrorHorizontal ? 1 : -1;
+  const mirrorU = !mirrorHorizontal;
+
   const prepared = useMemo(
-    () => prepareConsole(gltf.scene, texture),
+    () => prepareConsole(gltf.scene, texture, mirrorU),
     // generation forces remount after Strict Mode video reacquire
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
-    [gltf, texture, generation],
+    [gltf, texture, generation, mirrorU],
   );
-
-  // EN keeps the existing orientation (scale.x = -1).
-  // FA mirrors left↔right only (scale.x = +1).
-  const scaleX = mirrorHorizontal ? 1 : -1;
 
   useLayoutEffect(() => {
     const apply = () => {
-      applyCoverUv(texture, prepared.screenAspect, mirrorHorizontal);
+      applyCoverUv(texture, prepared.screenAspect);
       invalidate();
     };
 
@@ -384,14 +385,7 @@ function ConsoleModel({
       video.removeEventListener("loadedmetadata", apply);
       window.cancelAnimationFrame(raf);
     };
-  }, [
-    prepared.screenAspect,
-    texture,
-    video,
-    invalidate,
-    generation,
-    mirrorHorizontal,
-  ]);
+  }, [prepared.screenAspect, texture, video, invalidate, generation, mirrorU]);
 
   return (
     <group rotation={[0.1, 0.18, 0]} scale={[scaleX, 1, 1]}>

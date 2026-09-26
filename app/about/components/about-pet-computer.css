@@ -29,6 +29,8 @@
 
 .about-pet-computer--split .madbak-pet__stack {
   display: grid;
+  /* Lock present | options order under document rtl */
+  direction: ltr;
   grid-template-columns: minmax(0, 1.55fr) var(--apc-options);
   align-items: stretch;
   column-gap: clamp(1.25rem, 3.5vw, 3.25rem);

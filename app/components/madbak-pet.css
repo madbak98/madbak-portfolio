@@ -222,9 +222,16 @@
   box-sizing: border-box;
 }
 
-/* Persian / RTL options — centered readable stack, same chrome */
+/* Persian / RTL options — pack to physical left, readable FA chrome */
 .madbak-pet__options[dir="rtl"] {
-  align-items: stretch;
+  align-items: flex-end;
+}
+
+.madbak-pet__options[dir="rtl"] > li {
+  display: flex;
+  justify-content: flex-end;
+  width: auto;
+  max-width: 100%;
 }
 
 .madbak-pet__options[dir="rtl"] .madbak-pet__option {
@@ -233,7 +240,8 @@
   justify-content: center;
   letter-spacing: 0;
   text-transform: none;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
 }
 
 .madbak-pet__option:hover {
@@ -339,7 +347,7 @@
 }
 
 .madbak-pet--compact .madbak-pet__options[dir="rtl"] {
-  align-items: stretch;
+  align-items: flex-end;
 }
 
 .madbak-pet--compact:not(.is-expanded) .madbak-pet__options {

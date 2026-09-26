@@ -10,6 +10,8 @@
   margin-inline: auto;
   padding-inline: 0;
   box-sizing: border-box;
+  /* Keep console | CRT | options order even when document.dir is rtl */
+  direction: ltr;
   grid-template-columns: var(--ham-console) var(--ham-present) var(--ham-options);
   grid-template-rows: auto auto auto;
   column-gap: clamp(0.75rem, 2.2vw, 2rem);
@@ -102,12 +104,20 @@
 }
 
 .home-about-machine .madbak-pet__options[dir="rtl"] {
-  align-items: stretch;
   /*
-   * Cancel LTR right-pull. Keep options fully inside the column —
-   * a large negative translateX was clipping the left edge + border.
+   * Options stay in the right column (machine is direction:ltr).
+   * In RTL flex, flex-end packs to the physical left — toward the CRT,
+   * clear of the page edge and intro meta.
    */
+  align-items: flex-end;
   transform: none;
+}
+
+.home-about-machine .madbak-pet__options[dir="rtl"] > li {
+  display: flex;
+  justify-content: flex-end;
+  width: auto;
+  max-width: 100%;
 }
 
 .home-about-machine .madbak-pet__options[dir="rtl"] .madbak-pet__option {
@@ -116,7 +126,8 @@
   justify-content: center;
   letter-spacing: 0;
   text-transform: none;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   /* Keep 3D shadow from being clipped by a tight parent */
   position: relative;
   z-index: 1;
@@ -156,6 +167,7 @@
   }
 
   .home-about-machine .madbak-pet__options[dir="rtl"] {
+    align-items: flex-end;
     transform: none;
   }
 }
@@ -212,6 +224,7 @@
   }
 
   .home-about-machine .madbak-pet__options[dir="rtl"] {
+    align-items: flex-end;
     transform: none;
   }
 

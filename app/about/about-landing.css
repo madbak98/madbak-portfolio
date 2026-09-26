@@ -318,7 +318,8 @@
 @media (min-width: 768px) {
   .about-crt-stage__inner {
     display: grid;
-    /* LEFT CRT · RIGHT options */
+    /* LEFT CRT · RIGHT options — lock even when document.dir is rtl */
+    direction: ltr;
     grid-template-columns: minmax(0, 1.55fr) minmax(14rem, 20rem);
     grid-template-rows: auto auto auto auto auto auto;
     column-gap: clamp(1.25rem, 3.5vw, 3.25rem);
@@ -385,7 +386,14 @@
   }
 
   .about-crt-stage__inner .madbak-pet__options[dir="rtl"] {
-    align-items: stretch;
+    align-items: flex-end;
+  }
+
+  .about-crt-stage__inner .madbak-pet__options[dir="rtl"] > li {
+    display: flex;
+    justify-content: flex-end;
+    width: auto;
+    max-width: 100%;
   }
 
   .about-crt-stage__inner .madbak-pet__option {
