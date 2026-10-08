@@ -41,6 +41,7 @@ import {
   nftLinkTrack,
 } from "./lib/locale-ui";
 import { ContactSection } from "./components/ContactSection";
+import { WorkSignature } from "./components/WorkSignature";
 import { WorksScroll } from "./components/WorksScroll";
 
 const ThreeScene = dynamic(
@@ -814,15 +815,18 @@ export default function HomePage() {
                 {t("nav_contact")}
               </Link>
             </nav>
-            <div className="flex flex-col gap-2">
-              <p
-                className={`text-center font-mono text-[10px] text-white/40 sm:text-start ${brandUppercase()} ${trackMeta(lang)}`}
-              >
-                © 2026 MADBAK IND.
-              </p>
-              <p className="text-center font-mono text-[8px] uppercase tracking-[0.16em] text-white/25 sm:text-start">
-                Crowd study by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://skiper-ui.com/v1/skiper39" target="_blank" rel="noreferrer">Skiper UI</a> · characters by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://www.openpeeps.com/" target="_blank" rel="noreferrer">Open Peeps</a>
-              </p>
+            <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-2">
+                <p
+                  className={`text-center font-mono text-[10px] text-white/40 sm:text-start ${brandUppercase()} ${trackMeta(lang)}`}
+                >
+                  © 2026 MADBAK IND.
+                </p>
+                <p className="text-center font-mono text-[8px] uppercase tracking-[0.16em] text-white/25 sm:text-start">
+                  Crowd study by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://skiper-ui.com/v1/skiper39" target="_blank" rel="noreferrer">Skiper UI</a> · characters by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://www.openpeeps.com/" target="_blank" rel="noreferrer">Open Peeps</a>
+                </p>
+              </div>
+              <WorkSignature style={{ transform: "translateY(-4cm)" }} />
             </div>
           </div>
         </footer>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { FooterCrowd } from "../../components/FooterCrowd";
+import { WorkSignature } from "../../components/WorkSignature";
 
 export function MadlabManifesto() {
   return (
@@ -29,11 +30,14 @@ export function MadlabManifesto() {
           <Link href="/#contact" className="transition-colors hover:text-[#ebe8e1]">Contact</Link>
         </nav>
 
-        <div className="mt-auto flex flex-col gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-white/35">
-          <p>© 2026 MADBAK IND.</p>
-          <p className="text-[8px] tracking-[0.12em] text-white/25">
-            Crowd study by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://skiper-ui.com/v1/skiper39" target="_blank" rel="noreferrer">Skiper UI</a> · characters by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://www.openpeeps.com/" target="_blank" rel="noreferrer">Open Peeps</a>
-          </p>
+        <div className="mt-auto flex flex-col items-start gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-white/35">
+            <p>© 2026 MADBAK IND.</p>
+            <p className="text-[8px] tracking-[0.12em] text-white/25">
+              Crowd study by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://skiper-ui.com/v1/skiper39" target="_blank" rel="noreferrer">Skiper UI</a> · characters by <a className="underline underline-offset-2 transition-colors hover:text-white/60" href="https://www.openpeeps.com/" target="_blank" rel="noreferrer">Open Peeps</a>
+            </p>
+          </div>
+          <WorkSignature />
         </div>
       </div>
     </section>

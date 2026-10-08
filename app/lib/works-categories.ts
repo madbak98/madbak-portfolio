@@ -31,6 +31,42 @@ export type WorkCategory = {
 
 export const WEB_PROJECTS = [
   {
+    title: "TOKEN2049",
+    href: "https://sigmaa.pro/token2049",
+    year: "2026",
+    frameTone: "warm" as const,
+    images: [
+      "/projects/token2049/arrival.jpg",
+      "/projects/token2049/singapore.jpg",
+      "/projects/token2049/exhibition.jpg",
+      "/projects/token2049/universe.jpg",
+      "/projects/token2049/meeting.jpg",
+    ],
+    imageAlts: [
+      "TOKEN2049 Singapore hero — Sigma at Marina Bay Sands, 7–8 October 2026",
+      "Sigma Singapore section — who Sigma helps, with the city illustration",
+      "Sigma exhibition page at TOKEN2049 Singapore",
+      "Sigma universe diagram — partner network at TOKEN2049",
+      "Meet Sigma in Singapore — TOKEN2049 meeting page",
+    ],
+    label: {
+      en: "Event website",
+      fa: "وب‌سایت رویداد",
+    },
+    liveLabel: {
+      en: "Live Website",
+      fa: "وب‌سایت زنده",
+    },
+    platformLabel: {
+      en: "Sigma / TOKEN2049",
+      fa: "سیگما / TOKEN2049",
+    },
+    description: {
+      en: "An editorial event site for Sigma at TOKEN2049 Singapore — Marina Bay Sands, 7–8 October 2026.",
+      fa: "وب‌سایت ادیتوریال سیگما برای TOKEN2049 سنگاپور — مارینا بی سندز، ۷ و ۸ اکتبر ۲۰۲۶.",
+    },
+  },
+  {
     title: "SIGMAA.PRO",
     href: "https://sigmaa.pro",
     images: [

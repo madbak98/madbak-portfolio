@@ -48,11 +48,12 @@ const GENRES: {
 ];
 
 const WEB_CARD_SLOTS = [
+  "col-span-2 sm:col-span-6 lg:col-span-12",
   "col-span-2 sm:col-span-3 lg:col-span-6",
   "col-span-2 sm:col-span-3 lg:col-span-6",
 ] as const;
 
-/** Shared slideshow timing for SIGMAA.PRO + ART GALLERY cards */
+/** Shared slideshow timing for the website cards */
 const WEB_CARD_AUTOPLAY_MS = 3700;
 const WEB_CARD_CROSSFADE_S = 0.55;
 
@@ -86,11 +87,6 @@ const ART_GALLERY_META_TITLE: Record<LangKey, string> = {
 const ART_GALLERY_META_CATEGORY: Record<LangKey, string> = {
   en: "Cultural Website",
   fa: "وب‌سایت فرهنگی",
-};
-
-const LIVE_WEBSITE_LABEL: Record<LangKey, string> = {
-  en: "Live Website",
-  fa: "وب‌سایت زنده",
 };
 
 const ProjectTitleDisplay = memo(function ProjectTitleDisplay({
@@ -689,14 +685,16 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
               ? [
                   ART_GALLERY_META_TITLE[lang],
                   ART_GALLERY_META_CATEGORY[lang],
-                  "2026",
-                  LIVE_WEBSITE_LABEL[lang],
+                  "year" in project && project.year ? project.year : "2026",
+                  project.liveLabel[lang],
                 ]
               : [
                   project.label[lang],
-                  SIGMA_META_CATEGORY[lang],
-                  "2026",
-                  LIVE_WEBSITE_LABEL[lang],
+                  "platformLabel" in project
+                    ? project.platformLabel[lang]
+                    : SIGMA_META_CATEGORY[lang],
+                  "year" in project && project.year ? project.year : "2026",
+                  project.liveLabel[lang],
                 ];
 
             return (
@@ -709,7 +707,11 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
                 description={project.description[lang]}
                 meta={meta}
                 slotClass={slotClass}
-                frameTone={isFeatured ? "warm" : "dark"}
+                frameTone={
+                  ("frameTone" in project && project.frameTone === "warm") || isFeatured
+                    ? "warm"
+                    : "dark"
+                }
               />
             );
           })}
