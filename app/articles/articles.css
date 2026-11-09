@@ -1,0 +1,153 @@
+/* Scoped palette for the Articles publication — does not touch the global theme. */
+.articles-root {
+  --a-bg: #f3f2ef;
+  --a-surface: #ffffff;
+  --a-ink: #0c0c0d;
+  --a-muted: #5d5966;
+  --a-purple: #6c12f5;
+  --a-purple-deep: #4a06b0;
+  --a-lavender: #e2d4ff;
+  --a-line: #d9d6de;
+  /* Text/icons placed on an --a-ink surface. */
+  --a-on-ink: #ffffff;
+  --a-body: #26232b;
+  --a-scrim: rgb(17 17 17 / 0.3);
+  /* Purple surfaces are theme-invariant: their black and white never swap. */
+  --a-purple-black: #0c0c0d;
+  /* Outer page gutter: the content canvas is ~95vw on desktop. */
+  --a-gutter: max(1rem, 2.5vw);
+
+  min-height: 100vh;
+  background: var(--a-bg);
+  color: var(--a-ink);
+  font-family: var(--font-archivo), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+html:has(.articles-root),
+html:has(.articles-root) body {
+  background: #f3f2ef;
+}
+
+/* Dark theme: black and white swap, purple is untouched. */
+.articles-root[data-articles-theme="dark"] {
+  --a-bg: #080808;
+  --a-surface: #111111;
+  --a-ink: #f7f7f7;
+  --a-muted: #a6a6a6;
+  --a-lavender: #1e1530;
+  --a-line: #353535;
+  --a-on-ink: #080808;
+  --a-body: #dedce2;
+  --a-scrim: rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+html:has(.articles-root[data-articles-theme="dark"]),
+html:has(.articles-root[data-articles-theme="dark"]) body {
+  background: #080808;
+  color-scheme: dark;
+}
+
+.articles-root ::selection {
+  background: var(--a-purple);
+  color: #fff;
+}
+
+.articles-root :where(a, button, summary):focus-visible {
+  outline: 3px solid var(--a-purple);
+  outline-offset: 3px;
+}
+
+/* Helpers live in the components layer so Tailwind utilities can override them. */
+@layer components {
+/* Layout */
+.a-wrap {
+  padding-inline: var(--a-gutter);
+}
+.a-bleed {
+  margin-inline: calc(var(--a-gutter) * -1);
+}
+.a-bleed-r {
+  margin-right: calc(var(--a-gutter) * -1);
+}
+.a-bleed-l {
+  margin-left: calc(var(--a-gutter) * -1);
+  padding-left: var(--a-gutter);
+}
+
+/* Type */
+.a-display {
+  font-family: var(--font-archivo), "Arial Narrow", sans-serif;
+  font-stretch: 62%;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  line-height: 0.82;
+}
+.a-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.a-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--a-purple);
+}
+.a-outline-white {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.85);
+}
+.a-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.a-no-scrollbar {
+  scrollbar-width: none;
+}
+.a-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Long-form reading rhythm */
+.a-prose > * + * {
+  margin-top: 1.5rem;
+}
+.a-prose > h2 {
+  margin-top: 4.5rem;
+  scroll-margin-top: 6.5rem;
+}
+.a-prose > h3 {
+  margin-top: 2.5rem;
+}
+.a-prose > figure,
+.a-prose > blockquote,
+.a-prose > aside,
+.a-prose > section {
+  margin-top: 3.5rem;
+  margin-bottom: 3.5rem;
+}
+.a-prose > h3 + figure {
+  margin-top: 1.25rem;
+}
+.a-prose > p:first-of-type::first-letter {
+  float: left;
+  margin: 0.32rem 0.75rem 0 0;
+  font-family: var(--font-archivo), sans-serif;
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 6.2rem;
+  line-height: 0.74;
+  color: var(--a-purple);
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .articles-root * {
+    scroll-behavior: auto !important;
+  }
+}

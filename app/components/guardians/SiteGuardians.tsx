@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   useEffect,
   useState,
@@ -41,13 +42,19 @@ function shouldSkipGuardian(): boolean {
   return false;
 }
 
+/** Editorial reading routes stay free of the decorative 3D guardian. */
+function isGuardianFreeRoute(pathname: string | null): boolean {
+  return pathname === "/articles" || Boolean(pathname?.startsWith("/articles/"));
+}
+
 export function SiteGuardians() {
+  const hidden = isGuardianFreeRoute(usePathname());
   const [GuardianSystem, setGuardianSystem] = useState<ComponentType | null>(
     null,
   );
 
   useEffect(() => {
-    if (shouldSkipGuardian()) return;
+    if (hidden || shouldSkipGuardian()) return;
 
     let idleId = 0;
     let timeoutId = 0;
@@ -94,8 +101,8 @@ export function SiteGuardians() {
         win.cancelIdleCallback(idleId);
       }
     };
-  }, []);
+  }, [hidden]);
 
-  if (!GuardianSystem) return null;
+  if (hidden || !GuardianSystem) return null;
   return <GuardianSystem />;
 }

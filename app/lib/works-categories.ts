@@ -1,3 +1,4 @@
+import { ABOUT_COPY } from "./about-i18n";
 import { NFT_ITEMS, PROJECTS, type LangKey } from "./portfolio-data";
 
 export type WorkCategorySlug =
@@ -29,12 +30,176 @@ export type WorkCategory = {
   metaDescription: LocalizedText;
 };
 
+export type WebProjectFact = { label: LocalizedText; value: LocalizedText };
+
+export type WebProjectFullPage = {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+};
+
 export const WEB_PROJECTS = [
   {
-    title: "TOKEN2049",
+    slug: "muse-24",
+    title: "MUSE / 24",
+    href: "https://muse-24-art-gallery.vercel.app/",
+    featured: true as const,
+    year: "2026",
+    discipline: {
+      en: "Art Direction / Creative Website / Digital Experience",
+      fa: "دایرکشن هنری / وب‌سایت خلاقانه / تجربه دیجیتال",
+    },
+    projectType: {
+      en: "Art Gallery Website",
+      fa: "وب‌سایت گالری هنری",
+    },
+    identity: {
+      en: "Editorial, minimal, artistic, typography-driven, warm neutral palette.",
+      fa: "ادیتوریال، مینیمال، هنری، متکی بر تایپوگرافی، با پالت رنگی گرم و خنثی.",
+    },
+    fullPage: {
+      src: "/projects/art-gallery/muse-24-full-page.jpg",
+      width: 436,
+      height: 1024,
+      alt: "Full-page capture of the MUSE / 24 art gallery website: the “Make room for looking.” hero with a framed abstract painting, the Selected works index, the full-bleed “Slow down.” exhibition section, the “Art, in the present tense.” about section and the red “Come see for yourself.” closing section.",
+    },
+    facts: [
+      {
+        label: { en: "Focus", fa: "تمرکز" },
+        value: {
+          en: "Quiet typography, living archive, present-tense looking",
+          fa: "تایپوگرافی آرام، آرشیو زنده و نگاه در زمان حال",
+        },
+      },
+    ],
+    images: [
+      "/projects/art-gallery/art-gallery-home.png",
+      "/projects/art-gallery/art-gallery-selected-works.png",
+      "/projects/art-gallery/art-gallery-exhibition.png",
+      "/projects/art-gallery/art-gallery-about.png",
+      "/projects/art-gallery/art-gallery-visit.png",
+    ],
+    imageAlts: [
+      "Art Gallery homepage with editorial typography and featured abstract artwork",
+      "Art Gallery selected works section",
+      "Art Gallery full-screen exhibition page",
+      "Art Gallery about section",
+      "Art Gallery visit and location section",
+    ],
+    label: {
+      en: "Art Gallery / Cultural Website",
+      fa: "گالری هنری / وب‌سایت فرهنگی",
+    },
+    liveLabel: {
+      en: "Live Website",
+      fa: "وب‌سایت زنده",
+    },
+    description: {
+      en: "A digital experience for an art gallery, focused on visual storytelling, artwork presentation, editorial typography, and immersive composition.",
+      fa: "یک تجربه دیجیتال برای یک گالری هنری، با تمرکز بر روایت بصری، نمایش آثار هنری، تایپوگرافی ادیتوریال و ترکیب‌بندی غوطه‌ور.",
+    },
+  },
+  {
+    slug: "sigma",
+    title: "SIGMA",
+    href: "https://sigmaa.pro",
+    ongoing: true as const,
+    discipline: {
+      en: "Web3 / Crypto / Digital Agency",
+      fa: "Web3 / کریپتو / آژانس دیجیتال",
+    },
+    projectType: {
+      en: "Crypto Marketing Agency Website",
+      fa: "وب‌سایت آژانس بازاریابی کریپتو",
+    },
+    identity: {
+      en: "Dark cinematic interface, futuristic graphics, deep navy and black palette, blue and purple lighting, structured layouts.",
+      fa: "رابط سینمایی تیره، گرافیک‌های آینده‌نگر، پالت سرمه‌ای عمیق و مشکی، نورپردازی آبی و بنفش و چیدمان‌های ساختارمند.",
+    },
+    fullPage: {
+      src: "/projects/sigmaa/sigma-full-page.jpg",
+      width: 272,
+      height: 1024,
+      alt: "Full-page capture of the SIGMA website: a dark navy hero with line-art icons and the SIGMA wordmark, key figures, a 3D sphere section, the Sigma services diagram, a world-map reach section, a partner logo strip, “The people behind Sigma” photo globe and the closing “Let’s build what’s next” call to action.",
+    },
+    facts: [
+      {
+        label: { en: "Scope", fa: "دامنه کار" },
+        value: ABOUT_COPY.sigmaBody,
+      },
+      {
+        label: { en: "Stack", fa: "تکنولوژی" },
+        value: ABOUT_COPY.sigmaTech,
+      },
+    ],
+    images: [
+      "/projects/sigmaa/home-hero.jpg",
+      "/projects/sigmaa/capabilities.jpg",
+      "/projects/sigmaa/system.jpg",
+      "/projects/sigmaa/network.jpg",
+    ],
+    imageAlts: [
+      "SIGMAA.PRO homepage — finance and Web3 growth infrastructure hero",
+      "SIGMAA.PRO capabilities — service routes for growth, KOLs, and marketing",
+      "SIGMAA.PRO system overview — growth infrastructure network",
+      "SIGMAA.PRO network — the people and operators behind Sigma",
+    ],
+    label: {
+      en: "LIVE WEBSITE / ONGOING PROJECT",
+      fa: "وب‌سایت فعال / پروژه در حال توسعه و بهبود",
+    },
+    liveLabel: {
+      en: "Live Website",
+      fa: "وب‌سایت زنده",
+    },
+    platformLabel: {
+      en: "Web3 growth platform",
+      fa: "پلتفرم رشد Web3",
+    },
+    description: {
+      en: "A digital presence for a crypto growth agency, presenting its services, positioning, ecosystem, and international reach.",
+      fa: "حضور دیجیتال برای یک آژانس رشد کریپتو؛ معرفی خدمات، جایگاه برند، اکوسیستم و دامنه فعالیت بین‌المللی آن.",
+    },
+  },
+  {
+    slug: "token2049-singapore",
+    title: "TOKEN2049 SINGAPORE",
     href: "https://sigmaa.pro/token2049",
     year: "2026",
     frameTone: "warm" as const,
+    discipline: {
+      en: "Event Website / Web3 / Digital Experience",
+      fa: "وب‌سایت رویداد / Web3 / تجربه دیجیتال",
+    },
+    projectType: {
+      en: "Event Landing Page",
+      fa: "لندینگ پیج رویداد",
+    },
+    identity: {
+      en: "High-impact editorial typography, bright blue graphics, event-focused storytelling, large-scale illustrations, and immersive visual sections.",
+      fa: "تایپوگرافی ادیتوریال پرقدرت، گرافیک‌های آبی روشن، روایت‌پردازی متمرکز بر رویداد، تصویرسازی‌های بزرگ‌مقیاس و بخش‌های بصری غوطه‌ور.",
+    },
+    fullPage: {
+      src: "/projects/token2049/token2049-singapore-full-page.jpg",
+      width: 344,
+      height: 1024,
+      alt: "Full-page capture of the TOKEN2049 Singapore event page for Sigma: the “TOKEN2049 — 07–08 Oct 2026, Marina Bay Sands” hero, an illustrated Singapore skyline, the Exhibition section with event photography and key figures, the list of Sigma services, the illustrated “Universe” partner map and the “Meet Sigma in Singapore” team wall.",
+    },
+    facts: [
+      {
+        label: { en: "Client", fa: "کارفرما" },
+        value: { en: "Sigma", fa: "سیگما" },
+      },
+      {
+        label: { en: "Venue", fa: "محل برگزاری" },
+        value: { en: "Marina Bay Sands, Singapore", fa: "مارینا بی سندز، سنگاپور" },
+      },
+      {
+        label: { en: "Dates", fa: "تاریخ" },
+        value: { en: "7–8 October 2026", fa: "۷ و ۸ اکتبر ۲۰۲۶" },
+      },
+    ],
     images: [
       "/projects/token2049/arrival.jpg",
       "/projects/token2049/singapore.jpg",
@@ -62,72 +227,8 @@ export const WEB_PROJECTS = [
       fa: "سیگما / TOKEN2049",
     },
     description: {
-      en: "An editorial event site for Sigma at TOKEN2049 Singapore — Marina Bay Sands, 7–8 October 2026.",
-      fa: "وب‌سایت ادیتوریال سیگما برای TOKEN2049 سنگاپور — مارینا بی سندز، ۷ و ۸ اکتبر ۲۰۲۶.",
-    },
-  },
-  {
-    title: "SIGMAA.PRO",
-    href: "https://sigmaa.pro",
-    images: [
-      "/projects/sigmaa/home-hero.jpg",
-      "/projects/sigmaa/capabilities.jpg",
-      "/projects/sigmaa/system.jpg",
-      "/projects/sigmaa/network.jpg",
-    ],
-    imageAlts: [
-      "SIGMAA.PRO homepage — finance and Web3 growth infrastructure hero",
-      "SIGMAA.PRO capabilities — service routes for growth, KOLs, and marketing",
-      "SIGMAA.PRO system overview — growth infrastructure network",
-      "SIGMAA.PRO network — the people and operators behind Sigma",
-    ],
-    label: {
-      en: "Website in development",
-      fa: "وب‌سایت در حال توسعه",
-    },
-    liveLabel: {
-      en: "Live Website",
-      fa: "وب‌سایت زنده",
-    },
-    platformLabel: {
-      en: "Web3 growth platform",
-      fa: "پلتفرم رشد Web3",
-    },
-    description: {
-      en: "A future web direction — calm, tactile, and built for immersive storytelling.",
-      fa: "یک مسیر وب‌محور برای آینده — آرام، لمسی و ساخته‌شده برای روایت غوطه‌ور.",
-    },
-  },
-  {
-    title: "ART GALLERY",
-    href: "https://muse-24-art-gallery.vercel.app/",
-    featured: true as const,
-    year: "2026",
-    images: [
-      "/projects/art-gallery/art-gallery-home.png",
-      "/projects/art-gallery/art-gallery-selected-works.png",
-      "/projects/art-gallery/art-gallery-exhibition.png",
-      "/projects/art-gallery/art-gallery-about.png",
-      "/projects/art-gallery/art-gallery-visit.png",
-    ],
-    imageAlts: [
-      "Art Gallery homepage with editorial typography and featured abstract artwork",
-      "Art Gallery selected works section",
-      "Art Gallery full-screen exhibition page",
-      "Art Gallery about section",
-      "Art Gallery visit and location section",
-    ],
-    label: {
-      en: "Art Gallery / Cultural Website",
-      fa: "گالری هنری / وب‌سایت فرهنگی",
-    },
-    liveLabel: {
-      en: "Live Website",
-      fa: "وب‌سایت زنده",
-    },
-    description: {
-      en: "An editorial cultural website for MUSE / 24 — quiet typography, living archive, and present-tense looking.",
-      fa: "وب‌سایت فرهنگی ادیتوریال برای MUSE / 24 — تایپوگرافی آرام، آرشیو زنده و نگاه در زمان حال.",
+      en: "A digital event experience showcasing TOKEN2049 Singapore, with strong visual communication and structured event information.",
+      fa: "یک تجربه دیجیتال رویداد برای معرفی TOKEN2049 سنگاپور، با ارتباط بصری قوی و اطلاعات ساختارمند رویداد.",
     },
   },
 ] as const;
@@ -345,6 +446,74 @@ export function getNftItems() {
 }
 
 export const WORK_CATEGORY_SLUGS = WORK_CATEGORIES.map((category) => category.slug);
+
+/** A website project resolved for one language — the shape the showcase and detail pages render. */
+export type WebsiteProject = {
+  slug: string;
+  index: string;
+  title: string;
+  href: string;
+  /** Host and path of the live site, e.g. `sigmaa.pro/token2049`. */
+  domain: string;
+  year?: string;
+  /** Only set when the data states one (live, or live and ongoing). */
+  status?: string;
+  discipline: string;
+  projectType: string;
+  identity: string;
+  description: string;
+  facts: { label: string; value: string }[];
+  fullPage: WebProjectFullPage;
+  images: readonly string[];
+  imageAlts: readonly string[];
+};
+
+export const WEB_PROJECT_SLUGS: string[] = WEB_PROJECTS.map((project) => project.slug);
+
+function displayDomain(href: string): string {
+  const url = new URL(href);
+  return `${url.host}${url.pathname}`.replace(/\/$/, "");
+}
+
+export function getWebsiteProjects(lang: LangKey): WebsiteProject[] {
+  return WEB_PROJECTS.map((project, i) => ({
+    slug: project.slug,
+    index: String(i + 1).padStart(2, "0"),
+    title: project.title,
+    href: project.href,
+    domain: displayDomain(project.href),
+    year: "year" in project ? project.year : undefined,
+    status:
+      "featured" in project && project.featured
+        ? project.liveLabel[lang]
+        : "ongoing" in project
+          ? project.label[lang]
+          : undefined,
+    discipline: project.discipline[lang],
+    projectType: project.projectType[lang],
+    identity: project.identity[lang],
+    description: project.description[lang],
+    facts: project.facts.map((fact) => ({
+      label: fact.label[lang],
+      value: fact.value[lang],
+    })),
+    fullPage: project.fullPage,
+    images: project.images,
+    imageAlts: project.imageAlts,
+  }));
+}
+
+export function getWebsiteProject(slug: string, lang: LangKey) {
+  const projects = getWebsiteProjects(lang);
+  const at = projects.findIndex((project) => project.slug === slug);
+  if (at === -1) return undefined;
+  return {
+    project: projects[at]!,
+    previous: projects[(at - 1 + projects.length) % projects.length]!,
+    next: projects[(at + 1) % projects.length]!,
+    total: projects.length,
+  };
+}
 
 export type ArchiveLayout =
   | "lead-grid"

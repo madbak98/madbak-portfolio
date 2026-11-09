@@ -8,6 +8,7 @@ export type PetPageType =
   | "service-detail"
   | "contact"
   | "madlab"
+  | "articles"
   | "other";
 
 export type PetPageContext = {
@@ -68,6 +69,10 @@ export function resolvePetPageContext(pathname: string | null): PetPageContext {
     return { route, pageType: "madlab", title: "MADLAB" };
   }
 
+  if (route === "/articles" || route.startsWith("/articles/")) {
+    return { route, pageType: "articles", title: "Articles" };
+  }
+
   if (route === "/works" || route.startsWith("/works/")) {
     const workSlug = route.replace(/^\/works\/?/, "").split("/")[0] || undefined;
     const category = WORK_CATEGORIES.find((c) => c.slug === workSlug);
@@ -86,12 +91,12 @@ export type PetPresentation = "none" | "installation" | "floating";
 
 /**
  * Visual presentation only — conversation always uses the shared MadbakPet engine.
- * none = no Pet on this route (/about is editorial; Pet lives on homepage + floating)
+ * none = no Pet on this route (/about and /articles are editorial reading surfaces)
  * floating = persistent compact Old PC companion (homepage + other routes)
  * installation = reserved (unused; homepage About owns the CRT install)
  */
 export function petPresentationForContext(ctx: PetPageContext): PetPresentation {
-  if (ctx.pageType === "about") return "none";
+  if (ctx.pageType === "about" || ctx.pageType === "articles") return "none";
   return "floating";
 }
 

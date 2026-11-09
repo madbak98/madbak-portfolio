@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import "../works-theme.css";
 import { JsonLd } from "../../components/seo/JsonLd";
 import { WorksPageShell } from "../../components/works/WorksPageShell";
+import { WorksThemeScript } from "../../components/works/WorksThemeScript";
+import { isThemedCategory } from "../../components/works/works-theme";
 import {
   buildCategoryMetadata,
   buildCollectionPageJsonLd,
@@ -36,7 +39,7 @@ export default async function WorkCategoryRoute({ params }: PageProps) {
   const category = getWorkCategory(slug);
   if (!category) notFound();
 
-  return (
+  const content = (
     <>
       <JsonLd
         data={buildCollectionPageJsonLd({
@@ -46,5 +49,14 @@ export default async function WorkCategoryRoute({ params }: PageProps) {
       />
       <WorksPageShell category={category} />
     </>
+  );
+
+  if (!isThemedCategory(category)) return content;
+
+  return (
+    <div className="works-theme-root" suppressHydrationWarning>
+      <WorksThemeScript />
+      {content}
+    </div>
   );
 }

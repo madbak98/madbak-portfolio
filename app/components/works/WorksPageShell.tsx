@@ -4,14 +4,24 @@ import { useCallback, useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 import { TRANSLATIONS } from "../../lib/portfolio-data";
-import type { WorkCategory } from "../../lib/works-categories";
+import { getWebsiteProject, type WorkCategory } from "../../lib/works-categories";
 import { usePreferredLang } from "../../lib/locale-preference";
-import { documentTitleForPath } from "../../lib/seo";
+import { documentTitleForPath, websiteProjectTitle } from "../../lib/seo";
 import { htmlLangAttr, rootLocaleClasses } from "../../lib/locale-ui";
 import { MobileNavOverlay, SiteNav } from "../SiteNav";
+import { WebsiteProjectDetail } from "./WebsiteProjectDetail";
 import { WorksCategoryPage } from "./WorksCategoryPage";
+import { withThemeColors } from "./works-theme";
 
-export function WorksPageShell({ category }: { category: WorkCategory }) {
+export function WorksPageShell({
+  category: baseCategory,
+  projectSlug,
+}: {
+  category: WorkCategory;
+  /** Renders that website project's detail page instead of the category archive. */
+  projectSlug?: string;
+}) {
+  const category = withThemeColors(baseCategory);
   const [lang, setLang] = usePreferredLang();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [worksMenuOpen, setWorksMenuOpen] = useState(false);
@@ -21,10 +31,13 @@ export function WorksPageShell({ category }: { category: WorkCategory }) {
   const reduceMotion = Boolean(prefersReducedMotion);
 
   useEffect(() => {
-    document.title = documentTitleForPath(category.href, lang);
+    const project = projectSlug ? getWebsiteProject(projectSlug, lang)?.project : undefined;
+    document.title = project
+      ? websiteProjectTitle(project.title, lang)
+      : documentTitleForPath(category.href, lang);
     document.documentElement.lang = htmlLangAttr(lang);
     document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
-  }, [category.href, lang]);
+  }, [category.href, lang, projectSlug]);
 
   const t = (key: keyof (typeof TRANSLATIONS)["en"]) =>
     TRANSLATIONS[lang][key] ?? String(key);
@@ -86,7 +99,11 @@ export function WorksPageShell({ category }: { category: WorkCategory }) {
         setWorksAccordionOpen={setWorksAccordionOpen}
         size="lg"
       />
-      <WorksCategoryPage category={category} lang={lang} />
+      {projectSlug ? (
+        <WebsiteProjectDetail slug={projectSlug} lang={lang} t={t} />
+      ) : (
+        <WorksCategoryPage category={category} lang={lang} />
+      )}
     </div>
   );
 }

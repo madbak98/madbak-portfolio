@@ -693,8 +693,8 @@ function WebProjectsSection({ lang }: { lang: LangKey }) {
                   "platformLabel" in project
                     ? project.platformLabel[lang]
                     : SIGMA_META_CATEGORY[lang],
-                  "year" in project && project.year ? project.year : "2026",
-                  project.liveLabel[lang],
+                  ...("year" in project && project.year ? [project.year] : []),
+                  ...("ongoing" in project ? [] : [project.liveLabel[lang]]),
                 ];
 
             return (

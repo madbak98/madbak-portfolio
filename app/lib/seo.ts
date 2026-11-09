@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import type { LangKey } from "./portfolio-data";
-import type { WorkCategorySlug } from "./works-categories";
+import type { WebsiteProject, WorkCategorySlug } from "./works-categories";
 import {
   absoluteUrl,
   CONTENT_UPDATED_AT,
@@ -317,6 +317,56 @@ export function buildCategoryMetadata(
   };
 }
 
+export function websiteProjectTitle(projectTitle: string, lang: LangKey): string {
+  const kind = lang === "fa" ? "پروژه وب‌سایت" : "Website Project";
+  return withBrandTitle(`${projectTitle} — ${kind}`, lang);
+}
+
+export function buildWebsiteProjectMetadata(project: WebsiteProject): Metadata {
+  const path = `/works/websites/${project.slug}`;
+  const title = websiteProjectTitle(project.title, "en");
+  const description = `${project.projectType} — ${project.description}`;
+  return {
+    title: { absolute: title },
+    description,
+    alternates: languageAlternates(path),
+    ...sharedSocialMetadata({
+      title,
+      description,
+      url: absoluteUrl(path),
+      lang: "en",
+      imagePath: project.images[0] ?? project.fullPage.src,
+    }),
+  };
+}
+
+export function buildWebsiteProjectJsonLd(project: WebsiteProject) {
+  const path = `/works/websites/${project.slug}`;
+  const categoryTitle = withBrandTitle(CATEGORY_SEO.websites.en.title, "en");
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "@id": `${absoluteUrl(path)}#project`,
+      url: absoluteUrl(path),
+      name: project.title,
+      description: project.description,
+      genre: project.discipline,
+      image: absoluteUrl(project.fullPage.src),
+      ...(project.year ? { dateCreated: project.year } : {}),
+      creator: { "@id": `${SITE_URL}/#person` },
+      isPartOf: { "@id": `${absoluteUrl("/works/websites")}#collection` },
+      sameAs: project.href,
+      inLanguage: "en",
+    },
+    buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: categoryTitle, path: "/works/websites" },
+      { name: project.title, path },
+    ]),
+  ];
+}
+
 export function documentTitleForPath(path: string, lang: LangKey): string {
   if (path === "/" || path === "") return HOME_SEO[lang].title;
   if (path === "/about") return ABOUT_SEO[lang].title;
@@ -473,6 +523,7 @@ export const SITEMAP_ROUTES: {
 }[] = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
   { path: "/lab", changeFrequency: "weekly", priority: 0.95 },
+  { path: "/articles", changeFrequency: "weekly", priority: 0.9 },
   { path: "/services", changeFrequency: "monthly", priority: 0.9 },
   { path: "/about", changeFrequency: "monthly", priority: 0.85 },
   { path: "/works/websites", changeFrequency: "monthly", priority: 0.9 },

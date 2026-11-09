@@ -3,6 +3,7 @@
 import { TRANSLATIONS, type LangKey } from "../../lib/portfolio-data";
 import type { WorkCategory, WorkCategorySlug } from "../../lib/works-categories";
 import { ProjectMarquee } from "../ProjectMarquee";
+import { WebsiteShowcase } from "./WebsiteShowcase";
 import { WorksArchiveIntro, WorksArchiveList } from "./WorksArchive";
 
 type TFn = (key: keyof (typeof TRANSLATIONS)["en"]) => string;
@@ -21,7 +22,11 @@ export function WorksCategoryShowcase({
   return (
     <section style={{ backgroundColor: category.accent, color: category.foreground }}>
       <WorksArchiveIntro category={category} lang={lang} t={t} />
-      <WorksArchiveList slug={slug} category={category} lang={lang} t={t} />
+      {slug === "websites" ? (
+        <WebsiteShowcase lang={lang} />
+      ) : (
+        <WorksArchiveList slug={slug} category={category} lang={lang} t={t} />
+      )}
       <div className="px-5 pb-16 sm:px-8 sm:pb-20 lg:px-12">
         <div className="mx-auto max-w-[1400px]">
           <ProjectMarquee

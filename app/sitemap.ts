@@ -1,8 +1,10 @@
 import type { MetadataRoute } from "next";
 
+import { ARTICLES } from "./lib/articles";
 import { SITEMAP_ROUTES } from "./lib/seo";
 import { MADLAB_ENTRIES } from "./lib/madlab";
 import { absoluteUrl, CONTENT_UPDATED_AT } from "./lib/site";
+import { WEB_PROJECT_SLUGS } from "./lib/works-categories";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
@@ -43,8 +45,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
+  const articles = ARTICLES.map((article) =>
+    entry(`/articles/${article.slug}`, {
+      changeFrequency: "monthly",
+      priority: article.featured ? 0.85 : 0.75,
+      lastModified: article.publishedAt,
+    }),
+  );
+
+  const websiteProjects = WEB_PROJECT_SLUGS.map((slug) =>
+    entry(`/works/websites/${slug}`, { changeFrequency: "monthly", priority: 0.8 }),
+  );
+
   const byUrl = new Map<string, SitemapEntry>();
-  for (const item of [...core, ...madlabExperiments]) {
+  for (const item of [...core, ...madlabExperiments, ...articles, ...websiteProjects]) {
     byUrl.set(item.url, item);
   }
 

@@ -64,6 +64,7 @@ export function SiteNav({
   const worksActive = Boolean(activeSlug) || worksMenuOpen;
   const labActive = pathname === "/lab" || pathname?.startsWith("/lab/");
   const servicesActive = pathname === "/services";
+  const articlesActive = pathname === "/articles" || pathname?.startsWith("/articles/");
   const aboutActive = pathname === "/about";
   const menuId = useId();
   const menuShellRef = useRef<HTMLDivElement>(null);
@@ -245,6 +246,15 @@ export function SiteNav({
             </Link>
 
             <Link
+              href="/articles"
+              className={`${linkClass} ${articlesActive ? "text-[#ff2a2a]" : ""}`}
+              onClick={() => setWorksMenuOpen(false)}
+            >
+              {t("nav_articles")}
+              {linkUnderline}
+            </Link>
+
+            <Link
               href="/services"
               className={`${linkClass} ${servicesActive ? "text-[#ff2a2a]" : ""}`}
               onClick={() => setWorksMenuOpen(false)}
@@ -399,6 +409,14 @@ export function SiteNav({
             onClick={() => setWorksMenuOpen(false)}
           >
             {t("nav_lab")}
+            {linkUnderline}
+          </Link>
+          <Link
+            href="/articles"
+            className={`${linkClass} shrink-0 whitespace-nowrap ${articlesActive ? "text-[#ff2a2a]" : ""}`}
+            onClick={() => setWorksMenuOpen(false)}
+          >
+            {t("nav_articles")}
             {linkUnderline}
           </Link>
           <Link
@@ -612,6 +630,14 @@ export function MobileNavOverlay({
             onClick={() => setMobileNavOpen(false)}
           >
             {t("nav_lab")}
+          </Link>
+
+          <Link
+            href="/articles"
+            className={`${itemClass} ${pathname?.startsWith("/articles") ? "text-[#ff2a2a]" : "text-[#EBE8E1]"}`}
+            onClick={() => setMobileNavOpen(false)}
+          >
+            {t("nav_articles")}
           </Link>
 
           <Link

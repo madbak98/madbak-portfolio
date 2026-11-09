@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 
@@ -15,10 +16,13 @@ export function WorksCategoryHero({
   category,
   lang,
   t,
+  actions,
 }: {
   category: WorkCategory;
   lang: LangKey;
   t: TFn;
+  /** Extra controls placed after the archive crumb (e.g. the theme toggle). */
+  actions?: ReactNode;
 }) {
   const reduce = useReducedMotion();
   const titleLines = category.titleLines[lang];
@@ -51,12 +55,15 @@ export function WorksCategoryHero({
           style={{ color: category.muted }}
         >
           <span>{category.eyebrow[lang]}</span>
-          <Link
-            href="/"
-            className="transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
-          >
-            {t("works_archive_crumb")}
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link
+              href="/"
+              className="transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
+            >
+              {t("works_archive_crumb")}
+            </Link>
+            {actions}
+          </div>
         </div>
 
         <motion.h1

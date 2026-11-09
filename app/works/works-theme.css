@@ -1,0 +1,31 @@
+/* Websites (Work) palette — light is the original category palette; screenshots are never themed. */
+.works-theme-root {
+  --wt-bg: #f4f0e8;
+  --wt-fg: #1c1a17;
+  --wt-muted: #6e6a63;
+  --wt-divider: rgba(28, 26, 23, 0.28);
+  --wt-marquee-bg: rgba(28, 26, 23, 0.08);
+  --wt-line: rgba(28, 26, 23, 0.16);
+  --wt-panel: #e8e4dc;
+  --wt-accent: #c45c4a;
+  --wt-shadow: rgba(28, 26, 23, 0.22);
+  background-color: var(--wt-bg);
+  color: var(--wt-fg);
+}
+
+.works-theme-root[data-works-theme="dark"] {
+  --wt-bg: #12110f;
+  --wt-fg: #f4f0e8;
+  --wt-muted: #a39e94;
+  --wt-divider: rgba(244, 240, 232, 0.22);
+  --wt-marquee-bg: rgba(244, 240, 232, 0.06);
+  --wt-line: rgba(244, 240, 232, 0.14);
+  --wt-panel: #1c1a17;
+  --wt-accent: #e07a66;
+  --wt-shadow: rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+html:has(.works-theme-root[data-works-theme="dark"]) {
+  background-color: #12110f;
+}
