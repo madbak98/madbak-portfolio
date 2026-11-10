@@ -4,7 +4,6 @@ import Image from "next/image";
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
@@ -99,17 +98,11 @@ export function MadbakPet({
   const openedForRouteRef = useRef<string | null>(null);
   const contextKey = `${pageContext.pageType}:${pageContext.route}`;
 
-  const preloadList = useMemo(() => Object.values(PET_CHARACTER_SRC), []);
-
   useEffect(() => {
-    preloadList.forEach((src) => {
-      const img = new window.Image();
-      img.src = src;
-    });
     lastActivityRef.current = Date.now();
     const id = window.requestAnimationFrame(() => setReady(true));
     return () => window.cancelAnimationFrame(id);
-  }, [preloadList]);
+  }, []);
 
   const playDialogue = useCallback(
     (dialogue: PetDialogue, opts?: { pushHistory?: boolean; clearStack?: boolean }) => {

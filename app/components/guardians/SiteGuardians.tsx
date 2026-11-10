@@ -1,28 +1,42 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import {
   useEffect,
   useState,
   type ComponentType,
 } from "react";
 
+import { CURSOR_MEDIA } from "./cursor-motion";
+
 /**
- * Layout-level Guardians host.
- * Three/GLB only download after first paint + idle — never on mobile / save-data / reduced-motion.
+ * Layout-level host for the Gundam cursor.
+ * Three/GLB only download after first paint + idle, and only for desktop mouse
+ * users with WebGL and without reduced motion / save-data. Until then (or if
+ * any of that fails) the existing site cursor stays in charge.
  * Imperative import (not next/dynamic at module scope) so the chunk is not prefetched early.
  */
 
 const DEFER_MS = 2500;
 
-function shouldSkipGuardian(): boolean {
+function hasWebGL(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    return Boolean(gl);
+  } catch {
+    return false;
+  }
+}
+
+function shouldSkipCursor(): boolean {
   if (typeof window === "undefined") return true;
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return true;
   }
 
-  if (window.matchMedia("(max-width: 767px)").matches) {
+  if (!window.matchMedia(CURSOR_MEDIA).matches) {
     return true;
   }
 
@@ -39,29 +53,23 @@ function shouldSkipGuardian(): boolean {
     return true;
   }
 
-  return false;
-}
-
-/** Editorial reading routes stay free of the decorative 3D guardian. */
-function isGuardianFreeRoute(pathname: string | null): boolean {
-  return pathname === "/articles" || Boolean(pathname?.startsWith("/articles/"));
+  return !hasWebGL();
 }
 
 export function SiteGuardians() {
-  const hidden = isGuardianFreeRoute(usePathname());
   const [GuardianSystem, setGuardianSystem] = useState<ComponentType | null>(
     null,
   );
 
   useEffect(() => {
-    if (hidden || shouldSkipGuardian()) return;
+    if (shouldSkipCursor()) return;
 
     let idleId = 0;
     let timeoutId = 0;
     let cancelled = false;
 
     const load = () => {
-      if (cancelled || shouldSkipGuardian()) return;
+      if (cancelled || shouldSkipCursor()) return;
       void import("./GuardianSystem")
         .then((m) => {
           if (cancelled) return;
@@ -101,8 +109,8 @@ export function SiteGuardians() {
         win.cancelIdleCallback(idleId);
       }
     };
-  }, [hidden]);
+  }, []);
 
-  if (hidden || !GuardianSystem) return null;
+  if (!GuardianSystem) return null;
   return <GuardianSystem />;
 }

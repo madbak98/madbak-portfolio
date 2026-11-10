@@ -32,6 +32,9 @@ import "./game-console-3d.css";
 
 const MODEL_PATH = "/models/game-console.glb";
 
+// Fetch the GLB alongside the video instead of after the video entry exists.
+if (typeof window !== "undefined") useLoader.preload(GLTFLoader, MODEL_PATH);
+
 /** Play in order, then loop the playlist. */
 const VIDEO_PLAYLIST = [
   "/videos/fight-console-game.mp4",
@@ -62,7 +65,6 @@ function acquireConsoleVideo(playlist: readonly string[]) {
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
-    // metadata only — avoid pulling full 5MB+ on mount
     video.preload = "metadata";
 
     const texture = new VideoTexture(video);
@@ -95,6 +97,8 @@ function warmNextConsoleClip(
     entry.warmer.load();
   }
   const warmer = document.createElement("video");
+  // Must match the player's CORS mode or the warmed bytes can't be reused.
+  warmer.crossOrigin = "anonymous";
   warmer.preload = "auto";
   warmer.muted = true;
   warmer.playsInline = true;

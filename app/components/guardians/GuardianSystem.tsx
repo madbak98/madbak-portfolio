@@ -3,41 +3,36 @@
 import {
   Component,
   Suspense,
+  useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
-import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Canvas, useLoader } from "@react-three/fiber";
 import { usePathname } from "next/navigation";
-import { useReducedMotion } from "motion/react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import { Guardian, type SharedGuardianInput } from "./Guardian";
-import { GUARDIAN, moodForRoute, SECTION_MOODS, type SectionMood } from "./guardian-motion";
+import { GundamCursor } from "./GundamCursor";
+import {
+  CURSOR_MEDIA,
+  EDITABLE_SELECTOR,
+  INTERACTIVE_SELECTOR,
+  type CursorInput,
+} from "./cursor-motion";
 import "./guardians.css";
 
 const MODEL_PATH = "/models/gundam-guardian.glb";
+/** Square canvas around the figure; leaves room for tilt and click motion. */
+const SHELL_PX = 168;
+/** MADLAB experiment pages run their own cursor-driven demos. */
+const HIDDEN_ROUTE = /^\/lab\/(?!tutorials(?:\/|$))[^/]+/;
 
-const HOME_SECTION_IDS = [
-  "hero",
-  "about",
-  "websites",
-  "madlab",
-  "contact",
-] as const;
+const ACTIVE_ATTR = "data-gundam-cursor";
+const TEXT_ATTR = "data-gundam-text";
 
-function mapHomeSectionToMoodKey(sectionId: string | null): string | null {
-  if (!sectionId) return null;
-  if (sectionId === "hero") return "home";
-  if (sectionId === "websites") return "works";
-  if (sectionId === "madlab") return "lab";
-  return sectionId;
-}
-
-class GuardianErrorBoundary extends Component<
-  { children: ReactNode },
+class CursorErrorBoundary extends Component<
+  { children: ReactNode; onError: () => void },
   { failed: boolean }
 > {
   state = { failed: false };
@@ -47,7 +42,7 @@ class GuardianErrorBoundary extends Component<
   }
 
   componentDidCatch() {
-    // Decorative only — never crash the page
+    this.props.onError();
   }
 
   render() {
@@ -56,25 +51,16 @@ class GuardianErrorBoundary extends Component<
   }
 }
 
-function GuardianWorld({
+function CursorScene({
   inputRef,
-  visible,
+  shellRef,
+  onReady,
 }: {
-  inputRef: React.MutableRefObject<SharedGuardianInput>;
-  visible: boolean;
+  inputRef: React.RefObject<CursorInput>;
+  shellRef: React.RefObject<HTMLDivElement | null>;
+  onReady: () => void;
 }) {
   const gltf = useLoader(GLTFLoader, MODEL_PATH);
-  const invalidate = useThree((s) => s.invalidate);
-  const source = useMemo(() => gltf.scene, [gltf]);
-  const animations = useMemo(() => gltf.animations ?? [], [gltf]);
-
-  useFrame((state) => {
-    inputRef.current.time = state.clock.elapsedTime;
-    if (visible && !inputRef.current.reducedMotion) {
-      invalidate();
-    }
-  });
-
   return (
     <>
       <ambientLight intensity={0.85} />
@@ -82,240 +68,155 @@ function GuardianWorld({
       <directionalLight position={[3.5, 5.5, 2.5]} intensity={1.55} />
       <directionalLight position={[-4, 2.5, 3]} intensity={0.55} color="#ffd7c2" />
       <directionalLight position={[0, 1, 5]} intensity={0.4} />
-      <Guardian
-        source={source}
-        animations={animations}
-        config={GUARDIAN}
+      <GundamCursor
+        source={gltf.scene}
         inputRef={inputRef}
-        visible={visible}
+        shellRef={shellRef}
+        onReady={onReady}
       />
     </>
   );
 }
 
 /**
- * Single Guardian — one model, one motion system.
- * Pointer-events none; never blocks Pet / nav / console.
+ * The Gundam as a site-wide 3D cursor. Visual layer only: pointer-events none,
+ * pointer state lives in refs, and the native/dot cursor behaviour is only
+ * changed while the model is actually rendering.
  */
 export function GuardianSystem() {
   const pathname = usePathname() || "/";
-  const prefersReduced = useReducedMotion();
-  const reducedMotion = Boolean(prefersReduced);
-  const [inView, setInView] = useState(true);
-  const [tabVisible, setTabVisible] = useState(true);
+  const hiddenRoute = HIDDEN_ROUTE.test(pathname);
+  const [supported, setSupported] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [ready, setReady] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
-
-  const inputRef = useRef<SharedGuardianInput>({
-    pointerX: 0,
-    pointerY: 0,
-    hasPointer: 0,
-    scrollVel: 0,
-    scrollDir: 0,
-    mood: SECTION_MOODS.home,
-    reducedMotion: false,
-    time: 0,
-    sizeScale: 1,
-    isMobile: false,
+  const inputRef = useRef<CursorInput>({
+    x: 0,
+    y: 0,
+    snap: true,
+    hover: false,
+    pressed: false,
+    released: false,
   });
 
-  const moodRef = useRef<SectionMood>(SECTION_MOODS.home);
-  const scrollRef = useRef({ lastY: 0, lastT: 0, vel: 0, dir: 0 });
+  const enabled = supported && !failed && !hiddenRoute;
+  const fail = useCallback(() => setFailed(true), []);
+  const markReady = useCallback(() => setReady(true), []);
 
   useEffect(() => {
-    inputRef.current.reducedMotion = reducedMotion;
-  }, [reducedMotion]);
-
-  useEffect(() => {
-    const syncSize = () => {
-      const w = window.innerWidth;
-      // Desktop 1 → tablet ~0.85 → mobile ~0.68 of already-reduced model
-      if (w < 480) {
-        inputRef.current.sizeScale = 0.65;
-        inputRef.current.isMobile = true;
-      } else if (w < 768) {
-        inputRef.current.sizeScale = 0.75;
-        inputRef.current.isMobile = true;
-      } else if (w < 1024) {
-        inputRef.current.sizeScale = 0.88;
-        inputRef.current.isMobile = false;
-      } else {
-        inputRef.current.sizeScale = 1;
-        inputRef.current.isMobile = false;
-      }
+    const fine = window.matchMedia(CURSOR_MEDIA);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setSupported(fine.matches && !reduce.matches);
+    sync();
+    fine.addEventListener("change", sync);
+    reduce.addEventListener("change", sync);
+    return () => {
+      fine.removeEventListener("change", sync);
+      reduce.removeEventListener("change", sync);
     };
-    syncSize();
-    window.addEventListener("resize", syncSize, { passive: true });
-    return () => window.removeEventListener("resize", syncSize);
   }, []);
 
   useEffect(() => {
-    const syncMood = (sectionId: string | null) => {
-      const mood = moodForRoute(pathname, sectionId);
-      moodRef.current = mood;
-      inputRef.current.mood = mood;
+    if (!enabled) return;
+    const root = document.documentElement;
+    const input = inputRef.current;
+    let inside = false;
+    let editable = false;
+
+    const syncVisible = () => {
+      const shell = shellRef.current;
+      if (shell) shell.dataset.visible = inside && !editable ? "true" : "false";
+      root.toggleAttribute(TEXT_ATTR, inside && editable);
     };
 
-    syncMood(null);
-
-    if (pathname !== "/" && pathname !== "") return;
-
-    const ratios = new Map<string, number>();
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const id = (entry.target as HTMLElement).id;
-          ratios.set(id, entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-        let best: string | null = null;
-        let bestR = 0;
-        ratios.forEach((r, id) => {
-          if (r > bestR) {
-            bestR = r;
-            best = id;
-          }
-        });
-        syncMood(mapHomeSectionToMoodKey(best));
-      },
-      { threshold: [0.12, 0.28, 0.45, 0.6], rootMargin: "-10% 0px -18% 0px" },
-    );
-
-    HOME_SECTION_IDS.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) io.observe(el);
-    });
-
-    const onScrollSections = () => {
-      let best: string | null = null;
-      let bestScore = -1;
-      HOME_SECTION_IDS.forEach((id) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const visible =
-          Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
-        if (visible > bestScore) {
-          bestScore = visible;
-          best = id;
-        }
-      });
-      syncMood(mapHomeSectionToMoodKey(best));
+    const classify = (target: EventTarget | null) => {
+      const el = target instanceof Element ? target : null;
+      editable = Boolean(el?.closest(EDITABLE_SELECTOR));
+      input.hover = !editable && Boolean(el?.closest(INTERACTIVE_SELECTOR));
+      syncVisible();
     };
-    window.addEventListener("scroll", onScrollSections, { passive: true });
-    onScrollSections();
 
-    return () => {
-      io.disconnect();
-      window.removeEventListener("scroll", onScrollSections);
-    };
-  }, [pathname]);
-
-  useEffect(() => {
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const syncPointerCapability = () => {
-      if (!fine.matches) {
-        inputRef.current.hasPointer = 0;
-        inputRef.current.pointerX = 0;
-        inputRef.current.pointerY = 0;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      input.x = e.clientX;
+      input.y = e.clientY;
+      if (!inside) {
+        inside = true;
+        input.snap = true;
+        classify(e.target);
+        setRunning(document.visibilityState === "visible");
       }
     };
-    syncPointerCapability();
-    fine.addEventListener("change", syncPointerCapability);
-
-    const onPointer = (e: PointerEvent) => {
-      if (!fine.matches) return;
-      const w = window.innerWidth || 1;
-      const h = window.innerHeight || 1;
-      inputRef.current.pointerX = (e.clientX / w) * 2 - 1;
-      inputRef.current.pointerY = -((e.clientY / h) * 2 - 1);
-      inputRef.current.hasPointer = 1;
+    const onOver = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") classify(e.target);
+    };
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" && e.button === 0) input.pressed = true;
+    };
+    const onUp = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || !input.pressed) return;
+      input.pressed = false;
+      input.released = true;
     };
     const onLeave = () => {
-      inputRef.current.hasPointer = 0;
+      inside = false;
+      input.pressed = false;
+      syncVisible();
+      setRunning(false);
+    };
+    const onVisibility = () => {
+      setRunning(inside && document.visibilityState === "visible");
     };
 
-    scrollRef.current.lastY = window.scrollY;
-    scrollRef.current.lastT = performance.now();
-
-    const onScroll = () => {
-      const now = performance.now();
-      const y = window.scrollY;
-      const dt = Math.max((now - scrollRef.current.lastT) / 1000, 1 / 120);
-      const dy = y - scrollRef.current.lastY;
-      const raw = Math.abs(dy) / dt / 1800;
-      scrollRef.current.vel =
-        scrollRef.current.vel * 0.72 + Math.min(raw, 1.4) * 0.28;
-      scrollRef.current.dir = dy === 0 ? 0 : dy > 0 ? 1 : -1;
-      scrollRef.current.lastY = y;
-      scrollRef.current.lastT = now;
-      inputRef.current.scrollVel = scrollRef.current.vel;
-      inputRef.current.scrollDir = scrollRef.current.dir;
-    };
-
-    let raf = 0;
-    const decay = () => {
-      scrollRef.current.vel *= 0.92;
-      if (scrollRef.current.vel < 0.02) {
-        scrollRef.current.vel = 0;
-        scrollRef.current.dir = 0;
-      }
-      inputRef.current.scrollVel = scrollRef.current.vel;
-      inputRef.current.scrollDir = scrollRef.current.dir;
-      raf = window.requestAnimationFrame(decay);
-    };
-    raf = window.requestAnimationFrame(decay);
-
-    window.addEventListener("pointermove", onPointer, { passive: true });
-    window.addEventListener("pointerleave", onLeave);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerover", onOver, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp, { passive: true });
+    window.addEventListener("pointercancel", onUp, { passive: true });
+    root.addEventListener("mouseleave", onLeave);
     window.addEventListener("blur", onLeave);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
-      fine.removeEventListener("change", syncPointerCapability);
-      window.removeEventListener("pointermove", onPointer);
-      window.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerover", onOver);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      root.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("blur", onLeave);
-      window.removeEventListener("scroll", onScroll);
-      window.cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibility);
+      root.removeAttribute(TEXT_ATTR);
+      input.hover = false;
+      input.pressed = false;
+      input.snap = true;
+      setRunning(false);
+      setReady(false);
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
-    const onVis = () => setTabVisible(document.visibilityState === "visible");
-    onVis();
-    document.addEventListener("visibilitychange", onVis);
+    if (!enabled || !ready) return;
+    const root = document.documentElement;
+    root.setAttribute(ACTIVE_ATTR, "");
+    return () => root.removeAttribute(ACTIVE_ATTR);
+  }, [enabled, ready]);
 
-    const el = shellRef.current;
-    let io: IntersectionObserver | null = null;
-    if (el && "IntersectionObserver" in window) {
-      io = new IntersectionObserver(
-        ([entry]) => setInView(Boolean(entry?.isIntersecting)),
-        { threshold: 0.01 },
-      );
-      io.observe(el);
-    }
-
-    return () => {
-      document.removeEventListener("visibilitychange", onVis);
-      io?.disconnect();
-    };
-  }, []);
-
-  const hideOnRoute = /^\/lab\/(?!tutorials(?:\/|$))[^/]+/.test(pathname);
-  if (hideOnRoute) return null;
-
-  const active = inView && tabVisible;
+  if (!enabled) return null;
 
   return (
     <div
       ref={shellRef}
-      className="site-guardians"
+      className="gundam-cursor"
       aria-hidden="true"
-      data-reduced={reducedMotion ? "true" : "false"}
+      data-visible="false"
+      style={{ width: SHELL_PX, height: SHELL_PX }}
     >
-      <GuardianErrorBoundary>
+      <CursorErrorBoundary onError={fail}>
         <Canvas
-          className="site-guardians__canvas"
-          dpr={[1, 1.5]}
+          className="gundam-cursor__canvas"
+          dpr={[1, 2]}
           gl={{
             alpha: true,
             antialias: true,
@@ -323,18 +224,19 @@ export function GuardianSystem() {
             premultipliedAlpha: false,
             failIfMajorPerformanceCaveat: false,
           }}
-          camera={{ position: [0, 0.35, 5.6], fov: 36, near: 0.1, far: 40 }}
-          frameloop={active && !reducedMotion ? "always" : "demand"}
+          camera={{ fov: 22, near: 0.01, far: 50, position: [0, 0, 6] }}
+          frameloop={running ? "always" : "never"}
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0);
+            gl.domElement.addEventListener("webglcontextlost", fail, { once: true });
           }}
           style={{ width: "100%", height: "100%", display: "block" }}
         >
           <Suspense fallback={null}>
-            <GuardianWorld inputRef={inputRef} visible={active} />
+            <CursorScene inputRef={inputRef} shellRef={shellRef} onReady={markReady} />
           </Suspense>
         </Canvas>
-      </GuardianErrorBoundary>
+      </CursorErrorBoundary>
     </div>
   );
 }

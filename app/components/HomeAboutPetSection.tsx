@@ -22,6 +22,9 @@ const GameConsole3D = dynamic(
   { ssr: false, loading: () => null },
 );
 
+/** Start pet + console well before the section scrolls in, so assets are warm. */
+const ACTIVATE_MARGIN_PX = 800;
+
 /**
  * Homepage #about — Pet/dialogue first; Game Console decorative & independent.
  */
@@ -49,8 +52,10 @@ export function HomeAboutPetSection() {
     // Immediate visibility check — IO alone can miss first paint / odd hosts
     const nearViewport = () => {
       const r = el.getBoundingClientRect();
-      const pad = 160;
-      return r.bottom > -pad && r.top < window.innerHeight + pad;
+      return (
+        r.bottom > -ACTIVATE_MARGIN_PX &&
+        r.top < window.innerHeight + ACTIVATE_MARGIN_PX
+      );
     };
     if (nearViewport()) activate();
 
@@ -60,7 +65,7 @@ export function HomeAboutPetSection() {
         ([entry]) => {
           if (entry?.isIntersecting) activate();
         },
-        { rootMargin: "160px 0px", threshold: 0.01 },
+        { rootMargin: `${ACTIVATE_MARGIN_PX}px 0px`, threshold: 0 },
       );
       io.observe(el);
     }
@@ -83,8 +88,8 @@ export function HomeAboutPetSection() {
   // Mount 3D only after Pet has committed — never share Suspense/load with Pet
   useEffect(() => {
     if (!active || consoleMount) return;
-    const t = window.setTimeout(() => setConsoleMount(true), 900);
-    return () => window.clearTimeout(t);
+    const id = window.requestAnimationFrame(() => setConsoleMount(true));
+    return () => window.cancelAnimationFrame(id);
   }, [active, consoleMount]);
 
   return (
